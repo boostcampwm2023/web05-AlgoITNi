@@ -7,6 +7,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   app.useGlobalInterceptors(new TimeoutInterceptor(configService));
-  await app.listen(3000);
+
+  const port = configService.get<number>('PORT');
+  await app.listen(port);
 }
 bootstrap();
