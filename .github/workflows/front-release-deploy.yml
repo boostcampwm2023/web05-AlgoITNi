@@ -10,10 +10,10 @@ jobs:
       matrix:
         node-version: [18.16.0]
     steps:
-      - name: 체크아웃
+      - name: ✅ 코드 체크아웃
         uses: actions/checkout@v3
 
-      - name: 의존성 설치
+      - name: ⬇️ 의존성 설치
         working-directory: ./frontEnd
         run: npm install
 
@@ -30,5 +30,6 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: '${{secrets.AWS_ACCESS_KEY_ID}}'
           AWS_SECRET_ACCESS_KEY: '${{secrets.AWS_SECRET_ACCESS_KEY}}'
+          AWS_DEFAULT_REGION: '${{secrets.AWS_DEFAULT_REGION}}'
         run: |
           aws --endpoint-url=https://kr.object.ncloudstorage.com s3 cp --recursive dist s3://algoitni
