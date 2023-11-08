@@ -11,7 +11,7 @@ jobs:
         node-version: [18.16.0]
     steps:
       - name: ✅ 유닛 테스트
-        working-directory: ./frontENd
+        working-directory: ./frontEnd
         run: npm test
 
       - name: 📦 프로젝트 빌드
