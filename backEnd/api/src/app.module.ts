@@ -1,9 +1,9 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { LoggerMiddleware } from './logger/logger.middleware';
+import { LoggerMiddleware } from './common/logger/logger.middleware';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TimeoutInterceptor } from './interceptor/timeout.intercetor';
+import { TimeoutInterceptor } from './common/interceptor/timeout.intercetor';
 import { SlackModule } from 'nestjs-slack-webhook';
 import { TypeOrmModule } from '@nestjs/typeorm';
 

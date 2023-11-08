@@ -3,7 +3,7 @@ import {
   HttpException,
   createParamDecorator,
 } from '@nestjs/common';
-import { ERRORS } from '../utils';
+import { ERRORS } from '../../utils';
 export const QueryRunner = createParamDecorator(
   (data, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
