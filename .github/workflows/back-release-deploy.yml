@@ -27,6 +27,7 @@ jobs:
           echo "DB_PASSWORD=${{secrets.DB_PASSWORD}}" >> .env
           echo "DB_DATABASE=${{secrets.DB_DATABASE}}" >> .env
           echo "SYNCHRONIZED=${{secrets.SYNCHRONIZED}}" >> .env
+          cat .env
 
       - name: ⬇️ 의존성 설치
         working-directory: ./backEnd/api
@@ -41,7 +42,7 @@ jobs:
         run: npm run build
       
       - name: 🐳 도커 로그인
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           username: ${{secrets.DOCKER_USERNAME}}
           password: ${{secrets.DOCKER_TOKEN}}
