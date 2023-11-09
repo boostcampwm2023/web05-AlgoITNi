@@ -1,19 +1,20 @@
-import { RTCConnectionList, createSocket } from '@/services/Socket';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createSocket } from '@/services/Socket';
+import { StreamObject, streamModel } from '@/stores/StreamModel';
 
 function StreamVideo({ stream }: { stream: MediaStream }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-
   useEffect(() => {
-    (videoRef.current as HTMLVideoElement).srcObject = stream;
+    if (!videoRef.current) return;
+    videoRef.current.srcObject = stream;
   }, []);
 
-  return <video ref={videoRef}></video>;
+  return <video key={stream.id} ref={videoRef} muted autoPlay />;
 }
 
 export default function Room() {
   const videoRef = useRef<HTMLVideoElement>(null);
-
+  const [stream, setStream] = useState<StreamObject[]>([]);
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({
@@ -21,14 +22,23 @@ export default function Room() {
       })
       .then((video) => {
         (videoRef.current as HTMLVideoElement).srcObject = video;
-        createSocket(video);
+        streamModel.subscribe(() => {
+          setStream(() => streamModel.getStream());
+        });
+        const socket = createSocket(video);
+        socket.connect();
+        socket.emit('join_room', {
+          room: '1234',
+        });
       });
   }, []);
 
   return (
     <div>
-      <video ref={videoRef} muted autoPlay></video>
-      {Object.entries(RTCConnectionList).map(([key, value]) => value.stream && <StreamVideo key={key} stream={value.stream} />)}
+      <video ref={videoRef} muted autoPlay />
+      {stream.map((item) => {
+        return <StreamVideo key={item.id} stream={item.stream} />;
+      })}
     </div>
   );
 }
