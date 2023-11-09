@@ -1,5 +1,5 @@
 FROM node:20.3.1-alpine3.18
-WORKDIR /home/app
+WORKDIR 가
 
 COPY . .
 RUN npm i -g pm2

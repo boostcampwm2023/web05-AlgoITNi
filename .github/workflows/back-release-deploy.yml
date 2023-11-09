@@ -14,10 +14,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name : ⚒️ pm2 설치
-        run: npm i pm2 -g
-
       - name : 🔐 env 설정
+        working-directory: ./backEnd/api
         run: |
           echo "WEB_HOOK_URL=${{secrets.WEB_HOOK_URL}}" >> .env
           echo "PORT=${{secrets.PORT}}" >> .env
@@ -27,7 +25,6 @@ jobs:
           echo "DB_PASSWORD=${{secrets.DB_PASSWORD}}" >> .env
           echo "DB_DATABASE=${{secrets.DB_DATABASE}}" >> .env
           echo "SYNCHRONIZED=${{secrets.SYNCHRONIZED}}" >> .env
-          cat .env
 
       - name: ⬇️ 의존성 설치
         working-directory: ./backEnd/api
@@ -60,4 +57,7 @@ jobs:
           username: ${{secrets.API_USERNAME}}
           password: ${{secrets.API_PASSWORD}}
           port: ${{secrets.API_PORT}}
-          script: sh deploy.sh
+          script: |
+            pwd
+            docker pull ${{secrets.DOCKER_USERNAME}}/api
+            docker run -d -p 4000:${{secrets.PORT}} ${{secrets.DOCKER_USERNAME}}/api
