@@ -6,8 +6,10 @@ import { SOCKET_EMIT_EVENT } from '@/constants/socketEvents';
 
 function StreamVideo({ stream }: { stream: MediaStream }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+
   useEffect(() => {
     if (!videoRef.current) return;
+
     videoRef.current.srcObject = stream;
   }, []);
 
@@ -25,11 +27,14 @@ export default function Room() {
         video: true,
       })
       .then((video) => {
-        (videoRef.current as HTMLVideoElement).srcObject = video;
+        if (videoRef.current) videoRef.current.srcObject = video;
+
         streamModel.subscribe(() => {
           setStreamList(() => streamModel.getStream());
         });
+
         const socket = createSocket(video);
+
         socket.connect();
         socket.emit(SOCKET_EMIT_EVENT.JOIN_ROOM, {
           room: roomId,
@@ -40,9 +45,9 @@ export default function Room() {
   return (
     <div>
       <video ref={videoRef} muted autoPlay />
-      {streamList.map(({ id, stream }) => {
-        return <StreamVideo key={id} stream={stream} />;
-      })}
+      {streamList.map(({ id, stream }) => (
+        <StreamVideo key={id} stream={stream} />
+      ))}
     </div>
   );
 }
