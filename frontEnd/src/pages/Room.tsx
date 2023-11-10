@@ -16,7 +16,7 @@ function StreamVideo({ stream }: { stream: MediaStream }) {
 
 export default function Room() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [stream, setStream] = useState<StreamObject[]>([]);
+  const [streamList, setStreamList] = useState<StreamObject[]>([]);
   const { roomId } = useParams();
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function Room() {
       .then((video) => {
         (videoRef.current as HTMLVideoElement).srcObject = video;
         streamModel.subscribe(() => {
-          setStream(() => streamModel.getStream());
+          setStreamList(() => streamModel.getStream());
         });
         const socket = createSocket(video);
         socket.connect();
@@ -40,8 +40,8 @@ export default function Room() {
   return (
     <div>
       <video ref={videoRef} muted autoPlay />
-      {stream.map((item) => {
-        return <StreamVideo key={item.id} stream={item.stream} />;
+      {streamList.map(({ id, stream }) => {
+        return <StreamVideo key={id} stream={stream} />;
       })}
     </div>
   );
