@@ -9,4 +9,5 @@ export const SOCKET_RECEIVE_EVENT = {
 export const SOCKET_EMIT_EVENT = {
   OFFER: 'offer',
   ANSWER: 'answer',
+  JOIN_ROOM: 'join_room',
 };

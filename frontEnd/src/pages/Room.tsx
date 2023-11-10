@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createSocket } from '@/services/Socket';
 import { StreamObject, streamModel } from '@/stores/StreamModel';
+import { SOCKET_EMIT_EVENT } from '@/constants/socketEvents';
 
 function StreamVideo({ stream }: { stream: MediaStream }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -27,7 +28,7 @@ export default function Room() {
         });
         const socket = createSocket(video);
         socket.connect();
-        socket.emit('join_room', {
+        socket.emit(SOCKET_EMIT_EVENT.JOIN_ROOM, {
           room: '1234',
         });
       });
