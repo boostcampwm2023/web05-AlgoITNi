@@ -10,6 +10,13 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TimeoutInterceptor(configService));
   app.useGlobalFilters(new ErrorFilter());
 
+  const origin = configService.get<string>('ALLOWED_ORIGIN');
+
+  app.enableCors({
+    origin: origin,
+    credentials: true,
+  });
+
   const port = configService.get<number>('PORT');
   await app.listen(port);
 }
