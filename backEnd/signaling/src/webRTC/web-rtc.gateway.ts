@@ -7,6 +7,15 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { JoinRoomDto } from './dto/join-room.dto';
+import { GetOfferDto } from './dto/get-offer.dto';
+import { GetAnswerDto } from './dto/get-answer.dto';
+import { GetIceCandidateDto } from './dto/get-ice.dto';
+import { PostAnswerDto } from './dto/post-answer.dto';
+import { PostIceCandidateDto } from './dto/post-ice.dto';
+import { PostOfferDto } from './dto/post-offer.dto';
+import { RoomUsersDto } from './dto/room-users.dto';
+import { UserIdDto } from './dto/user-id.dto copy';
 
 @WebSocketGateway({ namespace: 'signaling', cors: true })
 export class WebRtcGateway implements OnGatewayConnection {
@@ -23,7 +32,7 @@ export class WebRtcGateway implements OnGatewayConnection {
 
   @SubscribeMessage('join_room')
   handleJoin(
-    @MessageBody() data: { room: string },
+    @MessageBody() data: JoinRoomDto,
     @ConnectedSocket() socket: Socket,
   ) {
     const { room } = data;
@@ -39,63 +48,49 @@ export class WebRtcGateway implements OnGatewayConnection {
       this.users[room] = [{ id: socket.id }];
     }
     this.socketToRoom[socket.id] = room;
-
     socket.join(room);
 
     const users = this.users[room].filter((user) => user.id !== socket.id);
 
-    socket.emit('all_users', { users: users });
+    const roomUsersDto: RoomUsersDto = { users };
+
+    socket.emit('all_users', roomUsersDto);
   }
 
   @SubscribeMessage('offer')
   handleOffer(
     @MessageBody()
-    data: {
-      sdp: RTCSessionDescription;
-      offerSendId: string;
-      offerReceiveId: string;
-    },
+    data: GetOfferDto,
     @ConnectedSocket() socket: Socket,
   ) {
     const { sdp, offerSendId, offerReceiveId } = data;
-    socket.to(offerReceiveId).emit('getOffer', {
-      sdp: sdp,
-      offerSendId: offerSendId,
-    });
+    const postOfferDto: PostOfferDto = { sdp, offerSendId };
+    socket.to(offerReceiveId).emit('getOffer', postOfferDto);
   }
 
   @SubscribeMessage('answer')
   handleAnswer(
     @MessageBody()
-    data: {
-      sdp: RTCSessionDescription;
-      answerSendId: string;
-      answerReceiveId: string;
-    },
+    data: GetAnswerDto,
     @ConnectedSocket() socket: Socket,
   ) {
     const { sdp, answerSendId, answerReceiveId } = data;
-    socket.to(answerReceiveId).emit('getAnswer', {
-      sdp: sdp,
-      answerSendId: answerSendId,
-    });
+    const postAnswerDto: PostAnswerDto = { sdp, answerSendId };
+    socket.to(answerReceiveId).emit('getAnswer', postAnswerDto);
   }
 
   @SubscribeMessage('candidate')
   handleIceCandidate(
     @MessageBody()
-    data: {
-      candidate: any;
-      candidateSendId: string;
-      candidateReceiveId: string;
-    },
+    data: GetIceCandidateDto,
     @ConnectedSocket() socket: Socket,
   ) {
     const { candidate, candidateSendId, candidateReceiveId } = data;
-    socket.to(candidateReceiveId).emit('getCandidate', {
-      candidate: candidate,
-      candidateSendId: candidateSendId,
-    });
+    const postIceCandidateDto: PostIceCandidateDto = {
+      candidate,
+      candidateSendId,
+    };
+    socket.to(candidateReceiveId).emit('getCandidate', postIceCandidateDto);
   }
 
   @SubscribeMessage('disconnect')
@@ -109,6 +104,8 @@ export class WebRtcGateway implements OnGatewayConnection {
         delete this.users[roomID];
       }
     }
-    socket.to(roomID).emit('user_exit', { id: socket.id });
+    const id = socket.id;
+    const userIdDto: UserIdDto = { id };
+    socket.to(roomID).emit('user_exit', userIdDto);
   }
 }
