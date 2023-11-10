@@ -16,21 +16,22 @@ import { PostIceCandidateDto } from './dto/post-ice.dto';
 import { PostOfferDto } from './dto/post-offer.dto';
 import { RoomUsersDto } from './dto/room-users.dto';
 import { UserIdDto } from './dto/user-id.dto copy';
+import { SOCKET, SOCKET_EVENT } from 'src/common/utils';
 
-@WebSocketGateway({ namespace: 'signaling', cors: true })
+@WebSocketGateway({ namespace: SOCKET.NAME_SPACE, cors: true })
 export class WebRtcGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
 
   users = {};
   socketToRoom = {};
-  maximum = 4;
+  maximum = SOCKET.MAXIMUM;
 
   handleConnection(socket: Socket) {
     console.log(`on connect called : ${socket.id}`);
   }
 
-  @SubscribeMessage('join_room')
+  @SubscribeMessage(SOCKET_EVENT.JOIN_ROOM)
   handleJoin(
     @MessageBody() data: JoinRoomDto,
     @ConnectedSocket() socket: Socket,
@@ -40,7 +41,7 @@ export class WebRtcGateway implements OnGatewayConnection {
     if (this.users[room]) {
       const length = this.users[room].length;
       if (length === this.maximum) {
-        socket.emit('room_full');
+        socket.emit(SOCKET_EVENT.ROOM_FULL);
         return;
       }
       this.users[room].push({ id: socket.id });
@@ -54,10 +55,10 @@ export class WebRtcGateway implements OnGatewayConnection {
 
     const roomUsersDto: RoomUsersDto = { users };
 
-    socket.emit('all_users', roomUsersDto);
+    socket.emit(SOCKET_EVENT.ALL_USERS, roomUsersDto);
   }
 
-  @SubscribeMessage('offer')
+  @SubscribeMessage(SOCKET_EVENT.OFFER)
   handleOffer(
     @MessageBody()
     data: GetOfferDto,
@@ -65,10 +66,10 @@ export class WebRtcGateway implements OnGatewayConnection {
   ) {
     const { sdp, offerSendId, offerReceiveId } = data;
     const postOfferDto: PostOfferDto = { sdp, offerSendId };
-    socket.to(offerReceiveId).emit('getOffer', postOfferDto);
+    socket.to(offerReceiveId).emit(SOCKET_EVENT.GET_OFFER, postOfferDto);
   }
 
-  @SubscribeMessage('answer')
+  @SubscribeMessage(SOCKET_EVENT.ANSWER)
   handleAnswer(
     @MessageBody()
     data: GetAnswerDto,
@@ -76,10 +77,10 @@ export class WebRtcGateway implements OnGatewayConnection {
   ) {
     const { sdp, answerSendId, answerReceiveId } = data;
     const postAnswerDto: PostAnswerDto = { sdp, answerSendId };
-    socket.to(answerReceiveId).emit('getAnswer', postAnswerDto);
+    socket.to(answerReceiveId).emit(SOCKET_EVENT.GET_ANSWER, postAnswerDto);
   }
 
-  @SubscribeMessage('candidate')
+  @SubscribeMessage(SOCKET_EVENT.CANDIDATE)
   handleIceCandidate(
     @MessageBody()
     data: GetIceCandidateDto,
@@ -90,10 +91,12 @@ export class WebRtcGateway implements OnGatewayConnection {
       candidate,
       candidateSendId,
     };
-    socket.to(candidateReceiveId).emit('getCandidate', postIceCandidateDto);
+    socket
+      .to(candidateReceiveId)
+      .emit(SOCKET_EVENT.GET_CANDIDATE, postIceCandidateDto);
   }
 
-  @SubscribeMessage('disconnect')
+  @SubscribeMessage(SOCKET_EVENT.DISCONNECT)
   handleDisconnect(@ConnectedSocket() socket: Socket) {
     const roomID = this.socketToRoom[socket.id];
     let room = this.users[roomID];
@@ -106,6 +109,6 @@ export class WebRtcGateway implements OnGatewayConnection {
     }
     const id = socket.id;
     const userIdDto: UserIdDto = { id };
-    socket.to(roomID).emit('user_exit', userIdDto);
+    socket.to(roomID).emit(SOCKET_EVENT.USER_EXIT, userIdDto);
   }
 }
