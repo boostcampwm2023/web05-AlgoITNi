@@ -58,6 +58,4 @@ jobs:
           password: ${{secrets.API_PASSWORD}}
           port: ${{secrets.API_PORT}}
           script: |
-            pwd
-            docker pull ${{secrets.DOCKER_USERNAME}}/api
-            docker run -d -p 4000:${{secrets.PORT}} ${{secrets.DOCKER_USERNAME}}/api
+            bash deploy.sh >> /dev/deploy.log 2>&1
