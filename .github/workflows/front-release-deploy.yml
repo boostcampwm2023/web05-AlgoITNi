@@ -1,7 +1,7 @@
-name: frontEnd test deploy
+name: frontEnd CI/CD
 on:
-  pull_request:
-    branches: FE/release
+  push:
+    branches: [FE/release, main]
 jobs:
   build-test-deploy:
     runs-on: ubuntu-22.04
