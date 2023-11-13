@@ -54,8 +54,7 @@ export const createSocket = (localStream: MediaStream): Socket => {
   });
 
   socket.on(SOCKET_RECEIVE_EVENT.CANDIDATE, (data: { candidate: RTCIceCandidateInit; candidateSendId: string }) => {
-    if (RTCConnectionList[data.candidateSendId].remoteDescription)
-      RTCConnectionList[data.candidateSendId].addIceCandidate(new RTCIceCandidate(data.candidate));
+    RTCConnectionList[data.candidateSendId].addIceCandidate(new RTCIceCandidate(data.candidate));
   });
 
   socket.on(SOCKET_RECEIVE_EVENT.USER_EXIT, (data: { id: string }) => {
