@@ -1,7 +1,14 @@
+import { v4 as uuidv4 } from 'uuid';
+import { useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 
 export default function Home() {
-  const handleClick = () => {};
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    const roomId = uuidv4();
+    navigate(`/${roomId}`);
+  };
 
   return (
     <div className="h-[100vh] w-[100vw] bg-backgroundColor flex justify-center items-center py-[10vw] ">
