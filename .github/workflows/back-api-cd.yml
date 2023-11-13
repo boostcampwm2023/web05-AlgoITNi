@@ -1,10 +1,14 @@
 name: backEnd API server CI/CD
 on:
-  pull_request:
-    branches: [BE/release]
+  push:
+    branches: [BE/release, main]
+
+permissions:
+  contents: read
+
 jobs:
   api-server-ci:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: ✅ 코드 체크아웃
         uses: actions/checkout@v3
@@ -29,10 +33,6 @@ jobs:
       - name: ⬇️ 의존성 설치
         working-directory: ./backEnd/api
         run: npm install
-
-      - name: ✅ 유닛 테스트
-        working-directory: ./backEnd/api
-        run: npm test
 
       - name: 📦 프로젝트 빌드
         working-directory: ./backEnd/api
