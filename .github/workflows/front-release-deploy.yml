@@ -25,11 +25,15 @@ jobs:
         working-directory: ./frontEnd
         run: npm run build
 
-      - name: ⬆️ Object Storage 업로드
+      - name: ⬆️ S3업로드
         working-directory: ./frontEnd
         env:
           AWS_ACCESS_KEY_ID: '${{secrets.AWS_ACCESS_KEY_ID}}'
           AWS_SECRET_ACCESS_KEY: '${{secrets.AWS_SECRET_ACCESS_KEY}}'
           AWS_DEFAULT_REGION: '${{secrets.AWS_DEFAULT_REGION}}'
         run: |
-          aws --endpoint-url=https://kr.object.ncloudstorage.com s3 cp --recursive dist s3://algoitni
+          aws s3 sync ./dist s3://algoitni-deploy
+
+      - name: 🔄️ Cloudfront edge 로케이션에 대한 캐시 무효화
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{secrets.AWS_CLOUD_FRONT_ID}} --paths "/*"
