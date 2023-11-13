@@ -1,15 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { TimeoutInterceptor } from './common/interceptor/timeout.intercetor';
 import { ConfigService } from '@nestjs/config';
-import { ErrorFilter } from './common/exception/exception.filter';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
-  app.useGlobalInterceptors(new TimeoutInterceptor(configService));
-  app.useGlobalFilters(new ErrorFilter());
 
+  app.useWebSocketAdapter(new IoAdapter(app));
+
+  const configService = app.get(ConfigService);
+
+  const port = configService.get<number>('PORT');
   const origin = configService.get<string>('ALLOWED_ORIGIN');
 
   app.enableCors({
@@ -17,7 +18,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const port = configService.get<number>('PORT');
   await app.listen(port);
 }
 bootstrap();
