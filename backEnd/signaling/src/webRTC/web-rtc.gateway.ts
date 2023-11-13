@@ -17,9 +17,11 @@ import { PostOfferDto } from './dto/post-offer.dto';
 import { RoomUsersDto } from './dto/room-users.dto';
 import { UserIdDto } from './dto/user-id.dto copy';
 import { SOCKET, SOCKET_EVENT } from 'src/common/utils';
+import { Logger } from '@nestjs/common';
 
 @WebSocketGateway({ namespace: SOCKET.NAME_SPACE, cors: true })
 export class WebRtcGateway implements OnGatewayConnection {
+  private readonly logger = new Logger();
   @WebSocketServer()
   server: Server;
 
@@ -28,7 +30,7 @@ export class WebRtcGateway implements OnGatewayConnection {
   maximum = SOCKET.MAXIMUM;
 
   handleConnection(socket: Socket) {
-    console.log(`on connect called : ${socket.id}`);
+    this.logger.log(`on connect called : ${socket.id}`);
   }
 
   @SubscribeMessage(SOCKET_EVENT.JOIN_ROOM)
@@ -37,7 +39,6 @@ export class WebRtcGateway implements OnGatewayConnection {
     @ConnectedSocket() socket: Socket,
   ) {
     const { room } = data;
-
     if (this.users[room]) {
       const length = this.users[room].length;
       if (length === this.maximum) {
