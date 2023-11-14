@@ -12,6 +12,10 @@ export default {
     fontFamily: {
       Pretendard: 'Pretendard-Regular',
     },
+    screens: {
+      mobile: { min: '360px', max: '767px' },
+      pc: { min: '768px' },
+    },
   },
   plugins: [],
 };
