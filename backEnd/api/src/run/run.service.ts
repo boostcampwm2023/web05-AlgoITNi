@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { returnCode } from '../common/returnCode';
 import { RequestCodeblockDto } from './dto/request-codeblock.dto';
 import axios from 'axios';
@@ -8,6 +8,8 @@ import * as path from 'path';
 
 @Injectable()
 export class RunService {
+  private readonly logger = new Logger('RunService');
+
   constructor(private readonly configService: ConfigService) {}
   securityCheck(data) {
     // 모듈 제한
@@ -36,7 +38,10 @@ export class RunService {
 
     // check
     for (const pattern of [...blockModulesPattern, ...inputPattern]) {
-      if (pattern.test(data)) return returnCode['vulnerable'];
+      if (pattern.test(data)) {
+        this.logger.warn(`⚠️Invalid Code Requested⚠️\n${data}`);
+        return returnCode['vulnerable'];
+      }
     }
 
     return returnCode['safe'];
