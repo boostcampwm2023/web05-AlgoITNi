@@ -32,7 +32,14 @@ const useRoom = (roomId: string) => {
 
   const createPeerConnection = (socketId: string): RTCPeerConnection => {
     const RTCConnection = new RTCPeerConnection({
-      iceServers: [{ urls: 'stun:stun.1.google.com:19302' }],
+      iceServers: [
+        { urls: import.meta.env.VITE_STUN_URL },
+        {
+          urls: import.meta.env.VITE_TURN_URL,
+          username: import.meta.env.VITE_TURN_USERNAME,
+          credential: import.meta.env.VITE_TURN_CREDENTIAL,
+        },
+      ],
     });
 
     const newDataChannel = RTCConnection.createDataChannel('edit', { negotiated: true, id: 0 });
