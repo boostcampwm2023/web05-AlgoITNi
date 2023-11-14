@@ -1,13 +1,13 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { CodesService } from './codes.service';
-import { CodeDto } from './dto/code.dto';
+import { RequestCodeDto } from './dto/request-code.dto';
 
 @Controller('codes')
 export class CodesController {
   constructor(private readonly codesService: CodesService) {}
 
   @Post('/python')
-  async runPython(@Body() data: CodeDto) {
+  async runPython(@Body() data: RequestCodeDto) {
     return await this.codesService.testCode(data.code);
   }
 
