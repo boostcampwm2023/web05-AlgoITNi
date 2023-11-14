@@ -21,6 +21,15 @@ jobs:
         working-directory: ./frontEnd
         run: npm test
 
+      - name: ⚙️ env 설정
+        working-directory: ./frontEnd
+        run: |
+          touch .env.production
+          echo "VITE_SOCKET_URL=${{secrets.VITE_SOCKET_URL}}" >> .env
+          echo "VITE_API_URL=${{secrets.VITE_API_URL}}" >> .env
+          echo "VITE_TURN_URL=${{secrets.VITE_TURN_URL}}" >> .env
+          echo "VITE_STUN_URL=${{secrets.VITE_STUN_URL}}" >> .env
+
       - name: 📦 프로젝트 빌드
         working-directory: ./frontEnd
         run: npm run build
