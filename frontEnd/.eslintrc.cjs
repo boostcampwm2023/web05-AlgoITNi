@@ -26,5 +26,6 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'import/extensions': ['off'],
     'react-hooks/exhaustive-deps': 'off',
+    'no-param-reassign': 'off',
   },
 };
