@@ -2,9 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { returnCode } from '../common/returnCode';
 import { RequestCodeblockDto } from './dto/request-codeblock.dto';
 import axios from 'axios';
+import { ConfigService } from '@nestjs/config';
+import { requestPath } from '../common/utils';
+import * as path from 'path';
 
 @Injectable()
 export class RunService {
+  constructor(private readonly configService: ConfigService) {}
   securityCheck(data) {
     // 모듈 제한
     const blockedModules = [
@@ -39,7 +43,14 @@ export class RunService {
   }
 
   async requestRunning(codeBlock: RequestCodeblockDto) {
-    const result = await axios.post('http://localhost:4001', codeBlock);
+    const result = await axios.post(
+      'http://' +
+        path.join(
+          this.configService.get<string>('RUNNING_SERVER'),
+          requestPath.RUN_PYTHON,
+        ),
+      codeBlock,
+    );
     return result.data;
   }
 }
