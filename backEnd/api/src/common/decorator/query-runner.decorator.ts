@@ -1,18 +1,11 @@
-import {
-  ExecutionContext,
-  HttpException,
-  createParamDecorator,
-} from '@nestjs/common';
-import { ERRORS } from '../../utils';
+import { ExecutionContext, createParamDecorator } from '@nestjs/common';
+import { TransactionInterceptorRequired } from '../exception/exception';
 export const QueryRunner = createParamDecorator(
   (data, context: ExecutionContext) => {
     const request = context.switchToHttp().getRequest();
 
     if (!request.queryRunner) {
-      new HttpException(
-        ERRORS.TRANSACTION_INTERCEPTOR_REQUIRED.message,
-        ERRORS.TRANSACTION_INTERCEPTOR_REQUIRED.statusCode,
-      );
+      new TransactionInterceptorRequired();
     }
 
     return request.queryRunner;

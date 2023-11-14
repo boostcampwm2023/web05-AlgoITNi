@@ -6,6 +6,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TimeoutInterceptor } from './common/interceptor/timeout.intercetor';
 import { SlackModule } from 'nestjs-slack-webhook';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { RunningModule } from './running/running.module';
+import { RunModule } from './run/run.module';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         logging: ['query', 'error'],
       }),
     }),
+    RunModule,
   ],
   controllers: [AppController],
   providers: [AppService, TimeoutInterceptor],
