@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
-export class ForbiddenException extends HttpException {
+export class VulnerableException extends HttpException {
   constructor() {
-    super('Forbidden', HttpStatus.FORBIDDEN);
+    super('This code is not allowed', HttpStatus.FORBIDDEN);
   }
 }
 
