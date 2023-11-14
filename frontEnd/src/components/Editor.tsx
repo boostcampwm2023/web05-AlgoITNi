@@ -1,27 +1,24 @@
 import { useEffect, useState } from 'react';
 
 export default function Editor({ value, onChange }: { value: string; onChange: React.ChangeEventHandler<HTMLTextAreaElement> }) {
-  const [text, setText] = useState<string>('');
   const [lines, setLines] = useState<string[]>([]);
 
   useEffect(() => {
-    // 텍스트가 변경될 때마다 줄 번호를 업데이트
-    setLines(text.split('\n'));
-  }, [text]);
+    setLines(value.split('\n'));
+  }, [value]);
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(event);
-    setText(event.target.value);
   };
 
   return (
     <div className="w-full h-full rounded-lg bg-mainColor font-Pretendard">
       <h1 className="p-2 text-white border-b border-white h-[5%] text-xs">Solution.py</h1>
-      <div className="flex flex-col overflow-auto h-[65%]">
+      <div className="flex flex-col overflow-auto h-[65%] custom-scroll">
         <div className="flex flex-grow">
-          <div className="w-10 py-2 pr-2 border-r border-white">
+          <div className="w-10 py-2 pr-2 overflow-hidden border-r border-white">
             {lines.map((_, index) => (
-              <div key={index} className="flex justify-end ">
+              <div key={index} className="flex justify-end">
                 <span className="leading-7 text-gray-400">{index + 1}</span>
               </div>
             ))}
@@ -29,7 +26,7 @@ export default function Editor({ value, onChange }: { value: string; onChange: R
           <textarea
             value={value}
             onChange={handleChange}
-            className="w-full p-2 leading-7 text-white resize-none focus:outline-none bg-mainColor"
+            className="w-full p-2 pb-0 overflow-hidden overflow-x-scroll leading-7 text-white resize-none custom-scroll whitespace-nowrap focus:outline-none bg-mainColor"
           />
         </div>
       </div>
