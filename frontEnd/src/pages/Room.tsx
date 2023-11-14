@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useRoom from '@/hooks/useRoom';
+import Editor from '@/components/Editor';
 
 function StreamVideo({ stream }: { stream: MediaStream }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -44,7 +45,9 @@ export default function Room() {
       {streamList.map(({ id, stream }) => (
         <StreamVideo key={id} stream={stream} />
       ))}
-      <textarea onChange={handleChange} value={text} />
+      <div className="w-[700px] h-[600px]">
+        <Editor onChange={handleChange} value={text} />
+      </div>
     </div>
   );
 }
