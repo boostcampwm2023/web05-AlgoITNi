@@ -13,17 +13,17 @@ jest.mock('react-router-dom', () => ({
 }));
 
 describe('Home 테스트', () => {
-  it('방생성 클릭시, uuid를 url로 갖는 새로운 방을 생성하고, 해당 방 url로 이동한다.', async () => {
+  it('방생성 클릭시, uuid를 url로 갖는 새로운 방을 생성하고, 해당 방 url로 이동한다.', () => {
     render(<Home />);
-    await fireEvent.click(screen.getByText('방생성'));
+    fireEvent.click(screen.getByText('방생성'));
     expect(mockNavigate).toHaveBeenCalledWith('/test');
   });
 
-  it('참가 클릭시, input입력창에 입력한 url을 가진 방으로 이동한다.', async () => {
+  it('참가 클릭시, input입력창에 입력한 url을 가진 방으로 이동한다.', () => {
     render(<Home />);
     const input = screen.getByPlaceholderText('');
     fireEvent.change(input, { target: { value: 'inputValue' } });
-    await fireEvent.click(screen.getByText('참여'));
+    fireEvent.click(screen.getByText('참여'));
     expect(mockNavigate).toHaveBeenCalledWith('/inputValue');
   });
 });
