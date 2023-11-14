@@ -6,6 +6,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TimeoutInterceptor } from './common/interceptor/timeout.intercetor';
 import { SlackModule } from 'nestjs-slack-webhook';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
+import { WinstonLogger } from './common/logger/winstonLogger.service';
 
 @Module({
   imports: [
@@ -34,9 +36,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         logging: ['query', 'error'],
       }),
     }),
+    UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService, TimeoutInterceptor],
+  providers: [AppService, TimeoutInterceptor, WinstonLogger],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

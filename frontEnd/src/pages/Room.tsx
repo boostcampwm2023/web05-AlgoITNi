@@ -1,8 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { createSocket } from '@/services/Socket';
-import { StreamObject, streamModel } from '@/stores/StreamModel';
-import { SOCKET_EMIT_EVENT } from '@/constants/socketEvents';
+import useRoom from '@/hooks/useRoom';
 
 function StreamVideo({ stream }: { stream: MediaStream }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -17,30 +15,8 @@ function StreamVideo({ stream }: { stream: MediaStream }) {
 }
 
 export default function Room() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [streamList, setStreamList] = useState<StreamObject[]>([]);
   const { roomId } = useParams();
-
-  useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: true,
-      })
-      .then((video) => {
-        if (videoRef.current) videoRef.current.srcObject = video;
-
-        streamModel.subscribe(() => {
-          setStreamList(() => streamModel.getStream());
-        });
-
-        const socket = createSocket(video);
-
-        socket.connect();
-        socket.emit(SOCKET_EMIT_EVENT.JOIN_ROOM, {
-          room: roomId,
-        });
-      });
-  }, []);
+  const { videoRef, streamList } = useRoom(roomId as string);
 
   return (
     <div>

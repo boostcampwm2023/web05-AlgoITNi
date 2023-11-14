@@ -2,11 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import { WinstonLogger } from './common/logger/winstonLogger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useWebSocketAdapter(new IoAdapter(app));
+  app.useLogger(app.get(WinstonLogger));
 
   const configService = app.get(ConfigService);
 
@@ -17,7 +19,6 @@ async function bootstrap() {
     origin: origin,
     credentials: true,
   });
-
   await app.listen(port);
 }
 bootstrap();

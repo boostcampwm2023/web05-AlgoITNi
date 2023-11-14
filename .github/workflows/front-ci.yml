@@ -1,7 +1,7 @@
-name: frontEnd CI/CD
+name: frontEnd CI
 on:
-  push:
-    branches: [FE/release, main]
+  pull_request:
+    branches: [FE/release, dev, main]
 jobs:
   build-test-deploy:
     runs-on: ubuntu-22.04
@@ -33,20 +33,3 @@ jobs:
       - name: 📦 프로젝트 빌드
         working-directory: ./frontEnd
         run: npm run build
-
-      - name: ⬆️ S3업로드
-        working-directory: ./frontEnd
-        env:
-          AWS_ACCESS_KEY_ID: '${{secrets.AWS_ACCESS_KEY_ID}}'
-          AWS_SECRET_ACCESS_KEY: '${{secrets.AWS_SECRET_ACCESS_KEY}}'
-          AWS_DEFAULT_REGION: '${{secrets.AWS_DEFAULT_REGION}}'
-        run: |
-          aws s3 sync ./dist s3://algoitni-deploy
-
-      - name: 🔄️ Cloudfront edge 로케이션에 대한 캐시 무효화
-        env:
-          AWS_ACCESS_KEY_ID: '${{secrets.AWS_ACCESS_KEY_ID}}'
-          AWS_SECRET_ACCESS_KEY: '${{secrets.AWS_SECRET_ACCESS_KEY}}'
-          AWS_DEFAULT_REGION: '${{secrets.AWS_DEFAULT_REGION}}'
-        run: |
-          aws cloudfront create-invalidation --distribution-id ${{secrets.AWS_CLOUD_FRONT_ID}} --paths "/*"
