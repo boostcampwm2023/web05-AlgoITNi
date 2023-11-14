@@ -32,6 +32,7 @@ export default function Home() {
             방생성
           </Button>
           <input
+            placeholder=""
             className="rounded-2xl font-Pretendard px-[1.6vw] py-[14px] text-[1.5vw] w-3/5"
             value={inputValue}
             onChange={onChange}
