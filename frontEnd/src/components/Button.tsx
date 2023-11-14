@@ -1,6 +1,12 @@
 import { ReactNode } from 'react';
 
-export default function Button({ children, onClick, fontSize }: { children: ReactNode; onClick: () => void; fontSize: string }) {
+type ButtonProps = {
+  children: ReactNode;
+  onClick: () => void;
+  fontSize: string;
+};
+
+export default function Button({ children, onClick, fontSize }: ButtonProps) {
   return (
     <button
       type="button"
