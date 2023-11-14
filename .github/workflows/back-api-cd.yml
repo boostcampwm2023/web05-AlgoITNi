@@ -1,4 +1,4 @@
-name: backEnd API server CI/CD
+name: backEnd API server CD
 on:
   push:
     branches: [BE/release, main]
