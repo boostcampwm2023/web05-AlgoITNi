@@ -4,12 +4,11 @@ import { SOCKET_EMIT_EVENT, SOCKET_RECEIVE_EVENT } from '@/constants/socketEvent
 import { SOCKET_URL } from '@/constants/urls';
 
 const useRoom = (roomId: string) => {
-  const [RTCConnections, setRTCConnections] = useState<Record<string, RTCPeerConnection>>({});
   const [streamList, setStreamList] = useState<{ id: string; stream: MediaStream }[]>([]);
   const videoRef = useRef<HTMLVideoElement>(null);
   const localStream = useRef<MediaStream | null>(null);
 
-  const tempRTCConnections: Record<string, RTCPeerConnection> = {};
+  const RTCConnections: Record<string, RTCPeerConnection> = {};
 
   const socket = io(SOCKET_URL);
 
@@ -59,10 +58,10 @@ const useRoom = (roomId: string) => {
 
   socket.on(SOCKET_RECEIVE_EVENT.ALL_USERS, async (data: { users: Array<{ id: string }> }) => {
     data.users.forEach((user) => {
-      tempRTCConnections[user.id] = createPeerConnection(user.id);
+      RTCConnections[user.id] = createPeerConnection(user.id);
     });
 
-    Object.entries(tempRTCConnections).forEach(async ([key, value]) => {
+    Object.entries(RTCConnections).forEach(async ([key, value]) => {
       const offer = await value.createOffer({
         offerToReceiveAudio: true,
         offerToReceiveVideo: true,
@@ -79,16 +78,16 @@ const useRoom = (roomId: string) => {
   });
 
   socket.on(SOCKET_RECEIVE_EVENT.OFFER, async (data: { sdp: RTCSessionDescription; offerSendId: string }) => {
-    tempRTCConnections[data.offerSendId] = createPeerConnection(data.offerSendId);
+    RTCConnections[data.offerSendId] = createPeerConnection(data.offerSendId);
 
-    await tempRTCConnections[data.offerSendId].setRemoteDescription(new RTCSessionDescription(data.sdp));
+    await RTCConnections[data.offerSendId].setRemoteDescription(new RTCSessionDescription(data.sdp));
 
-    const answer = await tempRTCConnections[data.offerSendId].createAnswer({
+    const answer = await RTCConnections[data.offerSendId].createAnswer({
       offerToReceiveAudio: true,
       offerToReceiveVideo: true,
     });
 
-    await tempRTCConnections[data.offerSendId].setLocalDescription(new RTCSessionDescription(answer));
+    await RTCConnections[data.offerSendId].setLocalDescription(new RTCSessionDescription(answer));
 
     socket.emit(SOCKET_EMIT_EVENT.ANSWER, {
       sdp: answer,
@@ -98,23 +97,18 @@ const useRoom = (roomId: string) => {
   });
 
   socket.on(SOCKET_RECEIVE_EVENT.ANSWER, (data: { sdp: RTCSessionDescription; answerSendId: string }) => {
-    tempRTCConnections[data.answerSendId].setRemoteDescription(new RTCSessionDescription(data.sdp));
-
-    setRTCConnections(tempRTCConnections);
+    RTCConnections[data.answerSendId].setRemoteDescription(new RTCSessionDescription(data.sdp));
   });
 
   socket.on(SOCKET_RECEIVE_EVENT.CANDIDATE, (data: { candidate: RTCIceCandidateInit; candidateSendId: string }) => {
-    tempRTCConnections[data.candidateSendId].addIceCandidate(new RTCIceCandidate(data.candidate));
-
-    setRTCConnections(tempRTCConnections);
+    RTCConnections[data.candidateSendId].addIceCandidate(new RTCIceCandidate(data.candidate));
   });
 
   socket.on(SOCKET_RECEIVE_EVENT.USER_EXIT, (data: { id: string }) => {
-    tempRTCConnections[data.id].close();
-    delete tempRTCConnections[data.id];
+    RTCConnections[data.id].close();
+    delete RTCConnections[data.id];
 
     setStreamList((prev) => prev.filter((stream) => stream.id !== data.id));
-    setRTCConnections(tempRTCConnections);
   });
 
   return { videoRef, socket, RTCConnections, streamList };
