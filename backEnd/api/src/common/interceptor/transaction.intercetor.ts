@@ -4,11 +4,10 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
-  HttpException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { ERRORS } from 'src/utils';
+import { TransactionRollback } from '../exception/exception';
 
 @Injectable()
 export class TransactionInterceptor implements NestInterceptor {
@@ -32,10 +31,7 @@ export class TransactionInterceptor implements NestInterceptor {
       catchError(async (e) => {
         await qr.rollbackTransaction();
         await qr.release();
-        throw new HttpException(
-          ERRORS.TRANSACTION_ROLLBACK.message,
-          ERRORS.TRANSACTION_ROLLBACK.statusCode,
-        );
+        throw new TransactionRollback();
       }),
       tap(async () => {
         await qr.commitTransaction();

@@ -4,6 +4,8 @@ import { SOCKET_EMIT_EVENT, SOCKET_RECEIVE_EVENT } from '@/constants/socketEvent
 
 const useRoom = (roomId: string) => {
   const [streamList, setStreamList] = useState<{ id: string; stream: MediaStream }[]>([]);
+  const [dataChannels, setDataChannels] = useState<{ id: string; dataChannel: RTCDataChannel }[]>([]);
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const localStream = useRef<MediaStream | null>(null);
 
@@ -32,6 +34,9 @@ const useRoom = (roomId: string) => {
     const RTCConnection = new RTCPeerConnection({
       iceServers: [{ urls: 'stun:stun.1.google.com:19302' }],
     });
+
+    const newDataChannel = RTCConnection.createDataChannel('edit', { negotiated: true, id: 0 });
+    setDataChannels((prev) => [...prev, { id: socketId, dataChannel: newDataChannel }]);
 
     if (localStream.current) {
       localStream.current.getTracks().forEach((track) => {
@@ -107,10 +112,11 @@ const useRoom = (roomId: string) => {
     RTCConnections[data.id].close();
     delete RTCConnections[data.id];
 
+    setDataChannels((prev) => prev.filter(({ id }) => id !== data.id));
     setStreamList((prev) => prev.filter((stream) => stream.id !== data.id));
   });
 
-  return { videoRef, socket, RTCConnections, streamList };
+  return { videoRef, socket, RTCConnections, streamList, dataChannels };
 };
 
 export default useRoom;
