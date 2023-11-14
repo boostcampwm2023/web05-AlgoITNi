@@ -39,6 +39,7 @@
     "dotenv": "^16.3.1",
     "express-session": "^1.17.3",
     "mysql2": "^3.6.1",
+    "nest-winston": "^1.9.4",
     "nestjs-slack": "^2.0.0",
     "nestjs-slack-webhook": "^10.2.0",
     "passport": "^0.6.0",
@@ -47,7 +48,9 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "socket.io": "^4.7.2",
-    "typeorm": "^0.3.17"
+    "typeorm": "^0.3.17",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -91,5 +94,11 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "eslint"
+    ]
   }
 }
