@@ -29,6 +29,8 @@ jobs:
           echo "DB_PASSWORD=${{secrets.DB_PASSWORD}}" >> .env
           echo "DB_DATABASE=${{secrets.DB_DATABASE}}" >> .env
           echo "SYNCHRONIZED=${{secrets.SYNCHRONIZED}}" >> .env
+          echo "NODE_ENV=production" >> .env
+          echo "RUNNING_SERVER=${{secrets.RUNNING_SERVER_URL}} >> .env
 
       - name: ⬇️ 의존성 설치
         working-directory: ./backEnd/api
