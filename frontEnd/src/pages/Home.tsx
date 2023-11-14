@@ -21,7 +21,7 @@ export default function Home() {
   };
 
   return (
-    <div className="h-[100vh] w-[100vw] bg-backgroundColor flex justify-center items-center py-[10vw] ">
+    <div className="h-screen w-screen bg-backgroundColor flex justify-center items-center py-[10vw] ">
       <div className="flex flex-col basis-2/4 pc:gap-[130px] mobile:gap-[50px] justify-center items-center ">
         <div className="flex flex-col justify-center">
           <div className="text-[8.8vw] font-bold font-Pretendard ">AlgoITNi</div>
