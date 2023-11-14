@@ -28,7 +28,11 @@ jobs:
           echo "VITE_SOCKET_URL=${{secrets.VITE_SOCKET_URL}}" >> .env
           echo "VITE_API_URL=${{secrets.VITE_API_URL}}" >> .env
           echo "VITE_TURN_URL=${{secrets.VITE_TURN_URL}}" >> .env
+          echo "VITE_TURN_USERNAME=${{secrets.VITE_TURN_USERNAME}}" >> .env
+          echo "VITE_TURN_CREDENTIAL=${{secrets.VITE_TURN_CREDENTIAL}}" >> .env
           echo "VITE_STUN_URL=${{secrets.VITE_STUN_URL}}" >> .env
+          echo "VITE_STUN_USERNAME=${{secrets.VITE_STUN_USERNAME}}" >> .env
+          echo "VITE_STUN_CREDENTIAL=${{secrets.VITE_STUN_CREDENTIAL}}" >> .env
 
       - name: 📦 프로젝트 빌드
         working-directory: ./frontEnd
