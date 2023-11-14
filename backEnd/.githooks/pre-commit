@@ -1,0 +1,12 @@
+#!/bin/sh
+
+echo "backEnd Git Hook"
+cd ./backEnd/api
+npx lint-staged
+
+cd ../running
+npx lint-staged
+
+cd ../signaling
+npx lint-staged
+
