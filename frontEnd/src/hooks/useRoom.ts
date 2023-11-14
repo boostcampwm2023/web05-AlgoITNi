@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client/debug';
 import { SOCKET_EMIT_EVENT, SOCKET_RECEIVE_EVENT } from '@/constants/socketEvents';
-import { SOCKET_URL } from '@/constants/urls';
 
 const useRoom = (roomId: string) => {
   const [streamList, setStreamList] = useState<{ id: string; stream: MediaStream }[]>([]);
@@ -10,7 +9,7 @@ const useRoom = (roomId: string) => {
 
   const RTCConnections: Record<string, RTCPeerConnection> = {};
 
-  const socket = io(SOCKET_URL);
+  const socket = io(`${import.meta.env.VITE_SOCKET_URL}`);
 
   useEffect(() => {
     navigator.mediaDevices
