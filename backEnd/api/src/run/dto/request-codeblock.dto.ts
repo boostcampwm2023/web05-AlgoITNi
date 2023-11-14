@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class GetCodeBlockDto {
+export class RequestCodeblockDto {
   @IsString()
-  data: string;
+  code: string;
 }

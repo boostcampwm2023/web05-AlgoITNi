@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { returnCode } from '../common/returnCode';
+import { RequestCodeblockDto } from './dto/request-codeblock.dto';
+import axios from 'axios';
 
 @Injectable()
 export class RunService {
@@ -34,5 +36,10 @@ export class RunService {
     }
 
     return returnCode['safe'];
+  }
+
+  async requestRunning(codeBlock: RequestCodeblockDto) {
+    const result = await axios.post('http://localhost:4001', codeBlock);
+    return result.data;
   }
 }
