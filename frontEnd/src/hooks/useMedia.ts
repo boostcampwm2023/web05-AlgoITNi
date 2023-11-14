@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 export default function useMedia() {
-  const [userVideo, setUserVideo] = useState<MediaStream>();
+  const [userStream, setUserStream] = useState<MediaStream>();
   const [cameraList, setCameraList] = useState<MediaDeviceInfo[]>();
   const [micList, setMicList] = useState<MediaDeviceInfo[]>();
   const [speakerList, setSpeakerList] = useState<MediaDeviceInfo[]>();
@@ -16,7 +16,7 @@ export default function useMedia() {
         audio: selectedMic ? { deviceId: { exact: selectedMic } } : true,
       })
       .then((stream) => {
-        setUserVideo(stream);
+        setUserStream(stream);
       });
 
     navigator.mediaDevices.enumerateDevices().then((res) => {
@@ -26,10 +26,24 @@ export default function useMedia() {
     });
   }, [selectedCamera, selectedMic, selectedSpeaker]);
 
+  const offVideo = () => {
+    userStream?.getVideoTracks().forEach((track) => {
+      track.enabled = !track.enabled;
+    });
+    if (userStream) setUserStream({ ...userStream });
+  };
+
+  const muteMic = () => {
+    userStream?.getAudioTracks().forEach((track) => {
+      track.enabled = !track.enabled;
+    });
+    if (userStream) setUserStream({ ...userStream });
+  };
+
   return {
-    stream: userVideo,
-    camera: { list: cameraList, setCamera: setSelectedCamera },
-    mic: { list: micList, setMic: setSelectedMic },
+    stream: userStream,
+    camera: { list: cameraList, setCamera: setSelectedCamera, offVideo },
+    mic: { list: micList, setMic: setSelectedMic, muteMic },
     speaker: { list: speakerList, setSpeaker: setSelectedSpeaker },
   };
 }
