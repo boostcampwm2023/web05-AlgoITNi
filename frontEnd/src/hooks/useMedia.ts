@@ -1,6 +1,22 @@
 import { useEffect, useState } from 'react';
 
-export default function useMedia() {
+export interface MediaObject {
+  stream: MediaStream | undefined;
+  camera: {
+    list: MediaDeviceInfo[] | undefined;
+    setCamera: React.Dispatch<React.SetStateAction<string>>;
+  };
+  mic: {
+    list: MediaDeviceInfo[] | undefined;
+    setMic: React.Dispatch<React.SetStateAction<string>>;
+  };
+  speaker: {
+    list: MediaDeviceInfo[] | undefined;
+    setSpeaker: React.Dispatch<React.SetStateAction<string>>;
+  };
+}
+
+export default function useMedia(): MediaObject {
   const [userStream, setUserStream] = useState<MediaStream>();
   const [cameraList, setCameraList] = useState<MediaDeviceInfo[]>();
   const [micList, setMicList] = useState<MediaDeviceInfo[]>();
