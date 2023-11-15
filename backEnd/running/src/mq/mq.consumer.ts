@@ -18,7 +18,7 @@ export class MqConsumer {
       job.data,
       false,
     );
-    this.logger.debug(result);
+    this.logger.debug(JSON.stringify(result));
 
     const output: string[] =
       typeof result === 'string' ? [result] : result.output;

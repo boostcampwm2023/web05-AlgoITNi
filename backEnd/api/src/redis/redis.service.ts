@@ -5,22 +5,35 @@ import { Cache } from 'cache-manager';
 @Injectable()
 export class RedisService {
   private logger = new Logger(RedisService.name);
+  private runningRequest = 0;
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
+  delay = (delay) => {
+    return new Promise(resolve => setTimeout(resolve, delay))
+  }
+
   async getCompletedJob(jobID): Promise<string | string[]> {
+    this.runningRequest++;
+    this.logger.debug(this.runningRequest)
     this.logger.log(`try to get result to redis completedJob:${jobID}`);
     const maxTrial = 100;
     const getData = async () =>
       await this.cacheManager.get<string | string[]>(`completedJob:${jobID}`);
-    let result = await getData();
+    let result;
 
-    if (result !== null) return result;
     for (let i = 0; i < maxTrial; i++) {
+      await this.delay(50 * (Math.floor(this.runningRequest/10)));
       result = await getData();
-      if (result !== null) return result;
-      // TODO interval
+      if (result !== null) {
+        this.runningRequest--;
+        this.logger.debug(`trial: ${i}`);
+        this.logger.debug(this.runningRequest)
+        return result}
+      ;
     }
     this.logger.warn(maxTrial);
+
+    this.runningRequest--;
     return result;
   }
 }

@@ -73,7 +73,7 @@ export class RunService {
     // wait for answer
     const result = await this.redisService.getCompletedJob(job.id);
     if (result === null) {
-      this.logger.error(`${job.id} failed ${result}`);
+      this.logger.error(`${job.id} failed to find completed job : ${result}`);
       throw new TimeoutCodeRunning();
     }
     this.logger.log(`get completed result ${result}`);
