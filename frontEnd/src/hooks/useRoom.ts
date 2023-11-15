@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client/debug';
 import { SOCKET_EMIT_EVENT, SOCKET_RECEIVE_EVENT } from '@/constants/socketEvents';
+import { VITE_SOCKET_URL, VITE_STUN_URL, VITE_TURN_CREDENTIAL, VITE_TURN_URL, VITE_TURN_USERNAME } from '@/constants/env';
 
 const RTCConnections: Record<string, RTCPeerConnection> = {};
 
@@ -8,7 +9,7 @@ const useRoom = (roomId: string, localStream: MediaStream, isSetting: boolean) =
   const [isConnect, setIsConnect] = useState(false);
   const [streamList, setStreamList] = useState<{ id: string; stream: MediaStream }[]>([]);
   const [dataChannels, setDataChannels] = useState<{ id: string; dataChannel: RTCDataChannel }[]>([]);
-  const socket = io(`${import.meta.env.VITE_SOCKET_URL}`);
+  const socket = io(VITE_SOCKET_URL);
 
   const socketConnect = () => {
     socket.connect();
@@ -40,11 +41,11 @@ const useRoom = (roomId: string, localStream: MediaStream, isSetting: boolean) =
   const createPeerConnection = (socketId: string): RTCPeerConnection => {
     const RTCConnection = new RTCPeerConnection({
       iceServers: [
-        { urls: import.meta.env.VITE_STUN_URL },
+        { urls: VITE_STUN_URL },
         {
-          urls: import.meta.env.VITE_TURN_URL,
-          username: import.meta.env.VITE_TURN_USERNAME,
-          credential: import.meta.env.VITE_TURN_CREDENTIAL,
+          urls: VITE_TURN_URL,
+          username: VITE_TURN_USERNAME,
+          credential: VITE_TURN_CREDENTIAL,
         },
       ],
     });
