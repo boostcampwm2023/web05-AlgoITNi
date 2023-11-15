@@ -1,5 +1,5 @@
 import { ReactNode, useState } from 'react';
-import useMedia from '@/hooks/useMedia';
+import { MediaObject } from '@/hooks/useMedia';
 import MediaSelector from './MediaSelector';
 import Video from './Video';
 import micOnSVG from '@/assets/micOn.svg';
@@ -20,8 +20,8 @@ function ControlButton({ onClick, style, children }: { onClick: () => void; styl
   );
 }
 
-export default function SettingVideo() {
-  const { stream, camera, mic, speaker } = useMedia();
+export default function SettingVideo({ mediaObject }: { mediaObject: MediaObject }) {
+  const { stream, camera, mic, speaker } = mediaObject;
   const { list: cameraList, setCamera } = camera;
   const { list: micList, setMic } = mic;
   const { list: speakerList, setSpeaker } = speaker;
@@ -52,7 +52,7 @@ export default function SettingVideo() {
     stream && (
       <div className="flex flex-col gap-[20px] ">
         <div className="relative">
-          <Video stream={stream} />
+          <Video stream={stream} muted />
           <div className="absolute flex items-center justify-center w-full gap-[1vw] bottom-[10px]">
             <ControlButton onClick={handleMicClick} style={{ backgroundColor: micOn ? 'transparent' : '#ea4335', transition: 'all 0.5s' }}>
               <img src={micOn ? micOnSVG : micOffSVG} alt="micButton" />

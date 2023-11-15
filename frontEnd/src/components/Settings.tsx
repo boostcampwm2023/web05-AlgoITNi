@@ -1,7 +1,14 @@
+import { MediaObject } from '@/hooks/useMedia';
 import Button from './Button';
 import SettingVideo from './SettingVideo';
 
-export default function Setting({ setSetting }: { setSetting: React.Dispatch<React.SetStateAction<boolean>> }) {
+export default function Setting({
+  mediaObject,
+  setSetting,
+}: {
+  mediaObject: MediaObject;
+  setSetting: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   return (
     <div>
       <header className="mb-[5%]  mx-[7vw] mt-4">
@@ -12,7 +19,7 @@ export default function Setting({ setSetting }: { setSetting: React.Dispatch<Rea
       </header>
       <main className="flex px-[7vw]">
         <div className="basis-7/12">
-          <SettingVideo />
+          <SettingVideo mediaObject={mediaObject} />
         </div>
         <div className="flex flex-col items-center justify-center w-screen basis-5/12">
           <div className="w-[80%] flex flex-col items-center justify-center gap-[50px]">
