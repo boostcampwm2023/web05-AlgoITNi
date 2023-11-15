@@ -1,29 +1,24 @@
-import { useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useRoom from '@/hooks/useRoom';
 import Editor from '@/components/Editor';
-
-function StreamVideo({ stream }: { stream: MediaStream }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    if (!videoRef.current) return;
-
-    videoRef.current.srcObject = stream;
-  }, []);
-
-  return <video key={stream.id} ref={videoRef} muted autoPlay />;
-}
+import Setting from '@/components/Settings';
+import useMedia from '@/hooks/useMedia';
+import Video from '@/components/Video';
 
 export default function Room() {
   const { roomId } = useParams();
-  const { videoRef, streamList, dataChannels } = useRoom(roomId as string);
+  const mediaObject = useMedia();
+  const [isSetting, setSetting] = useState(false);
+  const { streamList, dataChannels } = useRoom(roomId as string, mediaObject.stream as MediaStream, isSetting);
+
+  if (!isSetting) return <Setting mediaObject={mediaObject} setSetting={setSetting} />;
 
   return (
     <div>
-      <video ref={videoRef} muted autoPlay />
+      <Video stream={mediaObject.stream as MediaStream} muted />
       {streamList.map(({ id, stream }) => (
-        <StreamVideo key={id} stream={stream} />
+        <Video key={id} stream={stream} />
       ))}
       <div className="w-[700px] h-[600px]">
         <Editor dataChannels={dataChannels} />

@@ -1,34 +1,41 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client/debug';
 import { SOCKET_EMIT_EVENT, SOCKET_RECEIVE_EVENT } from '@/constants/socketEvents';
 
-const useRoom = (roomId: string) => {
+const RTCConnections: Record<string, RTCPeerConnection> = {};
+
+const useRoom = (roomId: string, localStream: MediaStream, isSetting: boolean) => {
+  const [isConnect, setIsConnect] = useState(false);
   const [streamList, setStreamList] = useState<{ id: string; stream: MediaStream }[]>([]);
   const [dataChannels, setDataChannels] = useState<{ id: string; dataChannel: RTCDataChannel }[]>([]);
-
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const localStream = useRef<MediaStream | null>(null);
-
-  const RTCConnections: Record<string, RTCPeerConnection> = {};
-
   const socket = io(`${import.meta.env.VITE_SOCKET_URL}`);
 
+  const socketConnect = () => {
+    socket.connect();
+    socket.emit(SOCKET_EMIT_EVENT.JOIN_ROOM, {
+      room: roomId,
+    });
+    setIsConnect(true);
+  };
+
   useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: true,
-      })
-      .then((video) => {
-        if (videoRef.current) videoRef.current.srcObject = video;
-
-        localStream.current = video;
-
-        socket.connect();
-        socket.emit(SOCKET_EMIT_EVENT.JOIN_ROOM, {
-          room: roomId,
+    if (localStream && isSetting) {
+      if (!isConnect) socketConnect();
+      else {
+        Object.values(RTCConnections).forEach(async (peerConnection) => {
+          const videoSender = peerConnection.getSenders().find((sender) => sender.track?.kind === 'video');
+          const audioSender = peerConnection.getSenders().find((sender) => sender.track?.kind === 'audio');
+          const currentTracks = localStream.getTracks();
+          if (currentTracks) {
+            const currentVideoTrack = currentTracks.find((track) => track?.kind === 'video');
+            const currentAudioTrack = currentTracks.find((track) => track?.kind === 'audio');
+            if (currentVideoTrack) await videoSender?.replaceTrack(currentVideoTrack);
+            if (currentAudioTrack) await audioSender?.replaceTrack(currentAudioTrack);
+          }
         });
-      });
-  }, []);
+      }
+    }
+  }, [localStream, isSetting]);
 
   const createPeerConnection = (socketId: string): RTCPeerConnection => {
     const RTCConnection = new RTCPeerConnection({
@@ -43,11 +50,10 @@ const useRoom = (roomId: string) => {
     });
 
     const newDataChannel = RTCConnection.createDataChannel('edit', { negotiated: true, id: 0 });
-    setDataChannels((prev) => [...prev, { id: socketId, dataChannel: newDataChannel }]);
 
-    if (localStream.current) {
-      localStream.current.getTracks().forEach((track) => {
-        RTCConnection.addTrack(track, localStream.current as MediaStream);
+    if (localStream) {
+      localStream.getTracks().forEach((track) => {
+        RTCConnection.addTrack(track, localStream);
       });
     }
 
@@ -61,8 +67,12 @@ const useRoom = (roomId: string) => {
     });
 
     RTCConnection.addEventListener('track', (e) => {
-      setStreamList((prev) => [...prev, { id: socketId, stream: e.streams[0] }]);
+      setStreamList((prev) => {
+        const newArray = [...prev].filter(({ id }) => id !== socketId);
+        return [...newArray, { id: socketId, stream: e.streams[0] }];
+      });
     });
+    setDataChannels((prev) => [...prev, { id: socketId, dataChannel: newDataChannel }]);
 
     return RTCConnection;
   };
@@ -71,7 +81,6 @@ const useRoom = (roomId: string) => {
     data.users.forEach((user) => {
       RTCConnections[user.id] = createPeerConnection(user.id);
     });
-
     Object.entries(RTCConnections).forEach(async ([key, value]) => {
       const offer = await value.createOffer({
         offerToReceiveAudio: true,
@@ -123,7 +132,7 @@ const useRoom = (roomId: string) => {
     setStreamList((prev) => prev.filter((stream) => stream.id !== data.id));
   });
 
-  return { videoRef, socket, RTCConnections, streamList, dataChannels };
+  return { socket, streamList, dataChannels };
 };
 
 export default useRoom;
