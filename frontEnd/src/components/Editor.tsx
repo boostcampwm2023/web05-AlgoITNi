@@ -20,12 +20,6 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
     setPlainCode(ytext.current.toString());
   };
 
-  useEffect(() => {
-    dataChannels.forEach(({ dataChannel }) => {
-      dataChannel.onmessage = handleMessage;
-    });
-  }, [dataChannels]);
-
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     ytext.current.delete(0, ytext.current.length);
     ytext.current.insert(0, event.target.value);
@@ -37,16 +31,22 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
     setPlainCode(event.target.value);
   };
 
-  useEffect(() => {
-    setHighlightedCode(hljs.highlight(plainCode, { language: 'python' }).value.replace(/" "/g, '&nbsp; '));
-  }, [plainCode]);
-
   const handleScroll = (event: React.UIEvent<HTMLPreElement | HTMLTextAreaElement>) => {
     if (!preRef.current || !textareaRef.current) return;
 
     if (event.target === textareaRef.current) preRef.current.scrollLeft = textareaRef.current.scrollLeft;
     else textareaRef.current.scrollLeft = preRef.current.scrollLeft;
   };
+
+  useEffect(() => {
+    dataChannels.forEach(({ dataChannel }) => {
+      dataChannel.onmessage = handleMessage;
+    });
+  }, [dataChannels]);
+
+  useEffect(() => {
+    setHighlightedCode(hljs.highlight(plainCode, { language: 'python' }).value.replace(/" "/g, '&nbsp; '));
+  }, [plainCode]);
 
   return (
     <div className="w-full h-full rounded-lg bg-mainColor font-Pretendard">
