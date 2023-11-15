@@ -1,3 +1,10 @@
+# AlgoITNi
+#### 동료들과 함께 소통하며(화상, 음성, 채팅) 알고리즘 학습을 할 수 있는 플랫폼
+<img src="https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/03e6fe44-49fc-4ef1-9eb1-52747bb93251">
+
+##### [팀 노션 바로가기](!https://energetic-palm-634.notion.site/AlgoITNi-4d712d57a7be42bfb625d23d5eab5453?pvs=4)
+
+---
 # 팀원소개
 
 |                                  J065 서위영                                   |                                  J094 이동길                                   |                                 J126 이희경                                  |                                 J151 지승민                                  |
@@ -6,89 +13,34 @@
 |                                 **Front-End**                                  |                                 **Front-End**                                  |                                 **Back-End**                                 |                                 **Back-End**                                 |
 |                       [HBSPS](https://github.com/HBSPS)                        |                       [d0422](https://github.com/d0422)                        |                   [HKLeeeee](https://github.com/HKLeeeee)                    |                  [Gseungmin](https://github.com/Gseungmin)                   |
 
-# 협업 전략
 
-### 에픽-스토리-테스크
+# Tech
+`#WebRTC` `#Socket` `#CRDT` 
 
-에픽-스토리-테스크형태로 업무를 나누고, 개발을 진행해요.
-매주 월요일 스프린트 백로그를 작성하고, 테스크를 나눈뒤, 개발 일정을 조정해요.
+| 분야 | 기술스택 |
+|----|------|
+| FE | React, Typescript, WebRTC, github action, socket.io |
+| BE | NestJS, Typescript, Docker, github action, socket.io, mongoDB, MySQL, Redis |
 
-### git 브랜치전략
+# 주요 기능 소개
+### 메인화면
+방 생성 버튼으로 새롭게 방을 만들거나 공유받은 방 코드로 이미 있는 방에 참여할 수 있습니다.
 
-git-flow전략을 사용해요.
+![main](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/f4b34b43-efbf-4ada-8806-6a7bb9cd17d5)
 
-main브랜치에서 배포를 진행하고, dev브랜치에서 feature에 대한 개발을 진행해요.
-파트별 테스트 배포가 필요한 경우 release브랜치에서 진행해요!
+### 🐱 화상회의
+ 동료들과 화상회의를 하며 소통할 수 있습니다.
+### 😎 코드 공동 편집
+ 코드 편집기를 통해 코드를 공동 편집할 수 있습니다. <br>
+집단 지성을 발휘해보세요!
+### 🐍 코드 실행
+작성한 코드를 실행하고 실행 결과를 확인할 수 있습니다.
+### 💬 채팅
+채팅을 통해서도 소통할 수 있습니다. <br>
+음성 채팅이 어려운 상황에서나 참고할 자료를 보낼 때 활용할 수 있습니다. 
 
-# 그라운드 룰
+# 우리가 일하는 방식
+- [그라운드 룰](https://energetic-palm-634.notion.site/1f2cbea527e341c7ad1c8fd84ed5104d?pvs=4)
+- [깃 컨벤션](https://energetic-palm-634.notion.site/Git-Convention-8563596644404eb49148a940773d2be8?pvs=4)
+- [게더타운 규칙](https://energetic-palm-634.notion.site/b3b67313c1f748e7b58abf99466b000b?pvs=4)
 
-### 오프라인 정기회의
-
----
-
-**월요일**은 모여서 이번 주 계획을 공유해요.
-
-**수요일**은 급하게 논의할 사항이 생겼을 때 모이는 날이에요.
-
-**지각하면 커피사기!!!**
-
-### 페어프로그래밍
-
----
-
-**화요일 목요일 오전**을 페어프로그래밍 시간으로 활용해요.
-
-목요일 오전에는 지금까지 구현한 코드를 **리팩토링**하는 시간을 가져요.
-
-- 기능 구현에 대해서는 잠시 잊어요.
-
-### 작업 공간 & 시간
-
----
-
-작업은 **[게더타운 오피스](https://app.gather.town/app/4P950poJPWnG9asj/AlgoITNi)**에서 진행해요.
-
-불가피한 사정으로 **코어타임**을 지키지 못할 때는 미리 팀원들에게 양해를 구해요.
-
-하고있는 작업은 슬랙 채널에 공유하고 퇴근할 때도 알려요.
-
-### 스크럼회의
-
----
-
-스크럼은 간결했으면 좋겠어요.
-
-회의에서 이야기하고 싶은 안건은 [의사결정](https://www.notion.so/a84c2b30975f4e17892608839a39d0ea?pvs=21) 페이지에 차곡차곡 쌓아요.
-
-회의는 **30분 내외**로 끝날 수 있도록 안건을 구체적으로 정한 뒤 시작해요.
-
-회의를 통해 결정된 내용은 결정한 이유와 내용에 대해서 모두 회의록에 기록해요
-
-### 코드 리뷰
-
----
-
-코드 리뷰를 요청받으면 **30분 안에 리뷰를 완료**해요.
-
-- 리뷰 요청을 받으면 **같은 파트는 필수**로 리뷰를 해야해요.
-- **다른 파트는 선택적**으로 리뷰할 수 있어요.
-
-빠른 피드백 반영을 위해 리뷰어와 리뷰이 모두 줌, 허들이 가능한 경우 시간내서 참여해요.
-
-### 커뮤니케이션
-
----
-
-의견을 제시할 때는 내용과 이유를 **정확히** 제시해요 & 의견을 받을 때는 감정적으로 받아들이지 않아요
-
-의견 충돌이 있을 때는 충분한 논의로 모두가 이해할 수 있는 이유를 만들어요.
-
-각자 원하는 결정을 내릴 수 있는 슈퍼패스🎫 가 하나씩 있어요.
-
-- 2:2의 숨막히는 긴박한 일촉즉발의 대치상황에서 사용할 수 있어요.
-
-# 기획/디자인 링크
-
-[디자인 링크](https://www.figma.com/file/OdhrvGytGALp8RvuoYmyoI/AlgoITni?type=design&node-id=0%3A1&mode=design&t=iu6STKmESayevyxv-1)
-
-[기획 링크](https://energetic-palm-634.notion.site/b296b0316c684453afcf8156b18883f8?v=b93f6eae946041d0bd4715f7c76decca&pvs=4)
