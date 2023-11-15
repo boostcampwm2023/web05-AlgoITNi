@@ -1,17 +1,45 @@
 import { useEffect, useState, useRef } from 'react';
 import dompurify from 'dompurify';
 import hljs from 'highlight.js';
+import * as Y from 'yjs';
 
-export default function Editor({ value, onChange }: { value: string; onChange: React.ChangeEventHandler<HTMLTextAreaElement> }) {
+export default function Editor({ dataChannels }: { dataChannels: Array<{ id: string; dataChannel: RTCDataChannel }> }) {
   const sanitizer = dompurify.sanitize;
-  const [highlightedHTML, setHighlightedCode] = useState('');
+  const [plainCode, setPlainCode] = useState<string>('');
+  const [highlightedCode, setHighlightedCode] = useState('');
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
 
+  const ydoc = useRef(new Y.Doc());
+  const ytext = useRef(ydoc.current.getText('sharedText'));
+
+  const handleMessage = (event: MessageEvent) => {
+    Y.applyUpdate(ydoc.current, new Uint8Array(event.data));
+
+    setPlainCode(ytext.current.toString());
+  };
+
   useEffect(() => {
-    setHighlightedCode(hljs.highlight(value, { language: 'python' }).value.replace(/" "/g, '&nbsp; '));
-  }, [value]);
+    dataChannels.forEach(({ dataChannel }) => {
+      dataChannel.onmessage = handleMessage;
+    });
+  }, [dataChannels]);
+
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    ytext.current.delete(0, ytext.current.length);
+    ytext.current.insert(0, event.target.value);
+
+    dataChannels.forEach(({ dataChannel }) => {
+      if (dataChannel.readyState === 'open') dataChannel.send(Y.encodeStateAsUpdate(ydoc.current) as Uint8Array);
+    });
+
+    setPlainCode(event.target.value);
+  };
+
+  useEffect(() => {
+    setHighlightedCode(hljs.highlight(plainCode, { language: 'python' }).value.replace(/" "/g, '&nbsp; '));
+  }, [plainCode]);
 
   const handleScroll = (event: React.UIEvent<HTMLPreElement | HTMLTextAreaElement>) => {
     if (!preRef.current || !textareaRef.current) return;
@@ -26,7 +54,7 @@ export default function Editor({ value, onChange }: { value: string; onChange: R
       <div className="flex flex-col h-[65%] overflow-y-auto custom-scroll">
         <div className="flex flex-grow">
           <div className="w-10 py-2 pr-2 overflow-hidden border-r border-white">
-            {value.split('\n').map((_, index) => (
+            {plainCode.split('\n').map((_, index) => (
               <div key={index} className="flex justify-end">
                 <span className="leading-7 text-gray-400">{index + 1}</span>
               </div>
@@ -36,16 +64,14 @@ export default function Editor({ value, onChange }: { value: string; onChange: R
             <textarea
               onScroll={handleScroll}
               ref={textareaRef}
-              value={value}
-              onChange={onChange}
-              autoComplete="false"
-              spellCheck="false"
+              value={plainCode}
+              onChange={handleChange}
               className="z-10 absolute w-full tracking-[3px] h-full p-2 pb-0 leading-7 overflow-hidden overflow-x-scroll text-transparent bg-transparent resize-none caret-white custom-scroll whitespace-nowrap focus:outline-none bg-mainColor"
             />
             <pre onScroll={handleScroll} className="absolute top-0 left-0 z-0 w-full h-full p-2 overflow-hidden" ref={preRef}>
               <code
                 className="tracking-[3px] text-white font-Pretendard leading-7 w-full h-full text-ellipsis"
-                dangerouslySetInnerHTML={{ __html: sanitizer(highlightedHTML) }}
+                dangerouslySetInnerHTML={{ __html: sanitizer(highlightedCode) }}
               />
             </pre>
           </div>
