@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import useSpeaker from '@/stores/useSpeaker';
 
 export interface MediaObject {
   stream: MediaStream | undefined;
@@ -12,7 +13,6 @@ export interface MediaObject {
   };
   speaker: {
     list: MediaDeviceInfo[] | undefined;
-    setSpeaker: React.Dispatch<React.SetStateAction<string>>;
   };
 }
 
@@ -23,7 +23,7 @@ export default function useMedia(): MediaObject {
   const [speakerList, setSpeakerList] = useState<MediaDeviceInfo[]>();
   const [selectedCamera, setSelectedCamera] = useState<string>('');
   const [selectedMic, setSelectedMic] = useState<string>('');
-  const [selectedSpeaker, setSelectedSpeaker] = useState<string>('');
+  const { speaker } = useSpeaker((state) => state);
 
   useEffect(() => {
     navigator.mediaDevices
@@ -40,12 +40,12 @@ export default function useMedia(): MediaObject {
       setMicList(res.filter((mediaDevice) => mediaDevice.kind === 'audioinput'));
       setSpeakerList(res.filter((mediaDevice) => mediaDevice.kind === 'audiooutput'));
     });
-  }, [selectedCamera, selectedMic, selectedSpeaker]);
+  }, [selectedCamera, selectedMic, speaker]);
 
   return {
     stream: userStream,
     camera: { list: cameraList, setCamera: setSelectedCamera },
     mic: { list: micList, setMic: setSelectedMic },
-    speaker: { list: speakerList, setSpeaker: setSelectedSpeaker },
+    speaker: { list: speakerList },
   };
 }
