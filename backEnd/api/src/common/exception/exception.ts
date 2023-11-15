@@ -28,3 +28,12 @@ export class TransactionRollback extends HttpException {
     super('트랜잭션이 롤백되었습니다.', HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
+
+export class TimeoutCodeRunning extends HttpException {
+  constructor() {
+    super(
+      '코드실행 결과를 찾을 수 없습니다.',
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
+}

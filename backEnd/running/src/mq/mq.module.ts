@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
+import { MqConsumer } from './mq.consumer';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MqService } from './mq.service';
 import { RedisModule } from '../redis/redis.module';
+import { CodesModule } from '../codes/codes.module';
 
 @Module({
   imports: [
@@ -21,8 +22,9 @@ import { RedisModule } from '../redis/redis.module';
       name: 'runningRequest',
     }),
     RedisModule,
+    CodesModule,
   ],
-  providers: [MqService],
-  exports: [MqService],
+  providers: [MqConsumer],
+  exports: [MqConsumer],
 })
 export class MqModule {}

@@ -7,6 +7,7 @@ import { requestPath } from '../common/utils';
 import * as path from 'path';
 import { MqService } from '../mq/mq.service';
 import { RedisService } from '../redis/redis.service';
+import { TimeoutCodeRunning } from '../common/exception/exception';
 
 @Injectable()
 export class RunService {
@@ -65,14 +66,17 @@ export class RunService {
     return result.data;
   }
 
-  async requestRunningMQ(codeBlock: RequestCodeblockDto): Promise<string> {
+  async requestRunningMQ(codeBlock: RequestCodeblockDto) {
     const job = await this.mqService.addMessage(codeBlock);
     this.logger.log(`added message queue job#${job.id}`);
 
     // wait for answer
     const result = await this.redisService.getCompletedJob(job.id);
-    console.log(result);
+    if (result === null) {
+      this.logger.error(`${job.id} failed ${result}`);
+      throw new TimeoutCodeRunning();
+    }
     this.logger.log(`get completed result ${result}`);
-    return result.data;
+    return result;
   }
 }
