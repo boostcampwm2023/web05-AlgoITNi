@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import useRoom from '@/hooks/useRoom';
 import Editor from '@/components/Editor';
@@ -19,26 +19,6 @@ export default function Room() {
   const { roomId } = useParams();
   const { videoRef, streamList, dataChannels } = useRoom(roomId as string);
 
-  const [text, setText] = useState<string>('');
-
-  const handleMessage = (event: MessageEvent) => {
-    setText(event.data);
-  };
-
-  useEffect(() => {
-    dataChannels.forEach(({ dataChannel }) => {
-      dataChannel.onmessage = handleMessage;
-    });
-  }, [dataChannels]);
-
-  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setText(event.target.value);
-
-    dataChannels.forEach(({ dataChannel }) => {
-      if (dataChannel.readyState === 'open') dataChannel.send(event.target.value);
-    });
-  };
-
   return (
     <div>
       <video ref={videoRef} muted autoPlay />
@@ -46,7 +26,7 @@ export default function Room() {
         <StreamVideo key={id} stream={stream} />
       ))}
       <div className="w-[700px] h-[600px]">
-        <Editor onChange={handleChange} value={text} />
+        <Editor dataChannels={dataChannels} />
       </div>
     </div>
   );
