@@ -6,6 +6,7 @@ import micOnSVG from '@/assets/micOn.svg';
 import micOffSVG from '@/assets/micOff.svg';
 import videoOffSVG from '@/assets/videoOff.svg';
 import videoOnSVG from '@/assets/videoOn.svg';
+import useSpeaker from '@/stores/useSpeaker';
 
 function ControlButton({ onClick, style, children }: { onClick: () => void; style: Record<string, string>; children: ReactNode }) {
   return (
@@ -24,7 +25,8 @@ export default function SettingVideo({ mediaObject }: { mediaObject: MediaObject
   const { stream, camera, mic, speaker } = mediaObject;
   const { list: cameraList, setCamera } = camera;
   const { list: micList, setMic } = mic;
-  const { list: speakerList, setSpeaker } = speaker;
+  const { list: speakerList } = speaker;
+  const setSpeaker = useSpeaker((state) => state.setSpeaker);
   const [micOn, setMicOn] = useState(true);
 
   const [videoOn, setVideoOn] = useState(true);
