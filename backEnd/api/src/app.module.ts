@@ -10,6 +10,7 @@ import { RunModule } from './run/run.module';
 import { UsersModule } from './users/users.module';
 import { WinstonLogger } from './common/logger/winstonLogger.service';
 import { MqModule } from './mq/mq.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -38,10 +39,10 @@ import { MqModule } from './mq/mq.module';
         logging: ['query', 'error'],
       }),
     }),
-
     RunModule,
     UsersModule,
     MqModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService, TimeoutInterceptor, WinstonLogger],

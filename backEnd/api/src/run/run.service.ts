@@ -5,13 +5,19 @@ import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { requestPath } from '../common/utils';
 import * as path from 'path';
+import { MqService } from '../mq/mq.service';
+import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class RunService {
   private readonly logger = new Logger('RunService');
 
-  constructor(private readonly configService: ConfigService) {}
-  securityCheck(data) {
+  constructor(
+    private readonly configService: ConfigService,
+    private mqService: MqService,
+    private redisService: RedisService,
+  ) {}
+  securityCheck(data): number {
     // 모듈 제한
     const blockedModules = [
       'os',
@@ -47,7 +53,7 @@ export class RunService {
     return returnCode['safe'];
   }
 
-  async requestRunning(codeBlock: RequestCodeblockDto) {
+  async requestRunningApi(codeBlock: RequestCodeblockDto) {
     const url =
       'http://' +
       path.join(
@@ -56,6 +62,17 @@ export class RunService {
       );
     // console.log(url);
     const result = await axios.post(url, codeBlock);
+    return result.data;
+  }
+
+  async requestRunningMQ(codeBlock: RequestCodeblockDto): Promise<string> {
+    const job = await this.mqService.addMessage(codeBlock);
+    this.logger.log(`added message queue job#${job.id}`);
+
+    // wait for answer
+    const result = await this.redisService.getCompletedJob(job.id);
+    console.log(result);
+    this.logger.log(`get completed result ${result}`);
     return result.data;
   }
 }

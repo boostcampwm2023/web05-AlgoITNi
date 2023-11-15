@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Post, Get } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { RunService } from './run.service';
 import { RequestCodeblockDto } from './dto/request-codeblock.dto';
 import { returnCode } from '../common/returnCode';
@@ -23,7 +23,7 @@ export class RunController {
       throw new VulnerableException();
     }
 
-    const result = await this.runService.requestRunning(codeBlock);
+    const result = await this.runService.requestRunningApi(codeBlock);
     const responseCodeBlockDto = new ResponseCodeBlockDto(
       200,
       result.result,
@@ -32,10 +32,23 @@ export class RunController {
     return responseCodeBlockDto;
   }
 
-  @Get('queue')
-  async push() {
-    const job = await this.mqService.addMessage(this.data++);
-    console.log('queue create ', job.id);
-    return this.data;
+  @HttpCode(200)
+  @Post('v2')
+  async requestRunCodeV2(@Body() codeBlock: RequestCodeblockDto) {
+    const { code } = codeBlock;
+    const securityCheck = this.runService.securityCheck(code);
+    if (securityCheck === returnCode['vulnerable']) {
+      // fail
+      throw new VulnerableException();
+    }
+
+    const result = await this.runService.requestRunningMQ(codeBlock);
+
+    const responseCodeBlockDto = new ResponseCodeBlockDto(
+      200,
+      result,
+      'Running Python Code Success',
+    );
+    return responseCodeBlockDto;
   }
 }

@@ -17,7 +17,7 @@ export class MqService {
       { data },
       { removeOnComplete: true },
     );
-    console.log(`push ${job.id}`);
+    this.logger.log(`push to task Queue ${job.id}`);
     return job;
   }
 }

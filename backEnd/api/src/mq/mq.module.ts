@@ -3,6 +3,7 @@ import { MqConsumer } from './mq.consumer';
 import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MqService } from './mq.service';
+import { RedisModule } from '../redis/redis.module';
 
 @Module({
   imports: [
@@ -11,15 +12,16 @@ import { MqService } from './mq.service';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         redis: {
-          host: configService.get<string>('QUEUE_HOST'),
-          port: configService.get<number>('QUEUE_PORT'),
-          password: configService.get<string>('QUEUE_PASSWORD'),
+          host: configService.get<string>('REDIS_HOST'),
+          port: configService.get<number>('REDIS_PORT'),
+          password: configService.get<string>('REDIS_PASSWORD'),
         },
       }),
     }),
     BullModule.registerQueue({
       name: 'runningRequest',
     }),
+    RedisModule,
   ],
   providers: [MqConsumer, MqService],
   exports: [MqService],
