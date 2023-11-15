@@ -28,5 +28,6 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'off',
     'no-param-reassign': 'off',
     'react/no-array-index-key': 'off',
+    'react/no-danger': 'off',
   },
 };
