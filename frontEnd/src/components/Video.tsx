@@ -11,7 +11,7 @@ export default function Video({ stream, muted = false }: { stream: MediaStream; 
     videoRef.current.srcObject = stream;
     // setSinkId가 experimental method라서 typescript에 type이 없어서 이렇게 사용하였음
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (videoRef.current as any).setSinkId(speaker);
+    (videoRef.current as any).setSinkId?.(speaker);
   }, [stream]);
 
   return (
