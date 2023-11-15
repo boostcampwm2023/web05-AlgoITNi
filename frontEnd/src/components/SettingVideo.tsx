@@ -23,9 +23,6 @@ function ControlButton({ onClick, style, children }: { onClick: () => void; styl
 
 export default function SettingVideo({ mediaObject }: { mediaObject: MediaObject }) {
   const { stream, camera, mic, speaker } = mediaObject;
-  const { list: cameraList, setCamera } = camera;
-  const { list: micList, setMic } = mic;
-  const { list: speakerList } = speaker;
   const setSpeaker = useSpeaker((state) => state.setSpeaker);
   const [micOn, setMicOn] = useState(true);
 
@@ -50,6 +47,11 @@ export default function SettingVideo({ mediaObject }: { mediaObject: MediaObject
     setVideoOn((prev) => !prev);
     offVideo();
   };
+  const selector = [
+    { list: camera.list, setFunc: camera.setCamera },
+    { list: mic.list, setFunc: mic.setMic },
+    { list: speaker.list, setFunc: setSpeaker },
+  ];
   return (
     stream && (
       <div className="flex flex-col gap-[20px] ">
@@ -68,17 +70,13 @@ export default function SettingVideo({ mediaObject }: { mediaObject: MediaObject
           </div>
         </div>
         <div className="flex gap-[10px]">
-          {[
-            [cameraList, setCamera],
-            [micList, setMic],
-            [speakerList, setSpeaker],
-          ].map(
-            ([deviceList, setFunc], i) =>
-              deviceList && (
+          {selector.map(
+            ({ list, setFunc }, i) =>
+              list && (
                 <MediaSelector
                   key={i}
                   stream={stream}
-                  optionsData={deviceList as MediaDeviceInfo[]}
+                  optionsData={list as MediaDeviceInfo[]}
                   setFunc={setFunc as React.Dispatch<React.SetStateAction<string>>}
                 />
               ),
