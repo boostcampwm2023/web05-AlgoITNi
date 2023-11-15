@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-export default function Video({ stream }: { stream: MediaStream }) {
+export default function Video({ stream, muted = false }: { stream: MediaStream; muted?: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -9,5 +9,9 @@ export default function Video({ stream }: { stream: MediaStream }) {
     videoRef.current.srcObject = stream;
   }, [stream]);
 
-  return <video key={stream.id} ref={videoRef} muted autoPlay className="w-full rounded-3xl" />;
+  return (
+    <video ref={videoRef} autoPlay className="w-full rounded-3xl" playsInline muted={muted}>
+      <track kind="captions" />
+    </video>
+  );
 }
