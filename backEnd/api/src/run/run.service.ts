@@ -48,14 +48,14 @@ export class RunService {
   }
 
   async requestRunning(codeBlock: RequestCodeblockDto) {
-    const result = await axios.post(
+    const url =
       'http://' +
-        path.join(
-          this.configService.get<string>('RUNNING_SERVER'),
-          requestPath.RUN_PYTHON,
-        ),
-      codeBlock,
-    );
+      path.join(
+        this.configService.get<string>('RUNNING_SERVER'),
+        requestPath.RUN_PYTHON,
+      );
+    // console.log(url);
+    const result = await axios.post(url, codeBlock);
     return result.data;
   }
 }
