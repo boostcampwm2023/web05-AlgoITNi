@@ -16,6 +16,7 @@ export default function () {
   // const data = { "code" : "cnt=0\nfor i in range(10):\n    cnt+=i\nprint(cnt)" } ;
   const data = { "code" : "print('cnt')" } ;
   let res = http.post('http://localhost:4000/run/v2', data);
+  // let res = http.post('http://localhost:4000/run/v1', data);
 
   check(res, {
     'status is 200': (r) => r.status === 200 || r.status === 201,

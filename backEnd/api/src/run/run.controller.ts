@@ -1,10 +1,11 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { RunService } from './run.service';
 import { RequestCodeblockDto } from './dto/request-codeblock.dto';
 import { returnCode } from '../common/returnCode';
 import { VulnerableException } from '../common/exception/exception';
 import { ResponseCodeBlockDto } from './dto/response-codeblock.dto';
 import { MqService } from '../mq/mq.service';
+import { RedisService } from '../redis/redis.service';
 
 @Controller('run')
 export class RunController {
@@ -12,9 +13,10 @@ export class RunController {
   constructor(
     private mqService: MqService,
     private readonly runService: RunService,
+    private redisService: RedisService,
   ) {}
   @HttpCode(200)
-  @Post()
+  @Post('v1')
   async requestRunCode(@Body() codeBlock: RequestCodeblockDto) {
     const { code } = codeBlock;
     const securityCheck = this.runService.securityCheck(code);
@@ -50,5 +52,10 @@ export class RunController {
       'Running Python Code Success',
     );
     return responseCodeBlockDto;
+  }
+
+  @Get('avgTime')
+  showAvgTrialTime() {
+    return this.redisService.showTrialTimeAvg();
   }
 }
