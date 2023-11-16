@@ -29,5 +29,6 @@ module.exports = {
     'no-param-reassign': 'off',
     'react/no-array-index-key': 'off',
     'react/no-danger': 'off',
+    'react/require-default-props': 'off',
   },
 };
