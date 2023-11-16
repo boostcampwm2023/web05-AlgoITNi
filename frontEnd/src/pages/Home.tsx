@@ -28,9 +28,9 @@ export default function Home() {
           <div className="text-[1.4vw]  font-Pretendard">AlgoITNi를 통해 동료, 친구와 함께 알고리즘을 학습해봐요!</div>
         </div>
         <div className="flex items-center justify-center w-[37vw] gap-3">
-          <Button onClick={handleMakeRoomClick} fontSize="1.5vw">
+          <Button.Default onClick={handleMakeRoomClick} fontSize="1.5vw">
             방생성
-          </Button>
+          </Button.Default>
           <input
             placeholder=""
             className="rounded-2xl font-Pretendard px-[1.6vw] py-[14px] text-[1.5vw] w-3/5"
