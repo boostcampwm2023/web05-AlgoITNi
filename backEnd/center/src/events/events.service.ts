@@ -1,9 +1,15 @@
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import Redis from 'ioredis';
+import { ReturnConnectionsDto } from 'src/connections/dto/return-connections.dto copy';
+import { SignalingConnectionDto } from 'src/connections/dto/signaling-connections.dto';
 
 @Injectable()
 export class EventsService implements OnModuleInit {
+  private serverToUrl: Map<string, string> = new Map();
+  private serverToConnections: Map<string, number> = new Map();
+  private roomToUrl: Map<string, string> = new Map();
+
   constructor(@InjectRedis() private readonly client: Redis) {}
 
   onModuleInit() {
@@ -19,37 +25,54 @@ export class EventsService implements OnModuleInit {
 
       if (channel === 'register') {
         const { url } = data;
-        await this.handleRegister(url);
+        this.handleRegister(url);
       }
 
       if (channel === 'signaling') {
         const { url, connections } = data;
-        await this.handleSignaling(url, connections);
+        this.handleSignaling(url, connections);
       }
     });
   }
 
-  private async handleRegister(url: string) {
-    await this.client.set(url, 0);
+  private handleRegister(url: string) {
+    this.serverToConnections.set(url, 0);
+
+    const nextServer = this.serverToUrl.get('signaling');
+    if (!nextServer) {
+      this.serverToUrl.set('signaling', url);
+    }
   }
 
-  private async handleSignaling(url: string, connections: number) {
-    const currentUrl = await this.client.get('signaling');
+  private handleSignaling(url: string, connections: number) {
+    const nextServer = this.serverToUrl.get('signaling');
+    const minConnections = this.serverToConnections.get(nextServer);
 
-    if (currentUrl) {
-      const currentConnections = parseInt(
-        await this.client.get(currentUrl),
-        10,
-      );
-
-      if (connections < currentConnections) {
-        await this.client.set('signaling', url);
-        await this.client.set(url, connections);
-      }
-      return;
+    if (connections < minConnections) {
+      this.serverToUrl.set('signaling', url);
     }
 
-    await this.client.set('signaling', url);
-    await this.client.set(url, connections);
+    this.serverToConnections.set(url, connections);
+  }
+
+  findSignalingServer(data: SignalingConnectionDto): ReturnConnectionsDto {
+    const { roomName } = data;
+
+    const isServer = this.roomToUrl.get(roomName);
+
+    if (isServer) {
+      const result: ReturnConnectionsDto = { url: isServer };
+      return result;
+    }
+
+    const server = this.serverToUrl.get('signaling');
+    this.roomToUrl.set(roomName, server);
+    const result: ReturnConnectionsDto = { url: server };
+    return result;
+  }
+
+  leaveRoom(data: SignalingConnectionDto) {
+    const { roomName } = data;
+    this.roomToUrl.delete(roomName);
   }
 }
