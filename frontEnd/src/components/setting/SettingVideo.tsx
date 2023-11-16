@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import { MediaObject } from '@/hooks/useMedia';
+import Video from '../common/Video';
 import MediaSelector from './MediaSelector';
-import Video from './Video';
 import micOnSVG from '@/assets/micOn.svg';
 import micOffSVG from '@/assets/micOff.svg';
 import videoOffSVG from '@/assets/videoOff.svg';
@@ -54,8 +54,8 @@ export default function SettingVideo({ mediaObject }: { mediaObject: MediaObject
   ];
   return (
     stream && (
-      <div className="flex flex-col gap-[20px] ">
-        <div className="relative">
+      <div className="flex flex-col gap-[20px] w-full h-full">
+        <div className="relative w-full h-[550px]">
           <Video stream={stream} muted />
           <div className="absolute flex items-center justify-center w-full gap-[1vw] bottom-[10px]">
             <ControlButton onClick={handleMicClick} style={{ backgroundColor: micOn ? 'transparent' : '#ea4335', transition: 'all 0.5s' }}>
