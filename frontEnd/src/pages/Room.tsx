@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useRoom from '@/hooks/useRoom';
-import Editor from '@/components/Editor';
-import Setting from '@/components/Settings';
+import Setting from '@/components/setting/Settings';
 import useMedia from '@/hooks/useMedia';
-import Video from '@/components/Video';
+import VideoSection from '@/components/room/VideoSection';
+import LinkInputSection from '@/components/room/LinkInputSection';
+import EditorSection from '@/components/room/EditorSection';
+import ChattingSection from '@/components/room/ChattingSection';
 
 export default function Room() {
   const { roomId } = useParams();
@@ -15,13 +17,20 @@ export default function Room() {
   if (!isSetting) return <Setting mediaObject={mediaObject} setSetting={setSetting} />;
 
   return (
-    <div>
-      <Video stream={mediaObject.stream as MediaStream} muted />
-      {streamList.map(({ id, stream }) => (
-        <Video key={id} stream={stream} />
-      ))}
-      <div className="w-[700px] h-[600px]">
-        <Editor dataChannels={dataChannels} />
+    <div className="flex flex-col h-screen p-4">
+      <div className="flex h-full gap-4">
+        <div className="flex flex-col h-full gap-4 basis-9/12">
+          <div className="flex basis-3/12">
+            <VideoSection mediaObject={mediaObject} streamList={streamList} />
+          </div>
+          <div className="flex h-full gap-4 basis-9/12">
+            <LinkInputSection />
+            <EditorSection dataChannels={dataChannels} />
+          </div>
+        </div>
+        <div className="flex basis-3/12">
+          <ChattingSection />
+        </div>
       </div>
     </div>
   );

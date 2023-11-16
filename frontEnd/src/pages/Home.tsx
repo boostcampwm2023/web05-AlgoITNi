@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
-import Button from '@/components/Button';
+import Button from '@/components/common/Button';
 import useInput from '@/hooks/useInput';
 
 export default function Home() {
