@@ -1,6 +1,7 @@
 import { MediaObject } from '@/hooks/useMedia';
-import Button from './Button';
+import Button from '../common/Button';
 import SettingVideo from './SettingVideo';
+import Header from '../common/Header';
 
 export default function Setting({
   mediaObject,
@@ -11,12 +12,9 @@ export default function Setting({
 }) {
   return (
     <div>
-      <header className="mb-[5%]  mx-[7vw] mt-4">
-        <div className="flex items-center justify-start">
-          <img src="/main.png" alt="logo" width="50px" />
-          <div className="font-bold font-Pretendard text-[1.8vw]">AlgoITNi</div>
-        </div>
-      </header>
+      <div className="mb-[5%]  mx-[7vw] mt-4">
+        <Header />
+      </div>
       <main className="flex px-[7vw]">
         <div className="basis-7/12">
           <SettingVideo mediaObject={mediaObject} />

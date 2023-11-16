@@ -15,8 +15,16 @@ export default function Video({ stream, muted = false }: { stream: MediaStream; 
   }, [stream]);
 
   return (
-    <video ref={videoRef} autoPlay className="w-full rounded-3xl" playsInline muted={muted}>
-      <track kind="captions" />
-    </video>
+    <div className="relative w-full h-full">
+      <video
+        ref={videoRef}
+        autoPlay
+        className="absolute object-cover w-full h-full rounded-3xl shadow-black drop-shadow-2xl"
+        playsInline
+        muted={muted}
+      >
+        <track kind="captions" />
+      </video>
+    </div>
   );
 }
