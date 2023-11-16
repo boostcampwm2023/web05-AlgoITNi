@@ -7,6 +7,7 @@ import VideoSection from '@/components/room/VideoSection';
 import LinkInputSection from '@/components/room/LinkInputSection';
 import EditorSection from '@/components/room/EditorSection';
 import ChattingSection from '@/components/room/ChattingSection';
+import ControllSection from '@/components/room/ControllSection';
 
 export default function Room() {
   const { roomId } = useParams();
@@ -24,7 +25,10 @@ export default function Room() {
             <VideoSection mediaObject={mediaObject} streamList={streamList} />
           </div>
           <div className="flex h-full gap-4 basis-9/12">
-            <LinkInputSection />
+            <div className="flex flex-col w-full h-full gap-4 basis-2/5">
+              <LinkInputSection />
+              <ControllSection mediaObject={mediaObject} />
+            </div>
             <EditorSection dataChannels={dataChannels} />
           </div>
         </div>
