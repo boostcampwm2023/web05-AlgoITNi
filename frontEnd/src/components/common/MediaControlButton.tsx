@@ -4,11 +4,11 @@ import videoOffSVG from '@/assets/videoOff.svg';
 import videoOnSVG from '@/assets/videoOn.svg';
 import useMediaControl from '@/stores/useMediaControl';
 
-function selectImage(kind: 'mic' | 'video', state: boolean) {
-  if (kind === 'mic' && state) return micOnSVG;
-  if (kind === 'mic' && !state) return micOffSVG;
-  if (kind === 'video' && state) return videoOnSVG;
-  if (kind === 'video' && !state) return videoOffSVG;
+function selectImage(kind: 'mic' | 'video', isOn: boolean) {
+  if (kind === 'mic' && isOn) return micOnSVG;
+  if (kind === 'mic' && !isOn) return micOffSVG;
+  if (kind === 'video' && isOn) return videoOnSVG;
+  if (kind === 'video' && !isOn) return videoOffSVG;
   throw new Error('잘못된 입력입니다!');
 }
 
