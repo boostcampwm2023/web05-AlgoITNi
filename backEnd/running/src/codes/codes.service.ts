@@ -8,23 +8,26 @@ import { RunningException } from 'src/common/exception/exception';
 @Injectable()
 export class CodesService {
   private logger = new Logger(CodesService.name);
+  private tempDir = path.join(__dirname, '..', 'tmp');
+
+  constructor() {
+    if (!fs.existsSync(this.tempDir)) {
+      fs.mkdirSync(this.tempDir);
+    }
+  }
+
   async testCode(
     code: string,
     isHttp: boolean = true,
   ): Promise<ResponseCodeDto | string> {
     this.logger.debug('testCode Called');
-    const tempDir = path.join(__dirname, '..', 'tmp');
 
-    if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir);
-    }
-
-    const fileName = `python-${Date.now()}.py`;
-    const filePath = path.join(tempDir, fileName);
+    const filePath = this.getFilePath();
 
     try {
       fs.writeFileSync(filePath, code);
-      const { stdout, stderr } = await execPromise(`py ${filePath}`);
+      // const { stdout, stderr } = await execPromise(`python3 ${filePath}`);
+      const { stdout, stderr } = await this.run(filePath);
 
       if (stderr) {
         const errorMessage = this.getErrorMessage(stderr);
@@ -40,6 +43,20 @@ export class CodesService {
     } finally {
       fs.unlinkSync(filePath);
     }
+  }
+
+  getFilePath() {
+    const fileName = `python-${Date.now()}.py`;
+    return path.join(this.tempDir, fileName);
+  }
+
+  async run(filePath) {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 10000);
+    });
+    const { stdout, stderr } = await execPromise(`python3 ${filePath}`);
+    console.log('코드 실행 완료');
+    return { stdout, stderr };
   }
 
   getOutput(stdout: string): ResponseCodeDto {
