@@ -3,7 +3,6 @@ import { RunService } from './run.service';
 import { RequestCodeblockDto } from './dto/request-codeblock.dto';
 import { returnCode } from '../common/returnCode';
 import { VulnerableException } from '../common/exception/exception';
-import { ResponseCodeBlockDto } from './dto/response-codeblock.dto';
 import { MqService } from '../mq/mq.service';
 import { RedisService } from '../redis/redis.service';
 
@@ -40,13 +39,9 @@ export class RunController {
       throw new VulnerableException();
     }
 
-    const result = await this.runService.requestRunningMQ(codeBlock);
+    const responseCodeBlockDto =
+      await this.runService.requestRunningMQ(codeBlock);
 
-    const responseCodeBlockDto = new ResponseCodeBlockDto(
-      200,
-      result,
-      'Running Python Code Success',
-    );
     return responseCodeBlockDto;
   }
 

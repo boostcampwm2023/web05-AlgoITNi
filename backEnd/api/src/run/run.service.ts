@@ -90,7 +90,9 @@ export class RunService {
     }
   }
 
-  async requestRunningMQ(codeBlock: RequestCodeblockDto) {
+  async requestRunningMQ(
+    codeBlock: RequestCodeblockDto,
+  ): Promise<ResponseCodeBlockDto> {
     const job = await this.mqService.addMessage(codeBlock);
     this.logger.log(`added message queue job#${job.id}`);
 

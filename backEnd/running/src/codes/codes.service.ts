@@ -24,10 +24,7 @@ export class CodesService {
     }
   }
 
-  async testCode(
-    code: string,
-    isHttp: boolean = true,
-  ): Promise<ResponseCodeDto | string> {
+  async testCode(code: string): Promise<ResponseCodeDto | string> {
     this.logger.debug('function[testCode] Called');
 
     const filePath = this.getFilePath();
@@ -35,7 +32,6 @@ export class CodesService {
     try {
       fs.writeFileSync(filePath, code);
       const { stdout, stderr } = await this.runCommand(filePath, this.timeOut);
-      console.log(stdout, stderr);
       if (stderr) {
         const errorMessage = this.getErrorMessage(stderr);
         throw new RunningException(errorMessage);
@@ -45,13 +41,11 @@ export class CodesService {
     } catch (error) {
       this.logger.error(error.message);
       const errorMessage = this.getErrorMessage(error.message);
-      if (isHttp) {
-        if (errorMessage === this.unKnownMessage) {
-          throw new InternalServerErrorException();
-        }
-        throw new RunningException(errorMessage);
-      } // Https 요청일 경우
-      else return errorMessage;
+
+      if (errorMessage === this.unKnownMessage) {
+        throw new InternalServerErrorException();
+      }
+      throw new RunningException(errorMessage);
     } finally {
       fs.unlinkSync(filePath);
     }
