@@ -6,6 +6,8 @@ import { LoggerMiddleware } from './common/logger/logger.middleware';
 import { SlackModule } from 'nestjs-slack-webhook';
 import { CodesModule } from './codes/codes.module';
 import { WinstonLogger } from './common/logger/winstonLogger.service';
+import { RedisModule } from './redis/redis.module';
+import { MqModule } from './mq/mq.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { WinstonLogger } from './common/logger/winstonLogger.service';
       inject: [ConfigService],
     }),
     CodesModule,
+    MqModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [AppService, WinstonLogger],

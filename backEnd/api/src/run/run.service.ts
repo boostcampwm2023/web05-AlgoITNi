@@ -5,13 +5,20 @@ import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { requestPath } from '../common/utils';
 import * as path from 'path';
+import { MqService } from '../mq/mq.service';
+import { RedisService } from '../redis/redis.service';
+import { TimeoutCodeRunning } from '../common/exception/exception';
 
 @Injectable()
 export class RunService {
   private readonly logger = new Logger('RunService');
 
-  constructor(private readonly configService: ConfigService) {}
-  securityCheck(data) {
+  constructor(
+    private readonly configService: ConfigService,
+    private mqService: MqService,
+    private redisService: RedisService,
+  ) {}
+  securityCheck(data): number {
     // 모듈 제한
     const blockedModules = [
       'os',
@@ -47,15 +54,29 @@ export class RunService {
     return returnCode['safe'];
   }
 
-  async requestRunning(codeBlock: RequestCodeblockDto) {
-    const result = await axios.post(
+  async requestRunningApi(codeBlock: RequestCodeblockDto) {
+    const url =
       'http://' +
-        path.join(
-          this.configService.get<string>('RUNNING_SERVER'),
-          requestPath.RUN_PYTHON,
-        ),
-      codeBlock,
-    );
+      path.join(
+        this.configService.get<string>('RUNNING_SERVER'),
+        requestPath.RUN_PYTHON,
+      );
+    // console.log(url);
+    const result = await axios.post(url, codeBlock);
     return result.data;
+  }
+
+  async requestRunningMQ(codeBlock: RequestCodeblockDto) {
+    const job = await this.mqService.addMessage(codeBlock);
+    this.logger.log(`added message queue job#${job.id}`);
+
+    // wait for answer
+    const result = await this.redisService.getCompletedJob(job.id);
+    if (result === null) {
+      this.logger.error(`${job.id} failed to find completed job : ${result}`);
+      throw new TimeoutCodeRunning();
+    }
+    this.logger.log(`get completed result ${result}`);
+    return result;
   }
 }

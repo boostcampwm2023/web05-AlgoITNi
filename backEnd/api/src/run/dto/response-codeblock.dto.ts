@@ -1,6 +1,6 @@
 export class ResponseCodeBlockDto {
   statusCode: number;
-  result: string;
+  result: string | string[];
   message: string;
   timestamp: string;
   constructor(statusCode, result, message) {
