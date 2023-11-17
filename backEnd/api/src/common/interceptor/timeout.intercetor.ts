@@ -22,9 +22,9 @@ export class TimeoutInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap(() => {
         const elapsedTime = Date.now() - startTime;
-        if (elapsedTime > 0) {
-          this.timeOutNotification(elapsedTime, request);
-        }
+        if (elapsedTime > 5000) {
+          // this.timeOutNotification(elapsedTime, request);
+         }
       }),
     );
   }

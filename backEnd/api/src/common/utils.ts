@@ -1,3 +1,3 @@
 export const requestPath = {
-  RUN_PYTHON: '/python',
+  RUN_PYTHON: '/codes/python',
 };

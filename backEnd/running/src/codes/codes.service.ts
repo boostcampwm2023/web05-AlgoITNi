@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { execPromise } from 'src/common/utils';
@@ -7,8 +7,14 @@ import { RunningException } from 'src/common/exception/exception';
 
 @Injectable()
 export class CodesService {
-  async testCode(code: string) {
+  private logger = new Logger(CodesService.name);
+  async testCode(
+    code: string,
+    isHttp: boolean = true,
+  ): Promise<ResponseCodeDto | string> {
+    this.logger.debug('testCode Called');
     const tempDir = path.join(__dirname, '..', 'tmp');
+
     if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir);
     }
@@ -16,9 +22,8 @@ export class CodesService {
     const fileName = `python-${Date.now()}.py`;
     const filePath = path.join(tempDir, fileName);
 
-    fs.writeFileSync(filePath, code);
-
     try {
+      fs.writeFileSync(filePath, code);
       const { stdout, stderr } = await execPromise(`py ${filePath}`);
 
       if (stderr) {
@@ -28,8 +33,10 @@ export class CodesService {
 
       return this.getOutput(stdout);
     } catch (error) {
+      this.logger.error(error.message);
       const errorMessage = this.getErrorMessage(error.message);
-      throw new RunningException(errorMessage);
+      if (isHttp) throw new RunningException(errorMessage); // Https 요청일 경우
+      else return errorMessage;
     } finally {
       fs.unlinkSync(filePath);
     }
@@ -63,7 +70,7 @@ export class CodesService {
       return errorMessage;
     }
 
-    const errorMessage = '알수없는 에러가 발생했습니다.';
+    const errorMessage = '알 수 없는 에러가 발생했습니다.';
     return errorMessage;
   }
 }
