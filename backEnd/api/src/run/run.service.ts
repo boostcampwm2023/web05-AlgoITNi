@@ -1,4 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { returnCode } from '../common/returnCode';
 import { RequestCodeblockDto } from './dto/request-codeblock.dto';
 import axios from 'axios';
@@ -8,6 +13,7 @@ import * as path from 'path';
 import { MqService } from '../mq/mq.service';
 import { RedisService } from '../redis/redis.service';
 import { TimeoutCodeRunning } from '../common/exception/exception';
+import { ResponseCodeBlockDto } from './dto/response-codeblock.dto';
 
 @Injectable()
 export class RunService {
@@ -54,7 +60,9 @@ export class RunService {
     return returnCode['safe'];
   }
 
-  async requestRunningApi(codeBlock: RequestCodeblockDto) {
+  async requestRunningApi(
+    codeBlock: RequestCodeblockDto,
+  ): Promise<ResponseCodeBlockDto> {
     const url =
       'http://' +
       path.join(
@@ -62,8 +70,24 @@ export class RunService {
         requestPath.RUN_PYTHON,
       );
     // console.log(url);
-    const result = await axios.post(url, codeBlock);
-    return result.data;
+    try {
+      const result = await axios.post(url, codeBlock);
+      return new ResponseCodeBlockDto(
+        result.status,
+        result.data.output,
+        'Running Python Code Success',
+      );
+    } catch (e) {
+      this.logger.error(e.message);
+      const res = e.response.data;
+      if (e.response.data.status === HttpStatus.INTERNAL_SERVER_ERROR)
+        throw new InternalServerErrorException();
+      return new ResponseCodeBlockDto(
+        res.statusCode,
+        res.message,
+        'Failed to Run Code',
+      );
+    }
   }
 
   async requestRunningMQ(codeBlock: RequestCodeblockDto) {

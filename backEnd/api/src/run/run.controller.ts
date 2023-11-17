@@ -25,12 +25,8 @@ export class RunController {
       throw new VulnerableException();
     }
 
-    const result = await this.runService.requestRunningApi(codeBlock);
-    const responseCodeBlockDto = new ResponseCodeBlockDto(
-      200,
-      result.result,
-      'Running Python Code Success',
-    );
+    const responseCodeBlockDto =
+      await this.runService.requestRunningApi(codeBlock);
     return responseCodeBlockDto;
   }
 

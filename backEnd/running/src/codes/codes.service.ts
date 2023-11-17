@@ -1,14 +1,22 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
-import { execPromise } from 'src/common/utils';
 import { ResponseCodeDto } from './dto/response-code.dto ';
 import { RunningException } from 'src/common/exception/exception';
-
+import { exec } from 'child_process';
+type runCommandResult = { stdout: string; stderr: string };
 @Injectable()
 export class CodesService {
   private logger = new Logger(CodesService.name);
   private tempDir = path.join(__dirname, '..', 'tmp');
+  private timeOutMessage = '코드가 실행되는데 너무 오래 걸립니다.';
+  private unKnownMessage = '알 수 없는 에러가 발생했습니다.';
+  private killSignal: NodeJS.Signals = 'SIGINT';
+  private readonly timeOut = 5000;
 
   constructor() {
     if (!fs.existsSync(this.tempDir)) {
@@ -20,15 +28,14 @@ export class CodesService {
     code: string,
     isHttp: boolean = true,
   ): Promise<ResponseCodeDto | string> {
-    this.logger.debug('testCode Called');
+    this.logger.debug('function[testCode] Called');
 
     const filePath = this.getFilePath();
 
     try {
       fs.writeFileSync(filePath, code);
-      // const { stdout, stderr } = await execPromise(`python3 ${filePath}`);
-      const { stdout, stderr } = await this.run(filePath);
-
+      const { stdout, stderr } = await this.runCommand(filePath, this.timeOut);
+      console.log(stdout, stderr);
       if (stderr) {
         const errorMessage = this.getErrorMessage(stderr);
         throw new RunningException(errorMessage);
@@ -38,7 +45,12 @@ export class CodesService {
     } catch (error) {
       this.logger.error(error.message);
       const errorMessage = this.getErrorMessage(error.message);
-      if (isHttp) throw new RunningException(errorMessage); // Https 요청일 경우
+      if (isHttp) {
+        if (errorMessage === this.unKnownMessage) {
+          throw new InternalServerErrorException();
+        }
+        throw new RunningException(errorMessage);
+      } // Https 요청일 경우
       else return errorMessage;
     } finally {
       fs.unlinkSync(filePath);
@@ -50,13 +62,27 @@ export class CodesService {
     return path.join(this.tempDir, fileName);
   }
 
-  async run(filePath) {
-    await new Promise((resolve) => {
-      setTimeout(resolve, 10000);
+  runCommand(filePath, timeout): Promise<runCommandResult> {
+    return new Promise((resolve) => {
+      const childProcess = exec(`py ${filePath}`, (error, stdout, stderr) => {
+        if (error) {
+          this.logger.error(`failed to run requested code ${error.message}`);
+
+          if (error.signal === this.killSignal) {
+            stderr = this.timeOutMessage;
+          }
+          resolve({ stdout, stderr });
+        } else {
+          resolve({ stdout, stderr });
+        }
+      });
+
+      // 일정 시간 후 자식 프로세스 강제 종료
+      setTimeout(() => {
+        this.logger.log('timeout!');
+        childProcess.kill(this.killSignal);
+      }, timeout);
     });
-    const { stdout, stderr } = await execPromise(`python3 ${filePath}`);
-    console.log('코드 실행 완료');
-    return { stdout, stderr };
   }
 
   getOutput(stdout: string): ResponseCodeDto {
@@ -67,6 +93,8 @@ export class CodesService {
   }
 
   getErrorMessage(stderr: string): string {
+    if (stderr === this.timeOutMessage) return stderr;
+
     const errorLines = stderr.split('\n');
 
     const errorLineIndex = errorLines.findIndex(
@@ -87,7 +115,6 @@ export class CodesService {
       return errorMessage;
     }
 
-    const errorMessage = '알 수 없는 에러가 발생했습니다.';
-    return errorMessage;
+    return this.unKnownMessage;
   }
 }

@@ -20,9 +20,11 @@ export class ErrorFilter implements ExceptionFilter {
       exception instanceof HttpException
         ? exception.message
         : 'Internal Serval Error';
-    this.logger.error(exception.message, exception);
+    this.logger.error(
+      `path : ${request.url} \n${exception.message}`,
+      exception,
+    );
     response.status(status).json({
-      path: request.url,
       statusCode: status,
       message,
       timestamp: new Date().toISOString(),
