@@ -14,13 +14,21 @@ import { JoinRoomDto } from './dto/join-room.dto';
 import { LeaveRoomDto } from './dto/leave-room.dto';
 import { MessageDto } from './dto/message.dto';
 
-@WebSocketGateway({ cors: true })
+@WebSocketGateway({ namespace: 'chat', cors: true })
 export class ChatGateway implements OnGatewayConnection {
-  private readonly logger = new Logger();
   @WebSocketServer()
   server: Server;
 
-  constructor(@InjectRedis() private readonly client: Redis) {}
+  private readonly logger = new Logger();
+  private rooms: Map<string, boolean> = new Map();
+  private roomToCount: Map<string, number> = new Map();
+  private subscriberClient: Redis;
+  private publisherClient: Redis;
+
+  constructor(@InjectRedis() private readonly client: Redis) {
+    this.subscriberClient = client.duplicate();
+    this.publisherClient = client.duplicate();
+  }
 
   handleConnection(socket: Socket) {
     this.logger.log(`on connect called : ${socket.id}`);
@@ -33,6 +41,20 @@ export class ChatGateway implements OnGatewayConnection {
   ) {
     const { room } = data;
     socket.join(room);
+
+    const isRoom = this.rooms.get(room);
+    const count = this.roomToCount.get(room) || 0;
+    this.roomToCount.set(room, count + 1);
+
+    if (!isRoom) {
+      this.subscriberClient.subscribe(room);
+      this.subscriberClient.on('message', (channel, message) => {
+        if (channel === room) {
+          this.server.to(room).emit('newMessage', message);
+        }
+      });
+      this.rooms.set(room, true);
+    }
   }
 
   @SubscribeMessage('leaveRoom')
@@ -42,14 +64,22 @@ export class ChatGateway implements OnGatewayConnection {
   ) {
     const { room } = data;
     socket.leave(room);
+
+    const count = (this.roomToCount.get(room) || 1) - 1;
+    this.roomToCount.set(room, count);
+
+    if (count === 0) {
+      this.subscriberClient.unsubscribe(room);
+      this.rooms.delete(room);
+    }
   }
 
   @SubscribeMessage('sendMessage')
-  async sendMessage(
-    @MessageBody() data: MessageDto,
-    @ConnectedSocket() socket: Socket,
-  ) {
+  async sendMessage(@MessageBody() data: MessageDto) {
     const { room, message } = data;
-    socket.to(room).emit('newMessage', message);
+    const response = {
+      message: message,
+    };
+    this.publisherClient.publish(room, JSON.stringify(response));
   }
 }
