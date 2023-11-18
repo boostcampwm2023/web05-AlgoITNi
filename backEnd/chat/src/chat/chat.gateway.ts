@@ -13,6 +13,7 @@ import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { JoinRoomDto } from './dto/join-room.dto';
 import { LeaveRoomDto } from './dto/leave-room.dto';
 import { MessageDto } from './dto/message.dto';
+import * as os from 'os';
 
 @WebSocketGateway({ namespace: 'chat', cors: true })
 export class ChatGateway implements OnGatewayConnection {
@@ -22,6 +23,7 @@ export class ChatGateway implements OnGatewayConnection {
   private readonly logger = new Logger();
   private rooms: Map<string, boolean> = new Map();
   private roomToCount: Map<string, number> = new Map();
+  private instanceId = process.env.NODE_APP_INSTANCE || os.hostname();
   private subscriberClient: Redis;
   private publisherClient: Redis;
 
@@ -31,7 +33,7 @@ export class ChatGateway implements OnGatewayConnection {
   }
 
   handleConnection(socket: Socket) {
-    this.logger.log(`on connect called : ${socket.id}`);
+    this.logger.log(`Instance ${this.instanceId} - connected: ${socket.id}`);
   }
 
   @SubscribeMessage('joinRoom')
