@@ -14,8 +14,9 @@ import { JoinRoomDto } from './dto/join-room.dto';
 import { LeaveRoomDto } from './dto/leave-room.dto';
 import { MessageDto } from './dto/message.dto';
 import * as os from 'os';
+import { SOCKET, SOCKET_EVENT } from 'src/commons/utils';
 
-@WebSocketGateway({ namespace: 'chat', cors: true })
+@WebSocketGateway({ namespace: SOCKET.NAME_SPACE, cors: true })
 export class ChatGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
@@ -36,7 +37,7 @@ export class ChatGateway implements OnGatewayConnection {
     this.logger.log(`Instance ${this.instanceId} - connected: ${socket.id}`);
   }
 
-  @SubscribeMessage('joinRoom')
+  @SubscribeMessage(SOCKET_EVENT.JOIN_ROOM)
   handleJoin(
     @MessageBody() data: JoinRoomDto,
     @ConnectedSocket() socket: Socket,
@@ -52,14 +53,14 @@ export class ChatGateway implements OnGatewayConnection {
       this.subscriberClient.subscribe(room);
       this.subscriberClient.on('message', (channel, message) => {
         if (channel === room) {
-          this.server.to(room).emit('newMessage', message);
+          this.server.to(room).emit(SOCKET_EVENT.NEW_MESSAGE, message);
         }
       });
       this.rooms.set(room, true);
     }
   }
 
-  @SubscribeMessage('leaveRoom')
+  @SubscribeMessage(SOCKET_EVENT.LEAVE_ROOM)
   async handleLeave(
     @MessageBody() data: LeaveRoomDto,
     @ConnectedSocket() socket: Socket,
@@ -70,14 +71,14 @@ export class ChatGateway implements OnGatewayConnection {
     const count = (this.roomToCount.get(room) || 1) - 1;
     this.roomToCount.set(room, count);
 
-    if (count === 0) {
+    if (count === SOCKET.EMPTY_ROOM) {
       this.subscriberClient.unsubscribe(room);
       this.rooms.delete(room);
     }
   }
 
-  @SubscribeMessage('sendMessage')
-  async sendMessage(@MessageBody() data: MessageDto) {
+  @SubscribeMessage(SOCKET_EVENT.SEND_MESSAGE)
+  async handleMessage(@MessageBody() data: MessageDto) {
     const { room, message } = data;
     const response = {
       message: message,
