@@ -24,7 +24,6 @@ export class WebRtcGateway implements OnGatewayConnection {
   private readonly logger = new Logger();
   @WebSocketServer()
   server: Server;
-  private connections: number = 0;
 
   users = {};
   socketToRoom = {};
@@ -32,11 +31,6 @@ export class WebRtcGateway implements OnGatewayConnection {
 
   handleConnection(socket: Socket) {
     this.logger.log(`on connect called : ${socket.id}`);
-    this.connections++;
-  }
-
-  getConnectionCnt() {
-    return this.connections;
   }
 
   @SubscribeMessage(SOCKET_EVENT.JOIN_ROOM)
@@ -117,6 +111,5 @@ export class WebRtcGateway implements OnGatewayConnection {
     const id = socket.id;
     const userIdDto: UserIdDto = { id };
     socket.to(roomID).emit(SOCKET_EVENT.USER_EXIT, userIdDto);
-    this.connections--;
   }
 }
