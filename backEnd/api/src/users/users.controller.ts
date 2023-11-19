@@ -1,17 +1,11 @@
-import { Controller, Get, Logger } from '@nestjs/common';
+import { Controller, Post, Res } from '@nestjs/common';
+import { Response } from 'express';
 
 @Controller('users')
 export class UsersController {
-  private readonly logger = new Logger();
-  constructor() {}
-  @Get()
-  login() {
-    this.logger.log('log', UsersController.name);
-    this.logger.error('error', UsersController.name);
-    this.logger.warn('warn', UsersController.name);
-    this.logger.verbose('verbose', UsersController.name);
-    this.logger.debug('debug', UsersController.name);
-
-    return 'user login';
+  @Post('logout')
+  logout(@Res() res: Response) {
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
   }
 }

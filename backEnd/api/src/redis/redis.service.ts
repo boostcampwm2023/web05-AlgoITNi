@@ -51,4 +51,12 @@ export class RedisService {
     this.statistic_delay_time = [];
     return avgTime;
   }
+
+  async storeRefreshToken(userId: number, refreshToken: string) {
+    this.cacheManager.set(`refresh:${userId}`, refreshToken, 2592000);
+  }
+
+  async getRefreshToken(userId: number) {
+    return await this.cacheManager.get<string>(`refresh:${userId}`);
+  }
 }

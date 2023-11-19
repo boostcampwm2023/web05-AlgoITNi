@@ -11,19 +11,10 @@ import { UsersModule } from './users/users.module';
 import { WinstonLogger } from './common/logger/winstonLogger.service';
 import { MqModule } from './mq/mq.module';
 import { RedisModule } from './redis/redis.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    SlackModule.forRootAsync({
-      useFactory: (configService: ConfigService) => {
-        return {
-          type: 'webhook',
-          url: configService.get<string>('WEB_HOOK_URL'),
-        };
-      },
-      inject: [ConfigService],
-    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -34,15 +25,26 @@ import { RedisModule } from './redis/redis.module';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        entities: [__dirname + '/**/entity/*.entity{.ts,.js}'],
         synchronize: configService.get<string>('SYNCHRONIZED') === 'true',
         logging: ['query', 'error'],
       }),
+    }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    SlackModule.forRootAsync({
+      useFactory: (configService: ConfigService) => {
+        return {
+          type: 'webhook',
+          url: configService.get<string>('WEB_HOOK_URL'),
+        };
+      },
+      inject: [ConfigService],
     }),
     RunModule,
     UsersModule,
     MqModule,
     RedisModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, TimeoutInterceptor, WinstonLogger],
