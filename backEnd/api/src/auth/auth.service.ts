@@ -37,4 +37,8 @@ export class AuthService {
     this.redisService.storeRefreshToken(userInfo.id, refresh_token);
     return { access_token, refresh_token };
   }
+
+  async logout(userInfo) {
+    this.redisService.delRefreshToken(userInfo.userId);
+  }
 }

@@ -57,6 +57,10 @@ export class RedisService {
   }
 
   async getRefreshToken(userId: number) {
-    return await this.cacheManager.get<string>(`refresh:${userId}`);
+    return this.cacheManager.get<string>(`refresh:${userId}`);
+  }
+
+  async delRefreshToken(userId: number) {
+    this.cacheManager.del(`refresh:${userId}`);
   }
 }

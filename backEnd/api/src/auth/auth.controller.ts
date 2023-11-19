@@ -1,8 +1,8 @@
 import {
   Controller,
   Get,
+  Post,
   Query,
-  Redirect,
   Req,
   Res,
   UseGuards,
@@ -72,5 +72,14 @@ export class AuthController {
   getProfile(@Req() req: Request) {
     console.log(req);
     return req.user;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  logout(@Res() res: Response, @Req() req: Request) {
+    res.clearCookie('access_token');
+    res.clearCookie('refresh_token');
+    this.authService.logout(req.user);
+    return res.json({ message: 'Logout successful' });
   }
 }
