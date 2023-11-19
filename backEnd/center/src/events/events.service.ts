@@ -3,6 +3,11 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import Redis from 'ioredis';
 import { ResponseUrlDto } from 'src/connections/dto/response-url.dto copy';
 import { JoinRoomDto } from 'src/connections/dto/join-room.dto';
+import {
+  URLNotFoundException,
+  ValidateDtoException,
+} from 'src/common/exception/exception';
+import { ERRORS, EVENT } from 'src/common/utils';
 
 @Injectable()
 export class EventsService implements OnModuleInit {
@@ -17,19 +22,22 @@ export class EventsService implements OnModuleInit {
   }
 
   private subscribe() {
-    this.client.subscribe('register');
-    this.client.subscribe('signaling');
+    this.client.subscribe(EVENT.REGISTER);
+    this.client.subscribe(EVENT.SIGNALING);
 
     this.client.on('message', async (channel, message) => {
       const data = JSON.parse(message);
 
-      if (channel === 'register') {
+      if (channel === EVENT.REGISTER) {
         const { url } = data;
+        this.validateUrl(url);
         this.handleRegister(url);
       }
 
-      if (channel === 'signaling') {
+      if (channel === EVENT.SIGNALING) {
         const { url, usages } = data;
+        this.validateUrl(url);
+        this.validateUsages(usages);
         this.handleSignaling(url, usages);
       }
     });
@@ -57,6 +65,7 @@ export class EventsService implements OnModuleInit {
 
   findSignalingServer(data: JoinRoomDto): ResponseUrlDto {
     const { roomName } = data;
+    this.validateRoom(roomName);
 
     const isServer = this.roomToUrl.get(roomName);
 
@@ -66,6 +75,11 @@ export class EventsService implements OnModuleInit {
     }
 
     const server = this.serverToUrl.get('signaling');
+
+    if (!server) {
+      throw new URLNotFoundException(ERRORS.URL_NOT_FOUND.message);
+    }
+
     this.roomToUrl.set(roomName, server);
     const result: ResponseUrlDto = { url: server };
     return result;
@@ -73,6 +87,25 @@ export class EventsService implements OnModuleInit {
 
   leaveRoom(data: JoinRoomDto) {
     const { roomName } = data;
+    this.validateRoom(roomName);
     this.roomToUrl.delete(roomName);
+  }
+
+  validateRoom(room: string) {
+    if (!room) {
+      throw new ValidateDtoException(ERRORS.ROOM_EMPTY.message);
+    }
+  }
+
+  validateUrl(url: string) {
+    if (!url) {
+      throw new ValidateDtoException(ERRORS.URL_EMPTY.message);
+    }
+  }
+
+  validateUsages(usages: number) {
+    if (typeof usages !== 'number' || usages <= 0) {
+      throw new ValidateDtoException(ERRORS.USAGES_INVALID.message);
+    }
   }
 }
