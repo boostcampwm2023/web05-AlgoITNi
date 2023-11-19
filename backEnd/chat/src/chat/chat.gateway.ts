@@ -15,6 +15,7 @@ import { LeaveRoomDto } from './dto/leave-room.dto';
 import { MessageDto } from './dto/message.dto';
 import * as os from 'os';
 import { SOCKET, SOCKET_EVENT } from 'src/commons/utils';
+import { ChatService } from './chat.service';
 
 @WebSocketGateway({ namespace: SOCKET.NAME_SPACE, cors: true })
 export class ChatGateway implements OnGatewayConnection {
@@ -28,7 +29,10 @@ export class ChatGateway implements OnGatewayConnection {
   private subscriberClient: Redis;
   private publisherClient: Redis;
 
-  constructor(@InjectRedis() private readonly client: Redis) {
+  constructor(
+    @InjectRedis() private readonly client: Redis,
+    private readonly chatService: ChatService,
+  ) {
     this.subscriberClient = client.duplicate();
     this.publisherClient = client.duplicate();
   }
@@ -43,6 +47,8 @@ export class ChatGateway implements OnGatewayConnection {
     @ConnectedSocket() socket: Socket,
   ) {
     const { room } = data;
+    this.chatService.validateRoom(room);
+
     socket.join(room);
 
     const isRoom = this.rooms.get(room);
@@ -66,6 +72,8 @@ export class ChatGateway implements OnGatewayConnection {
     @ConnectedSocket() socket: Socket,
   ) {
     const { room } = data;
+    this.chatService.validateRoom(room);
+
     socket.leave(room);
 
     const count = (this.roomToCount.get(room) || 1) - 1;
@@ -80,6 +88,10 @@ export class ChatGateway implements OnGatewayConnection {
   @SubscribeMessage(SOCKET_EVENT.SEND_MESSAGE)
   async handleMessage(@MessageBody() data: MessageDto) {
     const { room, message } = data;
+
+    this.chatService.validateRoom(room);
+    this.chatService.validateMessage(message);
+
     const response = {
       message: message,
     };
