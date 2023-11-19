@@ -1,10 +1,19 @@
-import { Controller, Get, Query, Redirect, Req, Res } from '@nestjs/common';
-import { Response } from 'express';
+import {
+  Controller,
+  Get,
+  Query,
+  Redirect,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import { Request, Response } from 'express';
 import { GithubService } from './github/github.service';
 import { GoogleService } from './google/google.service';
 import { UsersService } from '../users/users.service';
 import { UserInfoDto } from '../users/dto/userInfo.dto';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +31,6 @@ export class AuthController {
   }
 
   @Get('github-callback')
-  @Redirect('/')
   async githubCallback(
     @Req() req: Request,
     @Res() res: Response,
@@ -49,15 +57,20 @@ export class AuthController {
 
     const { access_token, refresh_token } =
       await this.authService.login(loginUser);
+    res.header('Authorization', `Bearer ${access_token}`);
     res.cookie('access_token', access_token, {
       httpOnly: true,
     });
     res.cookie('refresh_token', refresh_token, {
       httpOnly: true,
     });
+    return res.redirect('/');
+  }
 
-    return {
-      message: 'login success',
-    };
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Req() req: Request) {
+    console.log(req);
+    return req.user;
   }
 }

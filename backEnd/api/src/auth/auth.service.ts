@@ -12,8 +12,8 @@ export class AuthService {
     private redisService: RedisService,
   ) {}
   async getAccessToken(userInfo: UserInfoDto) {
-    return await this.jwtService.signAsync({
-      id: userInfo.id,
+    return this.jwtService.signAsync({
+      sub: userInfo.id,
       name: userInfo.name,
     });
   }
@@ -21,7 +21,7 @@ export class AuthService {
   async getRefreshToken(userInfo: UserInfoDto) {
     return await this.jwtService.signAsync(
       {
-        id: userInfo.id,
+        sub: userInfo.id,
         name: userInfo.name,
       },
       {
