@@ -44,4 +44,10 @@ jobs:
           port: ${{secrets.SIGNALING_PORT}}
           script: |
             echo "PORT=${{ secrets.SIGNALING_SERVER_PORT }}" > /root/.env
+            echo "ALLOWED_ORIGIN=${{ secrets.SIGNALING_ALLOWED_ORIGIN }}" > /root/.env
+            echo "SOCKET_URL=${{ secrets.SERVER_A_SOCKET_URL }}" > /root/.env
+            echo "NODE_ENV=production" > /root/.env
+            echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" > /root/.env
+            echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" > /root/.env
+            echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" > /root/.env
             ./deploy.sh
