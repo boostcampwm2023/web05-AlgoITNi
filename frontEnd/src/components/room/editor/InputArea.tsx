@@ -1,0 +1,47 @@
+import { useEffect, useRef, useState } from 'react';
+import dompurify from 'dompurify';
+import hljs from 'highlight.js';
+
+export default function InputArea({
+  plainCode,
+  handleChange,
+}: {
+  plainCode: string;
+  handleChange: React.ChangeEventHandler<HTMLTextAreaElement>;
+}) {
+  const [highlightedCode, setHighlightedCode] = useState('');
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const preRef = useRef<HTMLPreElement>(null);
+
+  const sanitizer = dompurify.sanitize;
+
+  const handleScroll = (event: React.UIEvent<HTMLPreElement | HTMLTextAreaElement>) => {
+    if (!preRef.current || !textareaRef.current) return;
+
+    if (event.target === textareaRef.current) preRef.current.scrollLeft = textareaRef.current.scrollLeft;
+    else textareaRef.current.scrollLeft = preRef.current.scrollLeft;
+  };
+
+  useEffect(() => {
+    setHighlightedCode(hljs.highlight(plainCode, { language: 'python' }).value.replace(/" "/g, '&nbsp; '));
+  }, [plainCode]);
+
+  return (
+    <div className="relative w-full h-full">
+      <textarea
+        onScroll={handleScroll}
+        ref={textareaRef}
+        value={plainCode}
+        onChange={handleChange}
+        className="z-10 absolute w-full tracking-[3px] h-full p-2 pb-0 leading-7 overflow-hidden overflow-x-scroll text-transparent bg-transparent resize-none caret-white custom-scroll whitespace-nowrap focus:outline-none bg-mainColor"
+      />
+      <pre onScroll={handleScroll} className="absolute top-0 left-0 z-0 w-full h-full p-2 overflow-hidden" ref={preRef}>
+        <code
+          className="tracking-[3px] text-white font-Pretendard leading-7 w-full h-full text-ellipsis"
+          dangerouslySetInnerHTML={{ __html: sanitizer(highlightedCode) }}
+        />
+      </pre>
+    </div>
+  );
+}
