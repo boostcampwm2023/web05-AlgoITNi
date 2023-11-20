@@ -1,28 +1,21 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { ConnectionsService } from './connections.service';
-import { SignalingConnectionDto } from './dto/signaling-connections.dto';
-import { RegisterSignalingSocket } from './dto/register-signaling-socket.dto';
-import { ReturnConnectionsDto } from './dto/return-connections.dto copy';
+import { JoinRoomDto } from './dto/join-room.dto';
+import { EventsService } from 'src/events/events.service';
+import { ResponseDto } from 'src/common/dto/common-response.dto';
 
 @Controller('connections')
 export class ConnectionsController {
-  constructor(private readonly connectionsService: ConnectionsService) {}
+  constructor(private readonly eventService: EventsService) {}
 
-  @Post('signaling')
-  register(@Body() data: RegisterSignalingSocket) {
-    return this.connectionsService.registerSockets(data);
-  }
-
-  @Post('signaling/join')
-  create(@Body() data: SignalingConnectionDto) {
-    const response: ReturnConnectionsDto =
-      this.connectionsService.createConnection(data);
+  @Post('join')
+  create(@Body() data: JoinRoomDto): ResponseDto {
+    const response: ResponseDto = this.eventService.findServer(data);
     return response;
   }
 
-  @Post('signaling/leave')
-  leave(@Body() data: SignalingConnectionDto) {
-    this.connectionsService.leaveRoom(data);
-    return 'leave Success';
+  @Post('leave')
+  leave(@Body() data: JoinRoomDto): ResponseDto {
+    const response: ResponseDto = this.eventService.leaveRoom(data);
+    return response;
   }
 }

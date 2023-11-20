@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import useRoom from '@/hooks/useRoom';
+import useRTCConnection from '@/hooks/useRTCConnection';
 import Setting from '@/components/setting/Settings';
 import useMedia from '@/hooks/useMedia';
 import VideoSection from '@/components/room/VideoSection';
@@ -13,7 +13,7 @@ export default function Room() {
   const { roomId } = useParams();
   const mediaObject = useMedia();
   const [isSetting, setSetting] = useState(false);
-  const { streamList, dataChannels } = useRoom(roomId as string, mediaObject.stream as MediaStream, isSetting);
+  const { streamList, dataChannels } = useRTCConnection(roomId as string, mediaObject.stream as MediaStream, isSetting);
 
   if (!isSetting) return <Setting mediaObject={mediaObject} setSetting={setSetting} />;
 

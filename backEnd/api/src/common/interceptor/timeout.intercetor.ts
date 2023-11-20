@@ -3,9 +3,10 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
+  RequestTimeoutException,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { Observable, throwError, timeout } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 import { Request } from 'express';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
@@ -18,13 +19,22 @@ export class TimeoutInterceptor implements NestInterceptor {
     const startTime = Date.now();
 
     const request = context.switchToHttp().getRequest();
+    const timeoutValue = this.configService.get<number>('TIMEOUT') | 5000;
 
     return next.handle().pipe(
+      timeout(timeoutValue),
+      catchError((error) => {
+        if (error.name === 'TimeoutError') {
+          return throwError(() => new RequestTimeoutException());
+        } else {
+          return throwError(() => error);
+        }
+      }),
       tap(() => {
         const elapsedTime = Date.now() - startTime;
-        if (elapsedTime > 5000) {
-          // this.timeOutNotification(elapsedTime, request);
-         }
+        if (this.configService.get<string>('NODE_ENV') !== 'dev') {
+          this.timeOutNotification(elapsedTime, request);
+        }
       }),
     );
   }

@@ -14,11 +14,8 @@ export class DBException extends Error {
   }
 }
 
-export class RunningException extends Error {
-  status: number;
-
+export class RunningException extends HttpException {
   constructor(message: string = 'RunningException') {
-    super(message);
-    this.status = HttpStatus.BAD_REQUEST;
+    super(message, HttpStatus.BAD_REQUEST);
   }
 }

@@ -16,11 +16,17 @@ export class ErrorFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const status =
       exception instanceof HttpException ? exception.getStatus() : 500;
-    if (!(exception instanceof HttpException)) this.logger.error(exception);
+    const message =
+      exception instanceof HttpException
+        ? exception.message
+        : 'Internal Serval Error';
+    this.logger.error(
+      `path : ${request.url} \n${exception.message}`,
+      exception,
+    );
     response.status(status).json({
-      path: request.url,
       statusCode: status,
-      message: exception.message,
+      message,
       timestamp: new Date().toISOString(),
     });
   }

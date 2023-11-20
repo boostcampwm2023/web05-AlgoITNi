@@ -44,6 +44,10 @@ jobs:
           port: ${{secrets.RUNNING_PORT}}
           script: |
             echo "PORT=${{ secrets.RUNNING_SERVER_PORT }}" > /root/.env
-            echo "PORT=${{ secrets.ALLOWED_ORIGIN }}" > /root/.env
-            echo "PORT=${{ secrets.WEB_HOOK_URL }}" > /root/.env
+            echo "ALLOWED_ORIGIN=${{ secrets.RUNNING_ALLOWED_ORIGIN }}" >> /root/.env
+            echo "WEB_HOOK_URL=${{ secrets.WEB_HOOK_URL }}" >> /root/.env
+            echo "NODE_ENV=production" >> /root/.env
+            echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> /root/.env
+            echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> /root/.env
+            echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> /root/.env
             ./deploy.sh

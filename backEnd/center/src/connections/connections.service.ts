@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { ReturnConnectionsDto } from './dto/return-connections.dto copy';
-import { SignalingConnectionDto } from './dto/signaling-connections.dto';
+import { ResponseUrlDto } from './dto/response-url.dto';
+import { JoinRoomDto } from './dto/join-room.dto';
 import { RegisterSignalingSocket } from './dto/register-signaling-socket.dto';
 
 @Injectable()
@@ -21,7 +21,7 @@ export class ConnectionsService {
     return 'Register Success';
   }
 
-  createConnection(data: SignalingConnectionDto): ReturnConnectionsDto {
+  createConnection(data: JoinRoomDto): ResponseUrlDto {
     const { roomName } = data;
 
     const isRoom = this.roomToSocket.has(roomName);
@@ -30,7 +30,7 @@ export class ConnectionsService {
       const socket = this.roomToSocket.get(roomName);
       const connections = this.socketToConnections.get(socket);
       this.socketToConnections.set(socket, connections + 1);
-      const result: ReturnConnectionsDto = { url: socket };
+      const result: ResponseUrlDto = { url: socket };
       return result;
     }
 
@@ -45,12 +45,12 @@ export class ConnectionsService {
 
     this.roomToSocket.set(roomName, socket);
     this.socketToConnections.set(socket, connections + 1);
-    const result: ReturnConnectionsDto = { url: socket };
+    const result: ResponseUrlDto = { url: socket };
 
     return result;
   }
 
-  leaveRoom(data: SignalingConnectionDto): void {
+  leaveRoom(data: JoinRoomDto): void {
     const { roomName } = data;
     const socket = this.roomToSocket.get(roomName);
     const connections = this.socketToConnections.get(socket);
