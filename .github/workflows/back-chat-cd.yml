@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  running-server:
+  chat-server:
     runs-on: ubuntu-latest
 
     steps:
@@ -44,9 +44,9 @@ jobs:
           port: ${{secrets.CHAT_PORT}}
           script: |
             echo "PORT=${{ secrets.CHAT_SERVER_PORT }}" > /root/.env
-            echo "ALLOWED_ORIGIN=${{ secrets.CHAT_ALLOWED_ORIGIN }}" > /root/.env
-            echo "NODE_ENV=production" > /root/.env
-            echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" > /root/.env
-            echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" > /root/.env
-            echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" > /root/.env
+            echo "ALLOWED_ORIGIN=${{ secrets.CHAT_ALLOWED_ORIGIN }}" >> /root/.env
+            echo "NODE_ENV=production" >> /root/.env
+            echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> /root/.env
+            echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> /root/.env
+            echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> /root/.env
             ./deploy.sh
