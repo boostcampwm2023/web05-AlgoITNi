@@ -1,4 +1,4 @@
-name: backEnd chat server CI
+name: backEnd center server CI
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  running-server:
+  center-server:
     runs-on: ubuntu-latest
 
     steps:
