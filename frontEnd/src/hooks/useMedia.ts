@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import useSpeaker from '@/stores/useSpeaker';
+import useMediaControl from '@/stores/useMediaControl';
 
 export interface MediaObject {
   stream: MediaStream | undefined;
@@ -24,7 +25,7 @@ export default function useMedia(): MediaObject {
   const [selectedCamera, setSelectedCamera] = useState<string>('');
   const [selectedMic, setSelectedMic] = useState<string>('');
   const { speaker } = useSpeaker((state) => state);
-
+  const { micOn, videoOn } = useMediaControl((state) => state);
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({
@@ -37,6 +38,16 @@ export default function useMedia(): MediaObject {
           setMicList(res.filter((mediaDevice) => mediaDevice.kind === 'audioinput'));
           setSpeakerList(res.filter((mediaDevice) => mediaDevice.kind === 'audiooutput'));
         });
+
+        if (!micOn)
+          stream.getAudioTracks().forEach((track) => {
+            track.enabled = false;
+          });
+
+        if (!videoOn)
+          stream.getVideoTracks().forEach((track) => {
+            track.enabled = false;
+          });
         setUserStream(stream);
       });
   }, [selectedCamera, selectedMic, speaker]);
