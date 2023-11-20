@@ -4,13 +4,12 @@ import LineNumber from './LineNumber';
 import InputArea from './InputArea';
 import EditorButton from './EditorButton';
 import SaveButton from './SaveButton';
+import OutputArea from './OutputArea';
 
 export default function Editor({ dataChannels }: { dataChannels: Array<{ id: string; dataChannel: RTCDataChannel }> }) {
   const [plainCode, setPlainCode] = useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [execResult, setExecResult] = useState<string>(
-    'successsuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccesssuccess',
-  );
+  const [execResult, setExecResult] = useState<string>('');
 
   const ydoc = useRef(new Y.Doc());
   const ytext = useRef(ydoc.current.getText('sharedText'));
@@ -28,26 +27,14 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
     setPlainCode(event.target.value);
   };
 
-  const handleSaveLocal = () => {
-    const element = document.createElement('a');
-    const file = new Blob([plainCode], { type: 'text/plain' });
-    const fileURL = URL.createObjectURL(file);
-
-    element.href = fileURL;
-    element.download = 'solution.py';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
-    URL.revokeObjectURL(fileURL);
-  };
-
   const handleClear = () => {
     ytext.current.delete(0, ytext.current.length);
 
     setPlainCode('');
   };
+
+  // TODO: 코드 실행 핸들러 추가
+  const handleExecCode = () => {};
 
   useEffect(() => {
     dataChannels.forEach(({ dataChannel }) => {
@@ -62,11 +49,11 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
   }, [plainCode]);
 
   return (
-    <div className="w-full h-full rounded-lg bg-mainColor font-Pretendard min-w-[400px] min-h-[400px]">
-      <div className="min-h-[5%]">
-        <h1 className="p-2 text-white border-b border-white text-[2vh]">Solution.py</h1>
+    <div className="w-full h-full grid grid-rows-[repeat(12,minmax(0,1fr))] rounded-lg bg-mainColor font-Pretendard min-w-[400px] min-h-[400px]">
+      <div className="flex items-center justify-start h-full row-span-1 p-2 border-b border-white">
+        <h1 className="text-white text-[max(2vh,15px)]">Solution.py</h1>
       </div>
-      <div className="flex flex-col min-h-[65%] overflow-y-auto custom-scroll">
+      <div className="flex flex-col overflow-y-auto row-[span_7_/_span_7] custom-scroll">
         <div className="flex flex-grow">
           <div className="w-10 py-2 pr-2 overflow-hidden border-r border-white">
             <LineNumber plainCode={plainCode} />
@@ -74,22 +61,13 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
           <InputArea plainCode={plainCode} handleChange={handleChange} />
         </div>
       </div>
-      <div className="flex flex-col min-h-[30%]">
-        <div className="flex-grow">
-          <div className="p-2 text-white border-white border-y">OUTPUT</div>
-          <textarea
-            disabled
-            value={execResult}
-            className="w-full p-2 text-white border-b border-white resize-none bg-mainColor custom-scroll"
-          />
-        </div>
-        <div className="flex justify-end gap-2 px-2 py-1 h-fit">
-          {/* TODO: 클라우드 저장 핸들러 추가 */}
-          <SaveButton handleSaveLocal={handleSaveLocal} handleSaveCloud={() => {}} />
-          <EditorButton onClick={handleClear}>초기화</EditorButton>
-          {/* TODO: 클라우드 저장 핸들러 추가 */}
-          <EditorButton onClick={() => {}}>실행하기</EditorButton>
-        </div>
+      <div className="row-span-3">
+        <OutputArea execResult={execResult} />
+      </div>
+      <div className="flex items-center justify-end row-span-1 gap-2 p-[1vh]">
+        <SaveButton plainCode={plainCode} />
+        <EditorButton onClick={handleClear}>초기화</EditorButton>
+        <EditorButton onClick={handleExecCode}>실행하기</EditorButton>
       </div>
     </div>
   );

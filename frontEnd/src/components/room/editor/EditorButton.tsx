@@ -8,7 +8,7 @@ export default function EditorButton({
   return (
     <button
       type="button"
-      className="flex items-center justify-center px-4 py-2 text-[1.3vh] bg-[#132A37] font-thin text-white rounded whitespace-nowrap"
+      className="flex items-center w-[8vh] justify-center px-[max(2vh,25px)] h-full text-[max(1.2vh,10px)] bg-[#132A37] font-thin text-white rounded whitespace-nowrap"
       onClick={onClick}
     >
       {children}
