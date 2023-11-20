@@ -9,8 +9,8 @@ export class GithubService {
   private readonly authUrl = `https://github.com/login/oauth/authorize`;
   private readonly clientSecret;
   constructor(private configService: ConfigService) {
-    this.clientID = this.configService.get<string>('CLIENT_ID');
-    this.clientSecret = this.configService.get<string>('CLIENT_SECRET');
+    this.clientID = this.configService.get<string>('CLIENT_ID_GITHUB');
+    this.clientSecret = this.configService.get<string>('CLIENT_SECRET_GITHUB');
   }
   async authProxy() {
     const response = await axios.get(this.authUrl, {

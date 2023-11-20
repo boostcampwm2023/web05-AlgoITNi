@@ -46,6 +46,8 @@ export class AuthController {
       await this.userService.addUser(user, 'github');
       findUser = await this.userService.findUser(user);
     }
+    console.log(findUser);
+
     if (findUser.oauth !== 'github') {
       return { message: '다른 서비스로 가입한 내역이 있습니다.' }; // TODO: set StatusCode
     }
@@ -70,7 +72,6 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Req() req: Request) {
-    console.log(req);
     return req.user;
   }
 

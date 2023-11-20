@@ -24,7 +24,10 @@ import { AuthModule } from './auth/auth.module';
         port: +configService.get<number>('DB_PORT'),
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_DATABASE'),
+        database:
+          configService.get<string>('NODE_ENV') === 'dev'
+            ? configService.get<string>('DEV_DB_DATABASE')
+            : configService.get<string>('DB_DATABASE'),
         entities: [__dirname + '/**/entity/*.entity{.ts,.js}'],
         synchronize: configService.get<string>('SYNCHRONIZED') === 'true',
         logging: ['query', 'error'],
