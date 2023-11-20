@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Socket } from 'socket.io-client/debug';
 import Room from '../Room';
-import * as useRoom from '@/hooks/useRoom';
+import * as useRTCConnection from '@/hooks/useRTCConnection';
 import * as useMedia from '@/hooks/useMedia';
 
 const mockRoomData = {
@@ -25,7 +25,7 @@ jest.mock('@/constants/env', () => ({
 }));
 
 describe('Room 조건부 렌더링 테스트', () => {
-  jest.spyOn(useRoom, 'default').mockImplementation(() => mockRoomData);
+  jest.spyOn(useRTCConnection, 'default').mockImplementation(() => mockRoomData);
   jest.spyOn(useMedia, 'default').mockImplementation(() => mockMedia);
 
   it('Room에 처음 입장하면 Setting컴포넌트가 렌더링된다.', () => {
