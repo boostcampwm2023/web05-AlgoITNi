@@ -13,7 +13,13 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
   const [dataChannels, setDataChannels] = useState<{ id: string; dataChannel: RTCDataChannel }[]>([]);
 
   const socketConnect = () => {
-    fetch(VITE_SOCKET_URL, { method: 'POST', body: JSON.stringify({ roomName: roomId }) })
+    fetch(VITE_SOCKET_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ roomName: roomId }),
+    })
       .then((res) => res.json())
       .then((res) => {
         socket = io(res.result.url);
