@@ -1,5 +1,5 @@
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { HttpCode, HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
 import Redis from 'ioredis';
 import { ResponseUrlDto } from 'src/connections/dto/response-url.dto';
 import { JoinRoomDto } from 'src/connections/dto/join-room.dto';
@@ -8,6 +8,7 @@ import {
   ValidateDtoException,
 } from 'src/common/exception/exception';
 import { ERRORS, EVENT } from 'src/common/utils';
+import { ResponseDto } from 'src/common/dto/common-response.dto';
 
 @Injectable()
 export class EventsService implements OnModuleInit {
@@ -63,15 +64,15 @@ export class EventsService implements OnModuleInit {
     this.serverToCpus.set(url, usages);
   }
 
-  findServer(data: JoinRoomDto): ResponseUrlDto {
+  findServer(data: JoinRoomDto): ResponseDto {
     const { roomName } = data;
     this.validateRoom(roomName);
 
     const isServer = this.roomToUrl.get(roomName);
 
     if (isServer) {
-      const result: ResponseUrlDto = { url: isServer };
-      return result;
+      const response = this.createResponse(HttpStatus.OK, { url: isServer });
+      return response;
     }
 
     const server = this.returnUrl;
@@ -81,14 +82,16 @@ export class EventsService implements OnModuleInit {
     }
 
     this.roomToUrl.set(roomName, server);
-    const result: ResponseUrlDto = { url: server };
-    return result;
+    const response = this.createResponse(HttpStatus.OK, { url: server });
+    return response;
   }
 
-  leaveRoom(data: JoinRoomDto) {
+  leaveRoom(data: JoinRoomDto): ResponseDto {
     const { roomName } = data;
     this.validateRoom(roomName);
     this.roomToUrl.delete(roomName);
+    const response = this.createResponse(HttpStatus.OK, { room: roomName });
+    return response;
   }
 
   validateRoom(room: string) {
@@ -107,5 +110,13 @@ export class EventsService implements OnModuleInit {
     if (typeof usages !== 'number' || usages <= 0) {
       throw new ValidateDtoException(ERRORS.USAGES_INVALID.message);
     }
+  }
+
+  createResponse(statusCode: number, result: object): ResponseDto {
+    const response = new ResponseDto();
+    response.statusCode = statusCode;
+    response.result = result;
+    response.timestamp = new Date().toISOString();
+    return response;
   }
 }
