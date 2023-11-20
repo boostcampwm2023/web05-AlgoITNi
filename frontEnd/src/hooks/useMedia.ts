@@ -32,14 +32,13 @@ export default function useMedia(): MediaObject {
         audio: selectedMic ? { deviceId: { exact: selectedMic } } : true,
       })
       .then((stream) => {
+        navigator.mediaDevices.enumerateDevices().then((res) => {
+          setCameraList(res.filter((mediaDevice) => mediaDevice.kind === 'videoinput'));
+          setMicList(res.filter((mediaDevice) => mediaDevice.kind === 'audioinput'));
+          setSpeakerList(res.filter((mediaDevice) => mediaDevice.kind === 'audiooutput'));
+        });
         setUserStream(stream);
       });
-
-    navigator.mediaDevices.enumerateDevices().then((res) => {
-      setCameraList(res.filter((mediaDevice) => mediaDevice.kind === 'videoinput'));
-      setMicList(res.filter((mediaDevice) => mediaDevice.kind === 'audioinput'));
-      setSpeakerList(res.filter((mediaDevice) => mediaDevice.kind === 'audiooutput'));
-    });
   }, [selectedCamera, selectedMic, speaker]);
 
   return {
