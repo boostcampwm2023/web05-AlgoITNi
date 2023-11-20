@@ -1,4 +1,4 @@
-name: backEnd running server CD
+name: backEnd center server CD
 
 on:
   push:
@@ -21,31 +21,29 @@ jobs:
           node-version: 18.16.0
 
       - name: ⬇️ 의존성 설치
-        working-directory: ./backEnd/running
+        working-directory: ./backEnd/center
         run: npm ci
 
       - name: 📦 프로젝트 빌드
-        working-directory: ./backEnd/running
+        working-directory: ./backEnd/center
         run: npm run build
 
       - name: 🐳 도커 로그인
-        working-directory: ./backEnd/running
+        working-directory: ./backEnd/center
         run: |
-          docker login -u ${{ secrets.DOCKER_RUNNING_USERNAME }} -p ${{ secrets.DOCKER_RUNNING_PASSWORD }}
-          docker build -t ${{ secrets.DOCKER_RUNNING_REPO }}/running .
-          docker push ${{ secrets.DOCKER_RUNNING_REPO }}/running
+          docker login -u ${{ secrets.DOCKER_CENTER_USERNAME }} -p ${{ secrets.DOCKER_CENTER_PASSWORD }}
+          docker build -t ${{ secrets.DOCKER_CENTER_REPO }}/center .
+          docker push ${{ secrets.DOCKER_CENTER_REPO }}/center
 
       - name: 🏃‍♂️Deploy
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{secrets.RUNNING_HOST}}
-          username: ${{secrets.RUNNING_USERNAME}}
-          password: ${{secrets.RUNNING_PASSWORD}}
-          port: ${{secrets.RUNNING_PORT}}
+          host: ${{secrets.CENTER_HOST}}
+          username: ${{secrets.CENTER_USERNAME}}
+          key: ${{ secrets.CENTER_PASSWORD }}
           script: |
-            echo "PORT=${{ secrets.RUNNING_SERVER_PORT }}" > /root/.env
-            echo "ALLOWED_ORIGIN=${{ secrets.RUNNING_ALLOWED_ORIGIN }}" > /root/.env
-            echo "WEB_HOOK_URL=${{ secrets.WEB_HOOK_URL }}" > /root/.env
+            echo "PORT=${{ secrets.CENTER_SERVER_PORT }}" > /root/.env
+            echo "ALLOWED_ORIGIN=${{ secrets.CENTER_ALLOWED_ORIGIN }}" > /root/.env
             echo "NODE_ENV=production" > /root/.env
             echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" > /root/.env
             echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" > /root/.env
