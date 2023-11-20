@@ -1,22 +1,26 @@
-import { ReactNode, useState } from 'react';
-import Modal from '@/components/common/Modal';
+import React, { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import useModalState, { MODAL_COMPONENTS } from '@/stores/useModalState';
 
-export default function useModal() {
-  const [open, setOpen] = useState(false);
+export default function useCreateModal<P extends Record<string, unknown>>(Component: React.ComponentType<P>) {
+  const { addModal, showModal, hideModal } = useModalState((state) => state);
+  const [modalId] = useState(uuidv4());
 
-  const closeModal = () => {
-    setOpen(false);
+  useEffect(() => {
+    MODAL_COMPONENTS[modalId] = {
+      Comp: Component,
+    };
+    addModal(modalId);
+  }, [modalId]);
+
+  const show = (props?: P) => {
+    MODAL_COMPONENTS[modalId].props = props;
+    showModal(modalId);
   };
 
-  const openModal = () => {
-    setOpen(true);
+  const hide = () => {
+    hideModal(modalId);
   };
 
-  const modalComponent = open ? ({ children }: { children: ReactNode }) => Modal({ children, cancel: closeModal }) : () => null;
-
-  return {
-    Modal: modalComponent,
-    openModal,
-    closeModal,
-  };
+  return { show, hide };
 }

@@ -3,7 +3,7 @@
 import { ReactNode } from 'react';
 import cancelImg from '@/assets/cancel.svg';
 
-export default function Modal({ children, cancel }: { children: ReactNode; cancel: () => void }) {
+export default function ModalWrapper({ children, cancel }: { children: ReactNode; cancel: () => void }) {
   return (
     <div className="z-20 absolute top-0 left-0 flex items-center justify-center w-screen h-screen bg-[rgba(0,0,0,0.5)]" onClick={cancel}>
       <div className="relative p-4 bg-white rounded-2xl" onClick={(e) => e.stopPropagation()}>
