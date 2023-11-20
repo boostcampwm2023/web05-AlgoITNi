@@ -27,6 +27,26 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
     setPlainCode(event.target.value);
   };
 
+  const handleUploadLocalCodeFile = () => {
+    const input = document.createElement('input');
+
+    input.type = 'file';
+    input.onchange = (changeFileEvent) => {
+      const file = (changeFileEvent.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (fileLoadEvent) => {
+          setPlainCode((fileLoadEvent.target?.result as string) || '');
+          input.remove();
+        };
+
+        reader.readAsText(file);
+      }
+    };
+
+    input.click();
+  };
+
   const handleClear = () => {
     ytext.current.delete(0, ytext.current.length);
 
@@ -64,10 +84,15 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
       <div className="row-span-3">
         <OutputArea execResult={execResult} />
       </div>
-      <div className="flex items-center justify-end row-span-1 gap-2 p-[1vh]">
-        <SaveButton plainCode={plainCode} />
-        <EditorButton onClick={handleClear}>초기화</EditorButton>
-        <EditorButton onClick={handleExecCode}>실행하기</EditorButton>
+      <div className="flex items-center justify-between row-span-1 gap-2 p-[1vh]">
+        <div className="h-full">
+          <EditorButton onClick={handleUploadLocalCodeFile}>로컬 파일 업로드</EditorButton>
+        </div>
+        <div className="flex h-full gap-2">
+          <SaveButton plainCode={plainCode} />
+          <EditorButton onClick={handleClear}>초기화</EditorButton>
+          <EditorButton onClick={handleExecCode}>실행하기</EditorButton>
+        </div>
       </div>
     </div>
   );

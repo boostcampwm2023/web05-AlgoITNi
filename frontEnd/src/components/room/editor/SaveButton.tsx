@@ -31,7 +31,7 @@ export default function SaveButton({ plainCode }: { plainCode: string }) {
 
   return (
     <div className="relative h-full">
-      <div className="peer flex items-center w-[8vh] justify-center px-[max(2vh,25px)] h-full text-[max(1.2vh,10px)] bg-[#132A37] font-thin text-white rounded whitespace-nowrap">
+      <div className="peer flex items-center min-w-[8vh] justify-center px-[max(2vh,25px)] h-full text-[max(1.2vh,10px)] bg-[#132A37] font-thin text-white rounded whitespace-nowrap">
         저장하기
       </div>
       <div className="absolute z-10 items-center justify-between hidden gap-2 p-2 -translate-x-1/2 rounded-lg bg-[#132A37] left-1/2 -top-12 peer-hover:flex hover:flex">
