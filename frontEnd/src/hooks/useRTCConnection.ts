@@ -1,22 +1,34 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { useState, useEffect } from 'react';
-import { io } from 'socket.io-client/debug';
+import { Socket, io } from 'socket.io-client/debug';
 import { SOCKET_EMIT_EVENT, SOCKET_RECEIVE_EVENT } from '@/constants/socketEvents';
 import { VITE_SOCKET_URL, VITE_STUN_URL, VITE_TURN_CREDENTIAL, VITE_TURN_URL, VITE_TURN_USERNAME } from '@/constants/env';
 
 const RTCConnections: Record<string, RTCPeerConnection> = {};
+let socket: Socket;
 
-const useRoom = (roomId: string, localStream: MediaStream, isSetting: boolean) => {
+const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: boolean) => {
   const [isConnect, setIsConnect] = useState(false);
   const [streamList, setStreamList] = useState<{ id: string; stream: MediaStream }[]>([]);
   const [dataChannels, setDataChannels] = useState<{ id: string; dataChannel: RTCDataChannel }[]>([]);
-  const socket = io(VITE_SOCKET_URL);
 
   const socketConnect = () => {
-    socket.connect();
-    socket.emit(SOCKET_EMIT_EVENT.JOIN_ROOM, {
-      room: roomId,
-    });
-    setIsConnect(true);
+    fetch(VITE_SOCKET_URL, { method: 'POST', body: JSON.stringify({ roomName: roomId }) })
+      .then((res) => res.json())
+      .then((res) => {
+        socket = io(res.result.url);
+        socket.on(SOCKET_RECEIVE_EVENT.ALL_USERS, onAllUser);
+        socket.on(SOCKET_RECEIVE_EVENT.OFFER, onOffer);
+        socket.on(SOCKET_RECEIVE_EVENT.ANSWER, onAnswer);
+        socket.on(SOCKET_RECEIVE_EVENT.CANDIDATE, onCandidate);
+        socket.on(SOCKET_RECEIVE_EVENT.USER_EXIT, onUserExit);
+        socket.connect();
+
+        socket.emit(SOCKET_EMIT_EVENT.JOIN_ROOM, {
+          room: roomId,
+        });
+        setIsConnect(true);
+      });
   };
 
   useEffect(() => {
@@ -78,7 +90,7 @@ const useRoom = (roomId: string, localStream: MediaStream, isSetting: boolean) =
     return RTCConnection;
   };
 
-  socket.on(SOCKET_RECEIVE_EVENT.ALL_USERS, async (data: { users: Array<{ id: string }> }) => {
+  const onAllUser = async (data: { users: Array<{ id: string }> }) => {
     data.users.forEach((user) => {
       RTCConnections[user.id] = createPeerConnection(user.id);
     });
@@ -96,9 +108,9 @@ const useRoom = (roomId: string, localStream: MediaStream, isSetting: boolean) =
         offerReceiveId: key,
       });
     });
-  });
+  };
 
-  socket.on(SOCKET_RECEIVE_EVENT.OFFER, async (data: { sdp: RTCSessionDescription; offerSendId: string }) => {
+  const onOffer = async (data: { sdp: RTCSessionDescription; offerSendId: string }) => {
     RTCConnections[data.offerSendId] = createPeerConnection(data.offerSendId);
 
     await RTCConnections[data.offerSendId].setRemoteDescription(new RTCSessionDescription(data.sdp));
@@ -115,25 +127,25 @@ const useRoom = (roomId: string, localStream: MediaStream, isSetting: boolean) =
       answerSendId: socket.id,
       answerReceiveId: data.offerSendId,
     });
-  });
+  };
 
-  socket.on(SOCKET_RECEIVE_EVENT.ANSWER, (data: { sdp: RTCSessionDescription; answerSendId: string }) => {
+  const onAnswer = (data: { sdp: RTCSessionDescription; answerSendId: string }) => {
     RTCConnections[data.answerSendId].setRemoteDescription(new RTCSessionDescription(data.sdp));
-  });
+  };
 
-  socket.on(SOCKET_RECEIVE_EVENT.CANDIDATE, (data: { candidate: RTCIceCandidateInit; candidateSendId: string }) => {
+  const onCandidate = (data: { candidate: RTCIceCandidateInit; candidateSendId: string }) => {
     RTCConnections[data.candidateSendId].addIceCandidate(new RTCIceCandidate(data.candidate));
-  });
+  };
 
-  socket.on(SOCKET_RECEIVE_EVENT.USER_EXIT, (data: { id: string }) => {
+  const onUserExit = (data: { id: string }) => {
     RTCConnections[data.id].close();
     delete RTCConnections[data.id];
 
     setDataChannels((prev) => prev.filter(({ id }) => id !== data.id));
     setStreamList((prev) => prev.filter((stream) => stream.id !== data.id));
-  });
+  };
 
   return { socket, streamList, dataChannels };
 };
 
-export default useRoom;
+export default useRTCConnection;
