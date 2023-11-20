@@ -87,9 +87,25 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
         <div className="p-2 text-white border-white border-y">OUTPUT</div>
         <textarea disabled className="flex-grow h-10 p-2 text-white border-b border-white resize-none bg-mainColor" />
         <div className="flex justify-end gap-2 px-2 py-1 h-fit">
-          <button type="button" className="flex items-center justify-center px-4 py-2 text-xs bg-[#132A37] font-thin text-white rounded">
-            저장하기
-          </button>
+          <div className="relative">
+            <div className="peer flex items-center justify-center px-4 py-2 text-xs bg-[#132A37] font-thin text-white rounded">
+              저장하기
+            </div>
+            <div className="absolute z-10 items-center justify-between hidden gap-2 p-2 -translate-x-1/2 rounded-lg bg-[#132A37] left-1/2 -top-12 peer-hover:flex hover:flex">
+              <button
+                type="button"
+                className="flex items-center justify-center w-32 px-4 py-2 text-sm text-white duration-300 rounded-lg hover:text-black hover:bg-backgroundColor whitespace-nowrap"
+              >
+                다른 이름으로 저장
+              </button>
+              <button
+                type="button"
+                className="flex items-center justify-center w-32 px-4 py-2 text-sm text-white duration-300 rounded-lg hover:text-black hover:bg-backgroundColor whitespace-nowrap"
+              >
+                클라우드에 저장
+              </button>
+            </div>
+          </div>
           <button
             type="button"
             className="flex items-center justify-center px-4 py-2 text-xs bg-[#132A37] font-thin text-white rounded"
