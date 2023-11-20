@@ -24,10 +24,6 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
     ytext.current.delete(0, ytext.current.length);
     ytext.current.insert(0, event.target.value);
 
-    dataChannels.forEach(({ dataChannel }) => {
-      if (dataChannel.readyState === 'open') dataChannel.send(Y.encodeStateAsUpdate(ydoc.current) as Uint8Array);
-    });
-
     setPlainCode(event.target.value);
   };
 
@@ -38,6 +34,12 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
     else textareaRef.current.scrollLeft = preRef.current.scrollLeft;
   };
 
+  const handleResetButton = () => {
+    ytext.current.delete(0, ytext.current.length);
+
+    setPlainCode('');
+  };
+
   useEffect(() => {
     dataChannels.forEach(({ dataChannel }) => {
       dataChannel.onmessage = handleMessage;
@@ -46,6 +48,10 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
 
   useEffect(() => {
     setHighlightedCode(hljs.highlight(plainCode, { language: 'python' }).value.replace(/" "/g, '&nbsp; '));
+
+    dataChannels.forEach(({ dataChannel }) => {
+      if (dataChannel.readyState === 'open') dataChannel.send(Y.encodeStateAsUpdate(ydoc.current) as Uint8Array);
+    });
   }, [plainCode]);
 
   return (
@@ -84,7 +90,11 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
           <button type="button" className="flex items-center justify-center px-4 py-2 text-xs bg-[#132A37] font-thin text-white rounded">
             저장하기
           </button>
-          <button type="button" className="flex items-center justify-center px-4 py-2 text-xs bg-[#132A37] font-thin text-white rounded">
+          <button
+            type="button"
+            className="flex items-center justify-center px-4 py-2 text-xs bg-[#132A37] font-thin text-white rounded"
+            onClick={handleResetButton}
+          >
             초기화
           </button>
           <button type="button" className="flex items-center justify-center px-4 py-2 text-xs bg-[#132A37] font-thin text-white rounded">
