@@ -13,3 +13,9 @@ export class DBException extends Error {
     this.status = HttpStatus.INTERNAL_SERVER_ERROR;
   }
 }
+
+export class RunningException extends HttpException {
+  constructor(message: string = 'RunningException') {
+    super(message, HttpStatus.BAD_REQUEST);
+  }
+}

@@ -2,9 +2,12 @@ import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TimeoutInterceptor } from './common/interceptor/timeout.intercetor';
 import { LoggerMiddleware } from './common/logger/logger.middleware';
 import { SlackModule } from 'nestjs-slack-webhook';
+import { CodesModule } from './codes/codes.module';
+import { WinstonLogger } from './common/logger/winstonLogger.service';
+import { RedisModule } from './redis/redis.module';
+import { MqModule } from './mq/mq.module';
 
 @Module({
   imports: [
@@ -18,9 +21,12 @@ import { SlackModule } from 'nestjs-slack-webhook';
       },
       inject: [ConfigService],
     }),
+    CodesModule,
+    MqModule,
+    RedisModule,
   ],
   controllers: [AppController],
-  providers: [AppService, TimeoutInterceptor],
+  providers: [AppService, WinstonLogger],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
