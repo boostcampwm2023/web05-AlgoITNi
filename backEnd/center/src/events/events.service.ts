@@ -1,7 +1,7 @@
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import Redis from 'ioredis';
-import { ResponseUrlDto } from 'src/connections/dto/response-url.dto copy';
+import { ResponseUrlDto } from 'src/connections/dto/response-url.dto';
 import { JoinRoomDto } from 'src/connections/dto/join-room.dto';
 import {
   URLNotFoundException,
@@ -11,7 +11,7 @@ import { ERRORS, EVENT } from 'src/common/utils';
 
 @Injectable()
 export class EventsService implements OnModuleInit {
-  private serverToUrl: Map<string, string> = new Map();
+  private returnUrl: string;
   private serverToCpus: Map<string, number> = new Map();
   private roomToUrl: Map<string, string> = new Map();
 
@@ -46,24 +46,24 @@ export class EventsService implements OnModuleInit {
   private handleRegister(url: string) {
     this.serverToCpus.set(url, 0);
 
-    const nextServer = this.serverToUrl.get('signaling');
+    const nextServer = this.returnUrl;
     if (!nextServer) {
-      this.serverToUrl.set('signaling', url);
+      this.returnUrl = url;
     }
   }
 
   private handleSignaling(url: string, usages: number) {
-    const nextServer = this.serverToUrl.get('signaling');
+    const nextServer = this.returnUrl;
     const minUsages = this.serverToCpus.get(nextServer);
 
     if (usages < minUsages) {
-      this.serverToUrl.set('signaling', url);
+      this.returnUrl = url;
     }
 
     this.serverToCpus.set(url, usages);
   }
 
-  findSignalingServer(data: JoinRoomDto): ResponseUrlDto {
+  findServer(data: JoinRoomDto): ResponseUrlDto {
     const { roomName } = data;
     this.validateRoom(roomName);
 
@@ -74,7 +74,7 @@ export class EventsService implements OnModuleInit {
       return result;
     }
 
-    const server = this.serverToUrl.get('signaling');
+    const server = this.returnUrl;
 
     if (!server) {
       throw new URLNotFoundException(ERRORS.URL_NOT_FOUND.message);

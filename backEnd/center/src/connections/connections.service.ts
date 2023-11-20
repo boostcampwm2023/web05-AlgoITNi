@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ResponseUrlDto } from './dto/response-url.dto copy';
+import { ResponseUrlDto } from './dto/response-url.dto';
 import { JoinRoomDto } from './dto/join-room.dto';
 import { RegisterSignalingSocket } from './dto/register-signaling-socket.dto';
 
