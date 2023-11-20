@@ -34,6 +34,21 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
     else textareaRef.current.scrollLeft = preRef.current.scrollLeft;
   };
 
+  const handleSaveLocal = () => {
+    const element = document.createElement('a');
+    const file = new Blob([plainCode], { type: 'text/plain' });
+    const fileURL = URL.createObjectURL(file);
+
+    element.href = fileURL;
+    element.download = 'solution.py';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+    URL.revokeObjectURL(fileURL);
+  };
+
   const handleResetButton = () => {
     ytext.current.delete(0, ytext.current.length);
 
@@ -94,6 +109,7 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
             <div className="absolute z-10 items-center justify-between hidden gap-2 p-2 -translate-x-1/2 rounded-lg bg-[#132A37] left-1/2 -top-12 peer-hover:flex hover:flex">
               <button
                 type="button"
+                onClick={handleSaveLocal}
                 className="flex items-center justify-center w-32 px-4 py-2 text-sm text-white duration-300 rounded-lg hover:text-black hover:bg-backgroundColor whitespace-nowrap"
               >
                 다른 이름으로 저장
