@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
+import { ResponseCodeBlockDto } from '../run/dto/response-codeblock.dto';
 
 @Injectable()
 export class RedisService {
@@ -13,16 +14,20 @@ export class RedisService {
     return new Promise((resolve) => setTimeout(resolve, delay));
   };
 
-  async getCompletedJob(jobID): Promise<string | string[]> {
+  async getCompletedJob(jobID): Promise<ResponseCodeBlockDto> {
     this.runningRequest++;
     // this.logger.debug(this.runningRequest)
     this.logger.log(`try to get result to redis completedJob:${jobID}`);
-    const maxTrial = 100;
+    const maxTrial = 1000;
     const getData = async () =>
-      await this.cacheManager.get<string | string[]>(`completedJob:${jobID}`);
+      await this.cacheManager.get<ResponseCodeBlockDto>(
+        `completedJob:${jobID}`,
+      );
+
     let result;
     const interval = 50 * (Math.floor(this.runningRequest / 10) + 1);
     this.statistic_delay_time.push(interval);
+
     for (let i = 0; i < maxTrial; i++) {
       await this.delay(interval);
       result = await getData();
