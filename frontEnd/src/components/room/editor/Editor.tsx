@@ -31,6 +31,7 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
     const input = document.createElement('input');
 
     input.type = 'file';
+    input.accept = '.py';
     input.onchange = (changeFileEvent) => {
       const file = (changeFileEvent.target as HTMLInputElement).files?.[0];
       if (file) {
