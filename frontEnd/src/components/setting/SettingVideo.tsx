@@ -37,6 +37,7 @@ export default function SettingVideo({ mediaObject }: { mediaObject: MediaObject
             ({ list, setFunc }, i) =>
               list && (
                 <MediaSelector
+                  className="w-[33%] font-Pretendard text-xl"
                   key={i}
                   optionsData={list as MediaDeviceInfo[]}
                   setFunc={setFunc as React.Dispatch<React.SetStateAction<string>>}
