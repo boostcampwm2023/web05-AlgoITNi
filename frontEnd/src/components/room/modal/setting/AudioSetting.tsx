@@ -6,6 +6,44 @@ import Button from '@/components/common/Button';
 import useSpeaker from '@/stores/useSpeaker';
 import { SettingProps } from '@/types/settingModal';
 
+function AudioSelector({
+  imgSrc,
+  media,
+  testState,
+  startTest,
+  stopTest,
+  playRef,
+}: {
+  imgSrc: string;
+  media: SettingProps;
+  testState: boolean;
+  startTest: () => void;
+  stopTest: () => void;
+  playRef: React.RefObject<HTMLAudioElement>;
+}) {
+  return (
+    <div className="flex items-center w-full basis-1/2">
+      <div className="flex items-center w-full">
+        <div className="flex w-[70%]">
+          <img src={imgSrc} alt="mic" width="40px" />
+          <MediaSelector
+            className="w-[80%] text-[1vw] "
+            optionsData={media.list as MediaDeviceInfo[]}
+            setFunc={media.setFunc as React.Dispatch<React.SetStateAction<string>>}
+          />
+        </div>
+
+        <Button.Default onClick={testState ? stopTest : startTest} fontSize="1vw">
+          {testState ? '중지' : '테스트'}
+        </Button.Default>
+        <audio ref={playRef} autoPlay>
+          <track kind="captions" />
+        </audio>
+      </div>
+    </div>
+  );
+}
+
 export default function AudioSetting({ stream, mic, speaker }: { stream: MediaStream; mic: SettingProps; speaker: SettingProps }) {
   const [micTest, setMicTest] = useState(false);
   const [speakerTest, setSpeakerTest] = useState(false);
@@ -51,44 +89,15 @@ export default function AudioSetting({ stream, mic, speaker }: { stream: MediaSt
 
   return (
     <div className="flex flex-col items-center w-full h-full">
-      <div className="flex items-center w-full basis-1/2">
-        <div className="flex items-center w-full">
-          <div className="flex w-[70%]">
-            <img src={micSrc} alt="mic" width="40px" />
-            <MediaSelector
-              className="w-[80%] text-[1vw] "
-              optionsData={mic.list as MediaDeviceInfo[]}
-              setFunc={mic.setFunc as React.Dispatch<React.SetStateAction<string>>}
-            />
-          </div>
-
-          <Button.Default onClick={micTest ? stopMicTest : startMicTest} fontSize="1vw">
-            {micTest ? '중지' : '테스트'}
-          </Button.Default>
-          <audio ref={audioRef} autoPlay>
-            <track kind="captions" />
-          </audio>
-        </div>
-      </div>
-      <div className="flex items-center justify-start w-full basis-1/2">
-        <div className="flex w-[70%]">
-          <div>
-            <img src={speakerSrc} alt="mic" width="40px" />
-          </div>
-
-          <MediaSelector
-            className="w-[80%] text-[1vw]"
-            optionsData={speaker.list as MediaDeviceInfo[]}
-            setFunc={speaker.setFunc as React.Dispatch<React.SetStateAction<string>>}
-          />
-        </div>
-        <Button.Default onClick={speakerTest ? stopSpeakerTest : startSpeakerTest} fontSize="1vw">
-          {speakerTest ? '중지' : '테스트'}
-        </Button.Default>
-        <audio ref={mp3Ref} autoPlay>
-          <track kind="captions" />
-        </audio>
-      </div>
+      <AudioSelector imgSrc={micSrc} media={mic} testState={micTest} startTest={startMicTest} stopTest={stopMicTest} playRef={audioRef} />
+      <AudioSelector
+        imgSrc={speakerSrc}
+        media={speaker}
+        testState={speakerTest}
+        startTest={startSpeakerTest}
+        stopTest={stopSpeakerTest}
+        playRef={mp3Ref}
+      />
     </div>
   );
 }
