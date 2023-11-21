@@ -5,6 +5,7 @@ import InputArea from './InputArea';
 import EditorButton from './EditorButton';
 import SaveButton from './SaveButton';
 import OutputArea from './OutputArea';
+import { EDITOR_TAB_SIZE } from '@/constants/env';
 
 export default function Editor({ dataChannels }: { dataChannels: Array<{ id: string; dataChannel: RTCDataChannel }> }) {
   const [plainCode, setPlainCode] = useState<string>('');
@@ -41,7 +42,7 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
     if (event.key === 'Tab') {
       event.preventDefault();
 
-      setCursorPosition((prev) => prev + 4);
+      setCursorPosition((prev) => prev + EDITOR_TAB_SIZE);
       setPlainCode((prev) => `${prev.slice(0, selectionStart)}    ${prev.slice(selectionStart)}`);
     }
   };

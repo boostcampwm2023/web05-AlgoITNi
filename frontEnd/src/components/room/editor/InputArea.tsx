@@ -29,8 +29,12 @@ export default function InputArea({
     else textareaRef.current.scrollLeft = preRef.current.scrollLeft;
   };
 
+  const highlightCode = (language: string, code: string) => {
+    return hljs.highlight(code, { language }).value.replace(/" "/g, '&nbsp; ');
+  };
+
   useEffect(() => {
-    setHighlightedCode(hljs.highlight(plainCode, { language: 'python' }).value.replace(/" "/g, '&nbsp; '));
+    setHighlightedCode(highlightCode('python', plainCode));
 
     if (textareaRef.current) {
       textareaRef.current.selectionStart = cursorPosition;
