@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import useModalState, { MODAL_COMPONENTS } from '@/stores/useModalState';
 import ModalWrapper from './ModalWrapper';
 
@@ -17,6 +16,7 @@ export default function Modals() {
     <>
       {modalComponents.map(({ Modal, id }) => (
         <ModalWrapper cancel={() => hideModal(id)} key={id}>
+          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
           <Modal.Comp {...Modal.props} />
         </ModalWrapper>
       ))}
