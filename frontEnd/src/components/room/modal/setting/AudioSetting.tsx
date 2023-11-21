@@ -3,7 +3,6 @@ import MediaSelector from '@/components/setting/MediaSelector';
 import micSrc from '@/assets/mic.svg';
 import speakerSrc from '@/assets/speaker.svg';
 import Button from '@/components/common/Button';
-import mp3 from '@/assets/dreams.mp3';
 import useSpeaker from '@/stores/useSpeaker';
 import { SettingProps } from '@/types/settingModal';
 
@@ -41,7 +40,7 @@ export default function AudioSetting({ stream, mic, speaker }: { stream: MediaSt
 
   const startSpeakerTest = () => {
     if (!mp3Ref.current) return;
-    mp3Ref.current.src = mp3;
+    mp3Ref.current.src = '/dreams.mp3';
     setSpeakerTest(true);
   };
   const stopSpeakerTest = () => {
