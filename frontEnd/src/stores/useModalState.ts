@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 // 전체 등록된 모달을 관리한다.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const MODAL_COMPONENTS: { [id: string]: { Comp: React.ComponentType<any>; props?: Record<string, unknown> } } = {};
+export const MODAL_COMPONENTS: { [id: string]: { Component: React.ComponentType<any>; props?: Record<string, unknown> } } = {};
 
 type Modal = {
   id: string;

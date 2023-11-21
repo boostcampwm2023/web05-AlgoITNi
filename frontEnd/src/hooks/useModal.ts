@@ -8,7 +8,7 @@ export default function useModal<P extends Record<string, unknown>>(Component: R
 
   useEffect(() => {
     MODAL_COMPONENTS[modalId] = {
-      Comp: Component,
+      Component,
     };
     addModal(modalId);
   }, [modalId]);

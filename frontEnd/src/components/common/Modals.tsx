@@ -17,7 +17,7 @@ export default function Modals() {
       {modalComponents.map(({ Modal, id }) => (
         <ModalWrapper cancel={() => hideModal(id)} key={id}>
           {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-          <Modal.Comp {...Modal.props} />
+          <Modal.Component {...Modal.props} />
         </ModalWrapper>
       ))}
     </>
