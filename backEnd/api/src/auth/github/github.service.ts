@@ -21,7 +21,6 @@ export class GithubService {
         scope: 'user',
       },
     });
-    console.log(response.request.res.responseUrl);
     return response.request.res.responseUrl;
   }
 

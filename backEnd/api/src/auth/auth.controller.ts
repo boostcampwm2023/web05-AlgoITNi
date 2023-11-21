@@ -25,7 +25,8 @@ export class AuthController {
   ) {}
 
   @Get('github')
-  async githubProxy(@Res() res: Response) {
+  async githubProxy(@Res() res: Response, @Req() req: Request) {
+    req.session['returnTo'] = req.headers.referer || '/';
     const redirectUrl = await this.githubService.authProxy();
     return res.redirect(redirectUrl);
   }
@@ -46,7 +47,6 @@ export class AuthController {
       await this.userService.addUser(user, 'github');
       findUser = await this.userService.findUser(user);
     }
-    console.log(findUser);
 
     if (findUser.oauth !== 'github') {
       return { message: '다른 서비스로 가입한 내역이 있습니다.' }; // TODO: set StatusCode
@@ -57,21 +57,19 @@ export class AuthController {
     loginUser.id = findUser.id;
     loginUser.name = findUser.name;
 
-    const { access_token, refresh_token } =
-      await this.authService.login(loginUser);
-    res.cookie('access_token', access_token, {
-      httpOnly: true,
-    });
-    res.cookie('refresh_token', refresh_token, {
-      httpOnly: true,
-    });
-    return res.redirect('/');
+    await this.authService.login(loginUser, res);
+
+    const returnTo = req.session['returnTo'];
+    delete req.session['returnTo'];
+
+    res.redirect(returnTo);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Req() req: Request) {
-    return req.user;
+  getProfile(@Res() res: Response, @Req() req: Request) {
+    console.log(req.user);
+    return res.redirect(req.headers.referer || '/');
   }
 
   @Post('logout')

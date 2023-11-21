@@ -9,6 +9,7 @@ import {
 } from './common/exception/exception.filter';
 import { WinstonLogger } from './common/logger/winstonLogger.service';
 import * as cookieParser from 'cookie-parser';
+import * as session from 'express-session';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
@@ -29,7 +30,13 @@ async function bootstrap() {
   });
 
   app.use(cookieParser());
-
+  app.use(
+    session({
+      secret: 'my-secret',
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
   const port = configService.get<number>('PORT');
   await app.listen(port);
 }
