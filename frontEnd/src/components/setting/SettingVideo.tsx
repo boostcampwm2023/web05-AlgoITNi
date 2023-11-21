@@ -38,7 +38,6 @@ export default function SettingVideo({ mediaObject }: { mediaObject: MediaObject
               list && (
                 <MediaSelector
                   key={i}
-                  stream={stream}
                   optionsData={list as MediaDeviceInfo[]}
                   setFunc={setFunc as React.Dispatch<React.SetStateAction<string>>}
                 />

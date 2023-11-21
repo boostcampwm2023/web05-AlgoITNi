@@ -26,6 +26,7 @@ export default function useMedia(): MediaObject {
   const [selectedMic, setSelectedMic] = useState<string>('');
   const { speaker } = useSpeaker((state) => state);
   const { micOn, videoOn } = useMediaControl((state) => state);
+
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({
