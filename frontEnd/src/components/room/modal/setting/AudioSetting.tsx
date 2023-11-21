@@ -10,15 +10,13 @@ function AudioSelector({
   imgSrc,
   media,
   testState,
-  startTest,
-  stopTest,
+  toggleState,
   playRef,
 }: {
   imgSrc: string;
   media: SettingProps;
   testState: boolean;
-  startTest: () => void;
-  stopTest: () => void;
+  toggleState: () => void;
   playRef: React.RefObject<HTMLAudioElement>;
 }) {
   return (
@@ -33,7 +31,7 @@ function AudioSelector({
           />
         </div>
 
-        <Button.Default onClick={testState ? stopTest : startTest} fontSize="1vw">
+        <Button.Default onClick={toggleState} fontSize="1vw">
           {testState ? '중지' : '테스트'}
         </Button.Default>
         <audio ref={playRef} autoPlay>
@@ -62,42 +60,28 @@ export default function AudioSetting({ stream, mic, speaker }: { stream: MediaSt
     (mp3Ref.current as any).setSinkId?.(speakerDevice);
   }, [speakerDevice]);
 
-  const startMicTest = () => {
+  const toggleMicTest = () => {
     if (!audioRef.current) return;
-    stream.getAudioTracks().forEach((track) => {
-      track.enabled = true;
-    });
-    setMicTest(true);
+    if (!micTest) {
+      audioRef.current.srcObject = stream;
+      stream.getAudioTracks().forEach((track) => {
+        track.enabled = true;
+      });
+    } else audioRef.current.srcObject = null;
+    setMicTest((prev) => !prev);
   };
 
-  const stopMicTest = () => {
-    if (!audioRef.current) return;
-    audioRef.current.srcObject = null;
-    setMicTest(false);
-  };
-
-  const startSpeakerTest = () => {
+  const toggleSpeakerTest = () => {
     if (!mp3Ref.current) return;
-    mp3Ref.current.src = '/dreams.mp3';
-    setSpeakerTest(true);
-  };
-  const stopSpeakerTest = () => {
-    if (!mp3Ref.current) return;
-    mp3Ref.current.src = '';
-    setSpeakerTest(false);
+    if (!speakerTest) mp3Ref.current.src = '/dreams.mp3';
+    else mp3Ref.current.src = '';
+    setSpeakerTest((prev) => !prev);
   };
 
   return (
     <div className="flex flex-col items-center w-full h-full">
-      <AudioSelector imgSrc={micSrc} media={mic} testState={micTest} startTest={startMicTest} stopTest={stopMicTest} playRef={audioRef} />
-      <AudioSelector
-        imgSrc={speakerSrc}
-        media={speaker}
-        testState={speakerTest}
-        startTest={startSpeakerTest}
-        stopTest={stopSpeakerTest}
-        playRef={mp3Ref}
-      />
+      <AudioSelector imgSrc={micSrc} media={mic} testState={micTest} toggleState={toggleMicTest} playRef={audioRef} />
+      <AudioSelector imgSrc={speakerSrc} media={speaker} testState={speakerTest} toggleState={toggleSpeakerTest} playRef={mp3Ref} />
     </div>
   );
 }
