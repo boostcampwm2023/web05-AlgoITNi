@@ -10,6 +10,7 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
   const [plainCode, setPlainCode] = useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [execResult, setExecResult] = useState<string>('');
+  const [cursorPosition, setCursorPosition] = useState<number>(0);
 
   const ydoc = useRef(new Y.Doc());
   const ytext = useRef(ydoc.current.getText('sharedText'));
@@ -24,7 +25,24 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
     ytext.current.delete(0, ytext.current.length);
     ytext.current.insert(0, event.target.value);
 
+    setCursorPosition(event.target.selectionStart);
     setPlainCode(event.target.value);
+  };
+
+  const handleClick = (event: React.MouseEvent<HTMLTextAreaElement>) => {
+    setCursorPosition((event.target as EventTarget & HTMLTextAreaElement).selectionStart);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const { selectionStart } = event.target as EventTarget & HTMLTextAreaElement;
+    setCursorPosition(selectionStart);
+
+    if (event.key === 'Tab') {
+      event.preventDefault();
+
+      setCursorPosition((prev) => prev + 4);
+      setPlainCode((prev) => `${prev.slice(0, selectionStart)}    ${prev.slice(selectionStart)}`);
+    }
   };
 
   const handleUploadLocalCodeFile = () => {
@@ -79,7 +97,13 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
           <div className="w-10 py-2 pr-2 overflow-hidden border-r border-white">
             <LineNumber plainCode={plainCode} />
           </div>
-          <InputArea plainCode={plainCode} handleChange={handleChange} />
+          <InputArea
+            plainCode={plainCode}
+            cursorPosition={cursorPosition}
+            handleChange={handleChange}
+            handleKeyDown={handleKeyDown}
+            handleClick={handleClick}
+          />
         </div>
       </div>
       <div className="row-span-3">
