@@ -57,7 +57,7 @@ export default function AudioSetting({ stream, mic, speaker }: { stream: MediaSt
           <div className="flex w-[70%]">
             <img src={micSrc} alt="mic" width="40px" />
             <MediaSelector
-              className="w-[80%] text-[1.5vw] "
+              className="w-[80%] text-[1vw] "
               optionsData={mic.list as MediaDeviceInfo[]}
               setFunc={mic.setFunc as React.Dispatch<React.SetStateAction<string>>}
             />
@@ -78,7 +78,7 @@ export default function AudioSetting({ stream, mic, speaker }: { stream: MediaSt
           </div>
 
           <MediaSelector
-            className="w-[80%] text-[1.5vw]"
+            className="w-[80%] text-[1vw]"
             optionsData={speaker.list as MediaDeviceInfo[]}
             setFunc={speaker.setFunc as React.Dispatch<React.SetStateAction<string>>}
           />
