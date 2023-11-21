@@ -6,6 +6,7 @@ import EditorButton from './EditorButton';
 import SaveButton from './SaveButton';
 import OutputArea from './OutputArea';
 import { EDITOR_TAB_SIZE } from '@/constants/env';
+import { uploadLocalFile } from '@/utils/file';
 
 export default function Editor({ dataChannels }: { dataChannels: Array<{ id: string; dataChannel: RTCDataChannel }> }) {
   const [plainCode, setPlainCode] = useState<string>('');
@@ -48,24 +49,7 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
   };
 
   const handleUploadLocalCodeFile = () => {
-    const input = document.createElement('input');
-
-    input.type = 'file';
-    input.accept = '.py';
-    input.onchange = (changeFileEvent) => {
-      const file = (changeFileEvent.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (fileLoadEvent) => {
-          setPlainCode((fileLoadEvent.target?.result as string) || '');
-          input.remove();
-        };
-
-        reader.readAsText(file);
-      }
-    };
-
-    input.click();
+    uploadLocalFile((result) => setPlainCode(result));
   };
 
   const handleClear = () => {

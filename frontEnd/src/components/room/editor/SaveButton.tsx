@@ -1,3 +1,5 @@
+import { downloadLocalFile } from '@/utils/file';
+
 function SaveButtonElement({ children, onClick }: { children: React.ReactNode; onClick: React.MouseEventHandler<HTMLButtonElement> }) {
   return (
     <button
@@ -12,18 +14,7 @@ function SaveButtonElement({ children, onClick }: { children: React.ReactNode; o
 
 export default function SaveButton({ plainCode }: { plainCode: string }) {
   const handleSaveLocal = () => {
-    const element = document.createElement('a');
-    const file = new Blob([plainCode], { type: 'text/plain' });
-    const fileURL = URL.createObjectURL(file);
-
-    element.href = fileURL;
-    element.download = 'solution.py';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);
-    URL.revokeObjectURL(fileURL);
+    downloadLocalFile(plainCode, 'solution.py');
   };
 
   // TODO: 클라우드 저장 로직 추가
