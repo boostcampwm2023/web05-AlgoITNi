@@ -8,8 +8,9 @@ import OutputArea from './OutputArea';
 
 export default function Editor({ dataChannels }: { dataChannels: Array<{ id: string; dataChannel: RTCDataChannel }> }) {
   const [plainCode, setPlainCode] = useState<string>('');
+  // TODO: 코드 실행 요청 후 결과 setState 추가
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [execResult, setExecResult] = useState<string>('');
+  const [execResult] = useState<string>('');
   const [cursorPosition, setCursorPosition] = useState<number>(0);
 
   const ydoc = useRef(new Y.Doc());
