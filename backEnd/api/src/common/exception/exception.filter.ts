@@ -29,7 +29,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   }
 }
 
-@Catch(JsonWebTokenError)
+@Catch()
 export class AuthErrorFilter implements ExceptionFilter {
   private readonly logger = new Logger('AuthError Filter');
   catch(exception: JsonWebTokenError, host: ArgumentsHost) {
@@ -57,7 +57,10 @@ export class ErrorFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
     const status = HttpStatus.INTERNAL_SERVER_ERROR;
     const message = 'Internal server error';
-    this.logger.error(`path : ${request.url} \n${message}`, exception);
+    this.logger.error(
+      `path : ${request.url} \n${exception.message}`,
+      exception,
+    );
     response.status(status).json({
       statusCode: status,
       message: message,

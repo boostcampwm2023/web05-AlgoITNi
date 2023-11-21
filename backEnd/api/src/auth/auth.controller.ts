@@ -59,7 +59,6 @@ export class AuthController {
 
     const { access_token, refresh_token } =
       await this.authService.login(loginUser);
-    res.header('Authorization', `Bearer ${access_token}`);
     res.cookie('access_token', access_token, {
       httpOnly: true,
     });
@@ -75,7 +74,6 @@ export class AuthController {
     return req.user;
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@Res() res: Response, @Req() req: Request) {
     res.clearCookie('access_token');

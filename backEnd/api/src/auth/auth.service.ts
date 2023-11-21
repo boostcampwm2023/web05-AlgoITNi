@@ -6,11 +6,16 @@ import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class AuthService {
+  private readonly refreshSecret;
+  private readonly refreshExpire;
   constructor(
     private configService: ConfigService,
     private jwtService: JwtService,
     private redisService: RedisService,
-  ) {}
+  ) {
+    this.refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET');
+    this.refreshExpire = this.configService.get<string>('JWT_REFRESH_EXPIRE');
+  }
   async getAccessToken(userInfo: UserInfoDto) {
     return this.jwtService.signAsync({
       sub: userInfo.id,
@@ -25,8 +30,8 @@ export class AuthService {
         name: userInfo.name,
       },
       {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-        expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRE'),
+        secret: this.refreshSecret,
+        expiresIn: this.refreshExpire,
       },
     );
   }
