@@ -17,7 +17,7 @@ export default function SettingVideo({ mediaObject }: { mediaObject: MediaObject
   return (
     stream && (
       <div className="flex flex-col gap-[20px] w-full h-full">
-        <div className="relative w-full h-[550px]">
+        <div className="relative w-full h-[60vh]">
           <Video stream={stream} muted />
           <div className="absolute flex items-center justify-center w-full gap-[1vw] bottom-[10px]">
             <MediaControlButton
