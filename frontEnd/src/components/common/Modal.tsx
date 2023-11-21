@@ -18,12 +18,8 @@ export default function Modal({
   cancel: () => void;
 }) {
   const [className, setClassName] = useState(ANIMATION_RENDER);
-  const handleCancel = () => {
-    setClassName(ANIMATION_REMOVE);
-  };
-  const handleAnimationEnd = () => {
-    if (className === ANIMATION_REMOVE) cancel();
-  };
+  const handleCancel = () => setClassName(ANIMATION_REMOVE);
+  const handleAnimationEnd = () => className === ANIMATION_REMOVE && cancel();
 
   return (
     <div
