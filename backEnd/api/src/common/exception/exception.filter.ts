@@ -29,7 +29,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   }
 }
 
-@Catch()
+@Catch(JsonWebTokenError)
 export class AuthErrorFilter implements ExceptionFilter {
   private readonly logger = new Logger('AuthError Filter');
   catch(exception: JsonWebTokenError, host: ArgumentsHost) {

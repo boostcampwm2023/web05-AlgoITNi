@@ -61,8 +61,7 @@ export class AuthController {
 
     const returnTo = req.session['returnTo'];
     delete req.session['returnTo'];
-
-    res.redirect(returnTo);
+    return res.redirect(returnTo);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -71,11 +70,12 @@ export class AuthController {
     return req.user;
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('logout')
   logout(@Res() res: Response, @Req() req: Request) {
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');
     this.authService.logout(req.user);
-    return res.json({ message: 'Logout successful' });
+    return res.json({ message: 'Logout success' });
   }
 }

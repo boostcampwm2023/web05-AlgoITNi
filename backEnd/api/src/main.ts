@@ -10,15 +10,21 @@ import {
 import { WinstonLogger } from './common/logger/winstonLogger.service';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
+import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
   app.useGlobalInterceptors(new TimeoutInterceptor(configService));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+    }),
+  );
 
   app.useGlobalFilters(
-    new ErrorFilter(), // last
+    new ErrorFilter(),
     new HttpExceptionFilter(),
-    new AuthErrorFilter(), // first
+    new AuthErrorFilter(),
   );
 
   // const origin = configService.get<string>('ALLOWED_ORIGIN');
@@ -32,7 +38,7 @@ async function bootstrap() {
   app.use(cookieParser());
   app.use(
     session({
-      secret: 'my-secret',
+      secret: configService.get<string>('SESSION_SECRET'),
       resave: false,
       saveUninitialized: false,
     }),
