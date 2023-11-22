@@ -27,7 +27,7 @@ export class AuthController {
   @Get('github')
   async githubProxy(@Res() res: Response, @Req() req: Request) {
     req.session['returnTo'] = req.headers.referer || '/';
-    const redirectUrl = await this.githubService.authProxy();
+    const redirectUrl = this.githubService.getAuthUrl();
     return res.redirect(redirectUrl);
   }
 

@@ -5,21 +5,17 @@ import { UserDto } from '../../users/dto/user.dto';
 
 @Injectable()
 export class GithubService {
+  private readonly authUrl;
   private readonly clientID;
-  private readonly authUrl = `https://github.com/login/oauth/authorize`;
   private readonly clientSecret;
   constructor(private configService: ConfigService) {
+    const authPath = `https://github.com/login/oauth/authorize`;
     this.clientID = this.configService.get<string>('CLIENT_ID_GITHUB');
     this.clientSecret = this.configService.get<string>('CLIENT_SECRET_GITHUB');
+    this.authUrl = `${authPath}?scope=user&client_id=${this.clientID}`;
   }
-  async authProxy() {
-    const response = await axios.get(this.authUrl, {
-      params: {
-        client_id: this.clientID,
-        scope: 'user',
-      },
-    });
-    return response.request.res.responseUrl;
+  getAuthUrl() {
+    return this.authUrl;
   }
 
   async getGithubAccessToken(code) {
