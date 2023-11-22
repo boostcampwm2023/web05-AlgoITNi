@@ -30,7 +30,7 @@ export default function Modal({
         <button className="absolute w-4 h-4 top-4 right-4" onClick={handleCancel} type="button">
           <img src={cancelImg} alt="cancel" />
         </button>
-        <div className="py-8">
+        <div className="py-8 reative">
           <Component {...{ ...modalProps, hide: handleCancel }} />
         </div>
       </div>
