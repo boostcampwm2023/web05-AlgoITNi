@@ -3,10 +3,14 @@ import { Inject, Injectable } from '@nestjs/common';
 import puppeteer from 'puppeteer';
 import { Cache } from 'cache-manager';
 import { time } from 'src/common/utils';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CrawlerService {
-  constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
+  constructor(
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private configService: ConfigService,
+  ) {}
 
   async findOne(url: string) {
     const contents = await this.getHtml(url);
@@ -26,7 +30,18 @@ export class CrawlerService {
   }
 
   async getHtml(url: string) {
-    const browser = await puppeteer.launch();
+    const chromiumPath = this.configService.get<string>('CHROMIUM_PATH');
+    const browser = await puppeteer.launch({
+      headless: 'new',
+      executablePath: chromiumPath,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+      ],
+      ignoreHTTPSErrors: true,
+    });
     const page = await browser.newPage();
     await page.goto(url);
     const contents = await page.content();
