@@ -6,14 +6,6 @@ export class VulnerableException extends HttpException {
   }
 }
 
-export class UnexpectedErrorEX extends Error {
-  status: number;
-  constructor() {
-    super('에러가 발생했습니다!');
-    this.status = HttpStatus.INTERNAL_SERVER_ERROR;
-  }
-}
-
 export class TransactionInterceptorRequired extends HttpException {
   constructor() {
     super(
@@ -35,5 +27,11 @@ export class TimeoutCodeRunning extends HttpException {
       '코드실행 결과를 찾을 수 없습니다.',
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
+  }
+}
+
+export class ResourceNotFound extends HttpException {
+  constructor(message = '요청하신 리소스를 찾을 수 없습니다.') {
+    super(message, HttpStatus.BAD_REQUEST);
   }
 }

@@ -12,6 +12,7 @@ import { WinstonLogger } from './common/logger/winstonLogger.service';
 import { MqModule } from './mq/mq.module';
 import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './auth/auth.module';
+import { CodesModule } from './codes/codes.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { AuthModule } from './auth/auth.module';
     MqModule,
     RedisModule,
     AuthModule,
+    CodesModule,
   ],
   controllers: [AppController],
   providers: [AppService, TimeoutInterceptor, WinstonLogger],
