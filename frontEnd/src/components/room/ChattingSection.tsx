@@ -27,11 +27,16 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
   };
 
   return (
-    <div className="relative flex items-center justify-center w-full h-full rounded-lg bg-primary font-Pretendard">
-      <form onSubmit={handleMessageSend} className="absolute bottom-0 w-full p-2 bg-red-300 rounded-b-lg">
-        <div className="relative">
-          <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} className="w-full h-10 p-2 rounded-lg" />
-          <button type="submit" className="absolute top-0 right-0 p-2 font-thin text-white rounded-lg bg-mainColor">
+    <div className="relative flex items-center justify-center w-full h-full rounded-lg bg-primary min-w-[150px]">
+      <form onSubmit={handleMessageSend} className="absolute bottom-0 w-full p-2 rounded-b-lg">
+        <div className="flex items-center h-10 border rounded-lg border-base">
+          <input
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="w-full h-10 p-2 rounded-s-lg focus:outline-none"
+          />
+          <button type="submit" className="h-full px-4 py-1 font-light text-white rounded-e-lg whitespace-nowrap bg-secondary">
             전송
           </button>
         </div>
