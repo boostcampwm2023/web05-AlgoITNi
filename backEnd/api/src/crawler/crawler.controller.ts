@@ -10,4 +10,10 @@ export class CrawlerController {
     const content = await this.crawlerService.findOne(url);
     return content;
   }
+
+  @Get('v2')
+  async crawlingV2(@Query('url') url: string) {
+    const content = await this.crawlerService.findOneUsingCache(url);
+    return content;
+  }
 }

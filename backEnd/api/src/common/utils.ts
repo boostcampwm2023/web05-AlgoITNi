@@ -9,6 +9,14 @@ const timeUnit = {
   DAY: 'd',
 };
 
+export const time = {
+  SECOND: 1,
+  MINUTE: 60,
+  FIVE_MINUTE: 5 * 60,
+  HOUR: 60 * 60,
+  DAY: 60 * 60 * 24,
+};
+
 export const calcExpireSeconds = (expireString: string) => {
   const regex = /^(\d+)([smhd])$/;
   const result = expireString.match(regex);
