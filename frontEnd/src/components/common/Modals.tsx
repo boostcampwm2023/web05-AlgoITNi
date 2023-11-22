@@ -15,7 +15,7 @@ export default function Modals() {
   return (
     <>
       {modalComponents.map(({ Modal: modal, id }) => (
-        <Modal cancel={() => hideModal(id)} key={id} Component={modal.Component} modalProps={modal.props} />
+        <Modal hide={() => hideModal(id)} key={id} Component={modal.Component} modalProps={modal.props} />
       ))}
     </>
   );

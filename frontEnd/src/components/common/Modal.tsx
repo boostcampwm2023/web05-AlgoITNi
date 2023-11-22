@@ -11,15 +11,15 @@ const ANIMATION_REMOVE = 'relative p-4 bg-white rounded-2xl animate-remove';
 export default function Modal({
   Component,
   modalProps,
-  cancel,
+  hide,
 }: {
   Component: React.ComponentType<any>;
   modalProps?: Record<string, unknown>;
-  cancel: () => void;
+  hide: () => void;
 }) {
   const [className, setClassName] = useState(ANIMATION_RENDER);
   const handleCancel = () => setClassName(ANIMATION_REMOVE);
-  const handleAnimationEnd = () => className === ANIMATION_REMOVE && cancel();
+  const handleAnimationEnd = () => className === ANIMATION_REMOVE && hide();
 
   return (
     <div
