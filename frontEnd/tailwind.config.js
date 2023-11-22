@@ -5,17 +5,17 @@ export default {
     extend: {
       keyframes: {
         render: {
-          '0%': { transform: 'scale(0)' },
+          '0%': { transform: 'scale(0.5)' },
           '100%': { transform: 'scale(1)' },
         },
         remove: {
           '0%': { transform: 'scale(1)' },
-          '100%': { transform: 'scale(0)' },
+          '100%': { transform: 'scale(0.2) ' },
         },
       },
       animation: {
-        render: 'render 0.3s',
-        remove: 'remove 0.3s',
+        render: 'render 0.2s',
+        remove: 'remove 0.2s',
       },
       colors: {
         mainColor: '#37485D',
