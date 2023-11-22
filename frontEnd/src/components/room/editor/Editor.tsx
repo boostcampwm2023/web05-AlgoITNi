@@ -74,7 +74,7 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
   }, [plainCode]);
 
   return (
-    <div className="w-full h-full grid grid-rows-[repeat(12,minmax(0,1fr))] rounded-lg bg-mainColor font-Pretendard min-w-[400px] min-h-[400px]">
+    <div className="w-full h-full grid grid-rows-[repeat(12,minmax(0,1fr))] rounded-lg bg-primary min-w-[400px] min-h-[400px]">
       <div className="flex items-center justify-start h-full row-span-1 p-2 border-b border-white">
         <h1 className="text-white text-[max(2vh,15px)]">Solution.py</h1>
       </div>

@@ -1,14 +1,26 @@
-@import './font.css';
+@import './fonts/pretendard.css';
 @import './editor.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Pretendard';
+  font-style: normal;
+  font-weight: normal;
+}
+
 html,
 body {
+  @apply font-Pretendard;
   width: 100%;
   height: 100%;
+}
+
+pre,
+code {
+  @apply font-Pretendard;
 }
 
 .custom-scroll::-webkit-scrollbar {
@@ -25,5 +37,5 @@ body {
 }
 
 .custom-scroll::-webkit-scrollbar-track {
-  @apply bg-mainColor;
+  @apply bg-primary;
 }

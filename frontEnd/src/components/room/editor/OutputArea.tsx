@@ -5,7 +5,7 @@ export default function OutputArea({ execResult }: { execResult: string }) {
       <textarea
         disabled
         value={execResult}
-        className="flex-grow w-full p-2 text-xs text-white border-b border-white resize-none bg-mainColor custom-scroll"
+        className="flex-grow w-full p-2 text-xs text-white border-b border-white resize-none bg-primary custom-scroll"
       />
     </div>
   );
