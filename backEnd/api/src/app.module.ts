@@ -11,9 +11,28 @@ import { UsersModule } from './users/users.module';
 import { WinstonLogger } from './common/logger/winstonLogger.service';
 import { MqModule } from './mq/mq.module';
 import { RedisModule } from './redis/redis.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'mysql',
+        host: configService.get<string>('DB_HOST'),
+        port: +configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database:
+          configService.get<string>('NODE_ENV') === 'dev'
+            ? configService.get<string>('DEV_DB_DATABASE')
+            : configService.get<string>('DB_DATABASE'),
+        entities: [__dirname + '/**/entity/*.entity{.ts,.js}'],
+        synchronize: configService.get<string>('SYNCHRONIZED') === 'true',
+        logging: ['query', 'error'],
+      }),
+    }),
     ConfigModule.forRoot({ isGlobal: true }),
     SlackModule.forRootAsync({
       useFactory: (configService: ConfigService) => {
@@ -24,25 +43,11 @@ import { RedisModule } from './redis/redis.module';
       },
       inject: [ConfigService],
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get<string>('DB_HOST'),
-        port: +configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USERNAME'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_DATABASE'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: configService.get<string>('SYNCHRONIZED') === 'true',
-        logging: ['query', 'error'],
-      }),
-    }),
     RunModule,
     UsersModule,
     MqModule,
     RedisModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, TimeoutInterceptor, WinstonLogger],

@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import Home from '@pages/Home.tsx';
 import Room from '@pages/Room.tsx';
 import '@styles/index.css';
+import Modals from './components/common/Modals';
 
 const router = createBrowserRouter([
   {
@@ -14,4 +15,12 @@ const router = createBrowserRouter([
     element: <Room />,
   },
 ]);
-ReactDOM.createRoot(document.getElementById('root')!).render(<RouterProvider router={router} />);
+function Main() {
+  return (
+    <div>
+      <RouterProvider router={router} />
+      <Modals />
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')!).render(<Main />);

@@ -58,18 +58,21 @@ export class CodesService {
 
   runCommand(filePath, timeout): Promise<runCommandResult> {
     return new Promise((resolve) => {
-      const childProcess = exec(`py ${filePath}`, (error, stdout, stderr) => {
-        if (error) {
-          this.logger.error(`failed to run requested code ${error.message}`);
+      const childProcess = exec(
+        `python3 ${filePath}`,
+        (error, stdout, stderr) => {
+          if (error) {
+            this.logger.error(`failed to run requested code ${error.message}`);
 
-          if (error.signal === this.killSignal) {
-            stderr = this.timeOutMessage;
+            if (error.signal === this.killSignal) {
+              stderr = this.timeOutMessage;
+            }
+            resolve({ stdout, stderr });
+          } else {
+            resolve({ stdout, stderr });
           }
-          resolve({ stdout, stderr });
-        } else {
-          resolve({ stdout, stderr });
-        }
-      });
+        },
+      );
 
       // 일정 시간 후 자식 프로세스 강제 종료
       setTimeout(() => {
