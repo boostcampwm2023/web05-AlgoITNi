@@ -40,10 +40,8 @@ export class AuthController {
     const accessToken = await this.githubService.getGithubAccessToken(code);
     const user = await this.githubService.getUserInfo(accessToken);
 
-    // find User
     let findUser = await this.userService.findUser(user);
     if (findUser === null) {
-      // 없으면 add
       await this.userService.addUser(user, 'github');
       findUser = await this.userService.findUser(user);
     }
@@ -52,7 +50,6 @@ export class AuthController {
       return { message: '다른 서비스로 가입한 내역이 있습니다.' }; // TODO: set StatusCode
     }
 
-    // 로그인 jwt 발급;
     const loginUser = new UserInfoDto();
     loginUser.id = findUser.id;
     loginUser.name = findUser.name;

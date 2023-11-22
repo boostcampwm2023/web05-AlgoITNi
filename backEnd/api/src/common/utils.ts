@@ -2,6 +2,13 @@ export const requestPath = {
   RUN_PYTHON: '/codes/python',
 };
 
+const timeUnit = {
+  SECOND: 's',
+  MINUTE: 'm',
+  HOUR: 'h',
+  DAY: 'd',
+};
+
 export const calcExpireSeconds = (expireString: string) => {
   const regex = /^(\d+)([smhd])$/;
   const result = expireString.match(regex);
@@ -9,13 +16,13 @@ export const calcExpireSeconds = (expireString: string) => {
     const num = result[1];
     const unit = result[2];
     switch (unit) {
-      case 's':
+      case timeUnit.SECOND:
         return 1000 * +num;
-      case 'm':
+      case timeUnit.MINUTE:
         return 1000 * +num * 60;
-      case 'h':
+      case timeUnit.HOUR:
         return 1000 * +num * 60 * 60;
-      case 'd':
+      case timeUnit.DAY:
         return 1000 * +num * 24 * 60 * 60;
     }
   }

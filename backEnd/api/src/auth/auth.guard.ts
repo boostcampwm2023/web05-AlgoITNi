@@ -55,7 +55,6 @@ export class JwtAuthGuard implements CanActivate {
 
     if (accessResult) {
       if (!refreshResult) {
-        // access 토큰이 유효한데 refresh 토큰이 expired 됐으면 업데이트
         const newRefreshToken = await this.authService.getRefreshToken(user);
         this.authService.setRefreshToken(response, newRefreshToken, user.sub);
       }
@@ -65,11 +64,9 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     if (!accessResult && refreshResult) {
-      // access token 만료.
       const refreshTokenHave = this.redisService.getRefreshToken(user.sub);
       if (refreshTokenHave !== refreshToken) return false; // 리프레시 토큰이 유효하지 않아요!
 
-      // accessToken 재발급
       const newAccessToken = await this.authService.getAccessToken(user);
       this.authService.setAccessToken(response, newAccessToken);
 
