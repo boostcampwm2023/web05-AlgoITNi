@@ -16,6 +16,9 @@ import { Request } from 'express';
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { UserInfoDto } from '../users/dto/userInfo.dto';
 import { ResourceNotFound } from '../common/exception/exception';
+import { Serialize } from '../common/interceptor/serialize.interceptor';
+import { SaveResultDto } from './dto/saveResult.dto';
+import { GetCodeDto } from './dto/getCode.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('codes')
@@ -24,6 +27,7 @@ export class CodesController {
   constructor(private readonly codesService: CodesService) {}
 
   @Post()
+  @Serialize(SaveResultDto)
   async save(@Body() saveCodeDto: SaveCodeDto, @Req() req: Request) {
     const user: UserInfoDto = req.user as UserInfoDto;
     saveCodeDto.userID = user.id;
@@ -31,6 +35,7 @@ export class CodesController {
   }
 
   @Get()
+  @Serialize(GetCodeDto)
   async getAll(@Req() req: Request) {
     const user: UserInfoDto = req.user as UserInfoDto;
     const userID = user.id;
@@ -38,6 +43,7 @@ export class CodesController {
   }
 
   @Get(':id')
+  @Serialize(GetCodeDto)
   async getOne(@Req() req: Request, @Param('id') id: string) {
     const user: UserInfoDto = req.user as UserInfoDto;
     const userID = user.id;
