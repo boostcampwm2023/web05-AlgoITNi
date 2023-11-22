@@ -41,7 +41,6 @@ export class AuthController {
   ) {
     const accessToken = await this.githubService.getGithubAccessToken(code);
     const user = await this.githubService.getUserInfo(accessToken);
-
     let findUser = await this.userService.findUser(user);
     if (findUser === null) {
       await this.userService.addUser(user, 'github');
