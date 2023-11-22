@@ -57,6 +57,7 @@ jobs:
             echo "SYNCHRONIZED=${{secrets.SYNCHRONIZED}}" >> .env
             echo "NODE_ENV=production" >> .env
             echo "RUNNING_SERVER=${{secrets.RUNNING_SERVER_URL}}" >> .env
+            echo "TIMEOUT=${{secrets.TIMEOUT}}" >> .env
             echo "REDIS_HOST=${{secrets.REDIS_HOST}}" >> .env
             echo "REDIS_PORT=${{secrets.REDIS_PORT}}" >> .env
             echo "REDIS_PASSWORD=${{secrets.REDIS_PASSWORD}}" >> .env
@@ -66,5 +67,6 @@ jobs:
             echo "JWT_ACCESS_EXPIRE=${{secrets.JWT_ACCESS_EXPIRE}}" >> .env
             echo "JWT_REFRESH_SECRET=${{secrets.JWT_REFRESH_SECRET}}" >> .env
             echo "JWT_REFRESH_EXPIRE=${{secrets.JWT_REFRESH_EXPIRE}}" >> .env
-        
+            echo "SESSION_SECRET=${{secrets.SESSION_SECRET}}" >> .env
+            
             bash deploy.sh >> /dev/deploy.log 2>&1
