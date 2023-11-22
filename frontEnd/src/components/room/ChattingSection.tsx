@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Socket, io } from 'socket.io-client/debug';
 import { VITE_CHAT_URL } from '@/constants/env';
 
@@ -12,6 +12,12 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
   const [message, setMessage] = useState('');
   const [allMessages, setAllMessage] = useState<SocketMessage[]>([]);
 
+  const [scrollRatio, setScrollRatio] = useState(100);
+  const [isLastMessageView, setIsLastMessageView] = useState(true);
+  const [isRecievedMessage, setIsRecievedMessage] = useState(false);
+
+  const messageAreaRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     socket = io(VITE_CHAT_URL, {
       transports: ['websocket'],
@@ -24,6 +30,31 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
     socket.emit('join_room', { room: roomId });
   }, []);
 
+  useEffect(() => {
+    if (isLastMessageView) messageAreaRef.current!.scrollTop = messageAreaRef.current!.scrollHeight;
+    else setIsRecievedMessage(true);
+  }, [allMessages]);
+
+  useEffect(() => {
+    if (scrollRatio >= 95) {
+      setIsLastMessageView(true);
+      setIsRecievedMessage(false);
+    } else setIsLastMessageView(false);
+  }, [scrollRatio]);
+
+  const handleScroll = () => {
+    // TODO: 쓰로틀링 걸기
+    if (!messageAreaRef.current) return;
+    const { scrollTop, clientHeight, scrollHeight } = messageAreaRef.current;
+
+    setScrollRatio(((scrollTop + clientHeight) / scrollHeight) * 100);
+  };
+
+  const handleMoveToBottom = () => {
+    messageAreaRef.current!.scrollTop = messageAreaRef.current!.scrollHeight;
+    setScrollRatio(100);
+  };
+
   const handleMessageSend = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -34,8 +65,8 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
   };
 
   return (
-    <div className="relative p-2 flex items-center justify-center w-full h-full rounded-lg bg-primary min-w-[150px]">
-      <div className="flex flex-col w-full h-full gap-2 px-2">
+    <div className="flex flex-col p-2 items-center justify-center w-full h-full rounded-lg bg-primary min-w-[150px]">
+      <div ref={messageAreaRef} className="flex flex-col w-full h-full gap-2 px-2 overflow-auto grow" onScroll={handleScroll}>
         {allMessages.map((messageData, index) => (
           <div key={index} className="flex flex-col gap-0.5">
             <span className="text-xs font-light text-white">보낸사람</span>
@@ -45,7 +76,16 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
           </div>
         ))}
       </div>
-      <form onSubmit={handleMessageSend} className="absolute bottom-0 w-full p-2 rounded-b-lg bg-primary">
+      <form onSubmit={handleMessageSend} className="relative w-full p-2 rounded-b-lg bg-primary">
+        {isRecievedMessage && (
+          <button
+            type="button"
+            onClick={handleMoveToBottom}
+            className="absolute z-10 w-8 h-8 text-xs text-white rounded-full bg-secondary right-8 -top-10"
+          >
+            ↓
+          </button>
+        )}
         <div className="flex items-center h-10 border rounded-lg border-base">
           <input
             type="text"
