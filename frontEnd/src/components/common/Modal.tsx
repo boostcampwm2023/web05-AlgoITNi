@@ -4,7 +4,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useState } from 'react';
 import cancelImg from '@/assets/cancel.svg';
-import useFocus from '@/hooks/useFocus';
+import useLayoutFocus from '@/hooks/useLayoutFocus';
 
 const ANIMATION_RENDER = 'relative p-4 bg-white rounded-2xl animate-render';
 const ANIMATION_REMOVE = 'relative p-4 bg-white rounded-2xl animate-remove';
@@ -19,7 +19,7 @@ export default function Modal({
   hide: () => void;
 }) {
   const [className, setClassName] = useState(ANIMATION_RENDER);
-  const focusRef = useFocus<HTMLDivElement>();
+  const focusRef = useLayoutFocus<HTMLDivElement>();
 
   const handleCancel = () => setClassName(ANIMATION_REMOVE);
   const handleAnimationEnd = () => className === ANIMATION_REMOVE && hide();
