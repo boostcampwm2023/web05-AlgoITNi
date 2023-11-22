@@ -11,24 +11,25 @@ export class UsersService {
     private usersRepository: Repository<UserEntity>,
   ) {}
 
-  addUser(userDTO: UserDto, oauth: OAUTH) {
+  async addUser(userDTO: UserDto, oauth: OAUTH) {
     try {
       const user = new UserEntity();
       user.name = userDTO.name;
       user.authServiceID = userDTO.authServiceID;
       user.oauth = oauth;
-      this.usersRepository.save<UserDto>(user);
+      await this.usersRepository.save<UserDto>(user);
     } catch (e) {
       console.log(e);
     }
   }
 
-  findUser(userDTO: UserDto): Promise<UserEntity> {
-    return this.usersRepository.findOne({
+  async findUser(userDTO: UserDto): Promise<UserEntity> {
+    const find = await this.usersRepository.findOne({
       where: {
         authServiceID: userDTO.authServiceID,
       },
     });
+    return find;
   }
 
   async delUser(userDTO: UserDto): Promise<void> {
