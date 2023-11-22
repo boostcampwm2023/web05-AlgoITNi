@@ -68,5 +68,5 @@ jobs:
             echo "JWT_REFRESH_SECRET=${{secrets.JWT_REFRESH_SECRET}}" >> .env
             echo "JWT_REFRESH_EXPIRE=${{secrets.JWT_REFRESH_EXPIRE}}" >> .env
             echo "SESSION_SECRET=${{secrets.SESSION_SECRET}}" >> .env
-            
+            echo "MONGO_PROD=${{secrets.MONGO_PROD}}" >> .env
             bash deploy.sh >> /dev/deploy.log 2>&1
