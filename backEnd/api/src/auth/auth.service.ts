@@ -30,7 +30,7 @@ export class AuthService {
   }
 
   async logout(userInfo) {
-    this.redisService.delRefreshToken(userInfo.userId);
+    this.redisService.delRefreshToken(userInfo.id);
   }
 
   async getAccessToken(userInfo: UserInfoDto) {
