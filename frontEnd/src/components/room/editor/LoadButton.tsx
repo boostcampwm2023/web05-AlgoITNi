@@ -16,18 +16,18 @@ function LoadButtonElement({ children, onClick }: { children: React.ReactNode; o
     </button>
   );
 }
-export default function LoadButton({ setCode }: { setCode: (value: React.SetStateAction<string>) => void }) {
+export default function LoadButton({ setPlainCode }: { setPlainCode: (value: React.SetStateAction<string>) => void }) {
   const { show, hide } = useModal(CodeListModal);
   const { show: showLoginModal, hide: hideLoginModal } = useModal(LoginModal);
 
   const handleLoadLocalCodeFile = () => {
-    uploadLocalFile((result) => setCode(result));
+    uploadLocalFile((result) => setPlainCode(result));
   };
 
   const handleLoadCloudCodeFile = async () => {
     try {
       const codeData = await getUserCodes();
-      show({ hide, codeData, setCode });
+      show({ hide, codeData, setPlainCode });
     } catch (err) {
       if (isAxiosError(err) && err.response && err.response.status === 401) {
         showLoginModal({ hideLoginModal });

@@ -6,11 +6,11 @@ import Button from '@/components/common/Button';
 export default function CodeListModal({
   hide,
   codeData,
-  setCode,
+  setPlainCode,
 }: {
   codeData: LoadCodeData[];
   hide: () => void;
-  setCode: (value: React.SetStateAction<string>) => void;
+  setPlainCode: (value: React.SetStateAction<string>) => void;
 }) {
   const [selectOne, setSelectOne] = useState<string>('');
 
@@ -22,7 +22,7 @@ export default function CodeListModal({
   const handleClick = () => {
     hide();
     const result = findById(selectOne);
-    if (result) setCode(result.content);
+    if (result) setPlainCode(result.content);
   };
 
   return (
