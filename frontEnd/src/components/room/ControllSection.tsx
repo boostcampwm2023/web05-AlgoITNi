@@ -9,7 +9,7 @@ export default function ControllSection({ mediaObject }: { mediaObject: MediaObj
   const { show, hide } = useModal(SettingModal);
 
   return (
-    <div className="flex bg-[#132A37] rounded-lg p-2 justify-between">
+    <div className="flex bg-secondary rounded-lg p-2 justify-between">
       <div className="flex gap-2">
         <MediaControlButton
           stream={stream as MediaStream}
