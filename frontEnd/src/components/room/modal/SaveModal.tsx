@@ -1,22 +1,52 @@
-export default function SaveModal() {
+import { isAxiosError } from 'axios';
+import Button from '@/components/common/Button';
+import useFocus from '@/hooks/useFocus';
+import useInput from '@/hooks/useInput';
+import useModal from '@/hooks/useModal';
+import SuccessModal from './SuccessModal';
+import LoginModal from './LoginModal';
+import postUserCode from '@/apis/postUserCode';
+
+export default function SaveModal({ hide, code }: { hide: () => void; code: string }) {
+  const { inputValue, onChange } = useInput('');
+  const ref = useFocus<HTMLInputElement>();
+  const { show: showSuccessModal, hide: hideSuccessModal } = useModal(SuccessModal);
+  const { show: showLoginModal, hide: hideLoginModal } = useModal(LoginModal);
+
+  const handleClick = async () => {
+    if (!inputValue) {
+      if (ref.current) ref.current.focus();
+      return;
+    }
+    hide();
+    try {
+      await postUserCode(inputValue, code);
+      showSuccessModal({ hide: hideSuccessModal });
+    } catch (err) {
+      if (isAxiosError(err) && err.response && err.response.status === 401) {
+        showLoginModal({ hide: hideLoginModal });
+      }
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => e.key === 'Enter' && handleClick();
+
   return (
-    <div className="flex items-center justify-center gap-8 min-w-[600px]">
-      <div className="relative flex items-center justify-center">
-        <img src="/main.png" alt="logo" className="w-64 h-64" />
-      </div>
-      <div className="flex flex-col items-center justify-center h-full gap-8">
-        <h1 className="text-2xl font-bold">소셜로그인</h1>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col justify-between h-full gap-4">
-            <a href="https://api.algoitni.site/auth/github" className="flex items-center p-4 text-white bg-black rounded-full">
-              <img src="/github.png" className="w-8 h-8" alt="github" />
-              <span className="text-xl font-bold px-11 basis-[90%]">Github Login</span>
-            </a>
-            <a href="https://algoitni.site" className="flex items-center p-4 border-2 rounded-full">
-              <img src="/google.png" className="w-8 h-8" alt="google" />
-              <span className="text-xl font-bold px-11 basis-[90%]">Google Login</span>
-            </a>
-          </div>
+    <div className="flex flex-col gap-4">
+      <div className="text-xl">저장될 코드의 파일 이름을 입력해주세요</div>
+      <div className="flex items-center justify-center gap-4">
+        <input
+          ref={ref}
+          value={inputValue}
+          onChange={onChange}
+          onKeyDown={handleKeyDown}
+          className="px-4 py-2 text-xl"
+          placeholder="solution.py"
+        />
+        <div className={inputValue ? '' : 'opacity-50'}>
+          <Button.Default onClick={handleClick} fontSize="1vw">
+            저장하기
+          </Button.Default>
         </div>
       </div>
     </div>
