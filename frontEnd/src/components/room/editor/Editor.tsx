@@ -6,7 +6,7 @@ import EditorButton from './EditorButton';
 import SaveButton from './SaveButton';
 import OutputArea from './OutputArea';
 import { EDITOR_TAB_SIZE } from '@/constants/env';
-import { uploadLocalFile } from '@/utils/file';
+import LoadButton from './LoadButton';
 
 export default function Editor({ dataChannels }: { dataChannels: Array<{ id: string; dataChannel: RTCDataChannel }> }) {
   const [plainCode, setPlainCode] = useState<string>('');
@@ -46,10 +46,6 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
       setCursorPosition((prev) => prev + EDITOR_TAB_SIZE);
       setPlainCode((prev) => `${prev.slice(0, selectionStart)}    ${prev.slice(selectionStart)}`);
     }
-  };
-
-  const handleUploadLocalCodeFile = () => {
-    uploadLocalFile((result) => setPlainCode(result));
   };
 
   const handleClear = () => {
@@ -97,7 +93,7 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
       </div>
       <div className="flex items-center justify-between row-span-1 gap-2 p-[1vh]">
         <div className="h-full">
-          <EditorButton onClick={handleUploadLocalCodeFile}>로컬 파일 업로드</EditorButton>
+          <LoadButton setPlainCode={setPlainCode} />
         </div>
         <div className="flex h-full gap-2">
           <SaveButton plainCode={plainCode} />
