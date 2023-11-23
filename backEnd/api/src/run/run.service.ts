@@ -105,4 +105,14 @@ export class RunService {
     this.logger.log(`get completed result ${result}`);
     return result;
   }
+  async requestRunningMQPubSub(
+    codeBlock: RequestCodeblockDto,
+    socketID: string,
+  ): Promise<void> {
+    const job = await this.mqService.addMessage(codeBlock);
+    this.logger.log(`added message queue job#${job.id}`);
+
+    // start subscribe
+    this.mqService.setInfo(job.id, socketID);
+  }
 }

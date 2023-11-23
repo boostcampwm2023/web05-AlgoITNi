@@ -10,3 +10,8 @@ export const ERRORS = {
 };
 
 export const execPromise = promisify(exec);
+
+export const REDIS = {
+  CHANNEL: 'completed',
+  QUEUE: 'task',
+};

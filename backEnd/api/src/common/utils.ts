@@ -44,3 +44,10 @@ export const ResponseMessage = {
   NEED_LOGIN: '로그인이 필요합니다.',
   INTERNAL_SERVER_ERROR: 'Internal server error',
 };
+
+export const SOCKET = {};
+
+export const REDIS = {
+  CHANNEL: 'completed',
+  QUEUE: 'task',
+};
