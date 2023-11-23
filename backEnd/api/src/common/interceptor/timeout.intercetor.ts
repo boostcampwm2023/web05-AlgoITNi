@@ -19,7 +19,7 @@ export class TimeoutInterceptor implements NestInterceptor {
     const startTime = Date.now();
 
     const request = context.switchToHttp().getRequest();
-    const timeoutValue = this.configService.get<number>('TIMEOUT') | 5000;
+    const timeoutValue = this.configService.get<number>('TIMEOUT') | 8000;
 
     return next.handle().pipe(
       timeout(timeoutValue),
