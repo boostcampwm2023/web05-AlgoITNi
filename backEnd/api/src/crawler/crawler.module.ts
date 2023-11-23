@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CrawlerService } from './crawler.service';
 import { CrawlerController } from './crawler.controller';
-import { cacheModule } from 'src/redis/redis.module';
+import { cacheModule } from '../redis/redis.module';
 
 @Module({
   imports: [cacheModule],

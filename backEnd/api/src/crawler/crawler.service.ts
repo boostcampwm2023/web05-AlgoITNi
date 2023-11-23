@@ -2,7 +2,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
 import puppeteer from 'puppeteer';
 import { Cache } from 'cache-manager';
-import { time } from 'src/common/utils';
+import { time } from '../common/utils';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
