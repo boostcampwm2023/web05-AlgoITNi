@@ -19,7 +19,6 @@ export class CrawlerController {
 
   @Get('v2')
   async crawlingV2(@Query('url') url: string) {
-    console.log('요청이 들어왔습니다.');
     const content = await this.crawlerService.findOneUsingCache(url);
     return content;
   }
