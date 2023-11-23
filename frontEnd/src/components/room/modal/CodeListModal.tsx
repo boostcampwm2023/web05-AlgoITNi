@@ -32,7 +32,7 @@ export default function CodeListModal({
         <div className="grid grid-cols-5 gap-4">
           {codeData.map((code) => (
             <div key={code.id} className={code.id === selectOne ? 'bg-blue-100  rounded-xl py-4' : 'py-4'}>
-              <CodeFileButton code={code} click={handleClick} selectOne={selectOne} setSelectOne={setSelectOne} />
+              <CodeFileButton code={code} handleDoubleClick={handleClick} selectOne={selectOne} setSelectOne={setSelectOne} />
             </div>
           ))}
         </div>

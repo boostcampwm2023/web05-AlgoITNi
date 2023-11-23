@@ -2,20 +2,17 @@ import { LoadCodeData } from '@/types/loadCodeData';
 
 export default function CodeFileButton({
   code,
-  click,
+  handleDoubleClick,
   selectOne,
   setSelectOne,
 }: {
   code: LoadCodeData;
-  click: () => void;
+  handleDoubleClick: () => void;
   selectOne: string;
   setSelectOne: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const handleClick = () => {
     if (code.id !== selectOne) setSelectOne(code.id);
-  };
-  const handleDoubleClick = () => {
-    click();
   };
 
   return (
