@@ -15,6 +15,7 @@ import { UsersService } from '../users/users.service';
 import { UserInfoDto } from '../users/dto/userInfo.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './auth.guard';
+import * as path from 'path';
 
 @Controller('auth')
 export class AuthController {
@@ -27,8 +28,18 @@ export class AuthController {
   ) {}
 
   @Get('github')
-  async githubProxy(@Res() res: Response, @Req() req: Request) {
-    req.session['returnTo'] = req.headers.referer || '/';
+  async githubProxy(
+    @Res() res: Response,
+    @Req() req: Request,
+    @Query('next') next: string,
+    @Query('dev') dev: boolean,
+  ) {
+    req.session['returnTo'] = dev
+      ? `http://${path.join('localhost:3000', next)}`
+      : `https://${path.join('algoitni.site', next)}`;
+    req.session.save((err) => {
+      if (err) this.logger.log(err);
+    });
     const redirectUrl = this.githubService.getAuthUrl();
     return res.redirect(redirectUrl);
   }
@@ -46,7 +57,6 @@ export class AuthController {
       await this.userService.addUser(user, 'github');
       findUser = await this.userService.findUser(user);
     }
-    this.logger.debug(findUser);
     if (findUser.oauth !== 'github') {
       return { message: '다른 서비스로 가입한 내역이 있습니다.' }; // TODO: set StatusCode
     }
@@ -56,9 +66,13 @@ export class AuthController {
     loginUser.name = findUser.name;
 
     await this.authService.login(loginUser, res);
-
     const returnTo = req.session['returnTo'];
+
     delete req.session['returnTo'];
+    req.session.save((err) => {
+      if (err) this.logger.log(err);
+    });
+
     return res.redirect(returnTo);
   }
 
