@@ -20,9 +20,8 @@ export default function SaveButton({ plainCode }: { plainCode: string }) {
     downloadLocalFile(plainCode, 'solution.py');
   };
 
-  // TODO: 클라우드 저장 로직 추가
-  const handleSaveCloud = () => {
-    show({ hide });
+  const handleSaveCloud = async () => {
+    show({ hide, code: plainCode });
   };
 
   return (
