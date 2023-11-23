@@ -4,14 +4,15 @@ import { Cache } from 'cache-manager';
 import { ResponseCodeBlockDto } from '../run/dto/response-codeblock.dto';
 import { ConfigService } from '@nestjs/config';
 import { calcExpireSeconds } from '../common/utils';
+import Redis from 'ioredis';
 
 @Injectable()
 export class RedisService {
   private logger = new Logger(RedisService.name);
   private statistic_delay_time = [];
   private runningRequest = 0;
-  private readonly refreshExpire;
-
+  private readonly refreshExpire: number;
+  private redis;
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private configService: ConfigService,
@@ -19,6 +20,11 @@ export class RedisService {
     this.refreshExpire = calcExpireSeconds(
       this.configService.get<string>('JWT_REFRESH_EXPIRE'),
     );
+    this.redis = new Redis({
+      port: configService.get<number>('REDIS_PORT'),
+      host: configService.get<string>('REDIS_HOST'),
+      password: configService.get<string>('REDIS_PASSWORD'),
+    });
   }
 
   delay = (delay) => {
@@ -64,18 +70,14 @@ export class RedisService {
   }
 
   async storeRefreshToken(userId: number, refreshToken: string) {
-    this.cacheManager.set(
-      `refresh:${userId}`,
-      refreshToken,
-      this.refreshExpire,
-    );
+    this.redis.set(`refresh:${userId}`, refreshToken, 'PX', this.refreshExpire);
   }
 
   async getRefreshToken(userId: number) {
-    return this.cacheManager.get<string>(`refresh:${userId}`);
+    return this.redis.get(`refresh:${userId}`);
   }
 
   async delRefreshToken(userId: number) {
-    this.cacheManager.del(`refresh:${userId}`);
+    this.redis.del(`refresh:${userId}`);
   }
 }

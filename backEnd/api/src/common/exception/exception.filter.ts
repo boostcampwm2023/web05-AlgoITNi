@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { JsonWebTokenError } from 'jsonwebtoken';
+import { ResponseMessage } from '../utils';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -42,7 +43,7 @@ export class AuthErrorFilter implements ExceptionFilter {
     );
     response.status(HttpStatus.UNAUTHORIZED).json({
       statusCode: HttpStatus.UNAUTHORIZED,
-      message: exception.message,
+      message: ResponseMessage.NEED_LOGIN,
       timestamp: new Date().toISOString(),
     });
   }
@@ -56,14 +57,13 @@ export class ErrorFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     const status = HttpStatus.INTERNAL_SERVER_ERROR;
-    const message = 'Internal server error';
     this.logger.error(
       `path : ${request.url} \n${exception.message}`,
       exception,
     );
     response.status(status).json({
       statusCode: status,
-      message: message,
+      message: ResponseMessage.INTERNAL_SERVER_ERROR,
       timestamp: new Date().toISOString(),
     });
   }
