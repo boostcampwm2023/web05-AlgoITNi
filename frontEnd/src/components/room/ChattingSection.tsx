@@ -8,6 +8,7 @@ import ChattingInput from './chatting/ChattingInput';
 import ScrollDownButton from './chatting/ScrollDownButton';
 
 let socket: Socket;
+let timer: NodeJS.Timeout | null;
 
 export default function ChattingSection({ roomId }: { roomId: string }) {
   const [message, setMessage] = useState('');
@@ -34,11 +35,16 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
   }, [allMessages]);
 
   const handleScroll = () => {
-    // TODO: 쓰로틀링 걸기
-    if (!messageAreaRef.current) return;
-    const { scrollTop, clientHeight, scrollHeight } = messageAreaRef.current;
+    if (!timer) {
+      timer = setTimeout(() => {
+        timer = null;
 
-    setScrollRatio(((scrollTop + clientHeight) / scrollHeight) * 100);
+        if (!messageAreaRef.current) return;
+
+        const { scrollTop, clientHeight, scrollHeight } = messageAreaRef.current;
+        setScrollRatio(((scrollTop + clientHeight) / scrollHeight) * 100);
+      }, 200);
+    }
   };
 
   const handleMoveToBottom = () => {
