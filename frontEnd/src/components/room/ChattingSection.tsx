@@ -62,6 +62,7 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
     if (socket) {
       socket.emit('send_message', { room: roomId, message });
       setMessage('');
+      setScrollRatio(100);
     }
   };
 
