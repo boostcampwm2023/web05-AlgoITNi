@@ -1,5 +1,5 @@
 import useModalState, { MODAL_COMPONENTS } from '@/stores/useModalState';
-import ModalWrapper from './ModalWrapper';
+import Modal from './Modal';
 
 export default function Modals() {
   const { modals } = useModalState((state) => state);
@@ -14,11 +14,8 @@ export default function Modals() {
 
   return (
     <>
-      {modalComponents.map(({ Modal, id }) => (
-        <ModalWrapper cancel={() => hideModal(id)} key={id}>
-          {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-          <Modal.Component {...Modal.props} />
-        </ModalWrapper>
+      {modalComponents.map(({ Modal: modal, id }) => (
+        <Modal hide={() => hideModal(id)} key={id} Component={modal.Component} modalProps={modal.props} />
       ))}
     </>
   );

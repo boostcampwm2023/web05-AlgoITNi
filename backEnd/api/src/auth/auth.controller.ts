@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Logger,
   Post,
   Query,
   Req,
@@ -17,6 +18,7 @@ import { JwtAuthGuard } from './auth.guard';
 
 @Controller('auth')
 export class AuthController {
+  private logger = new Logger(AuthController.name);
   constructor(
     private githubService: GithubService,
     private googleService: GoogleService,
@@ -39,13 +41,12 @@ export class AuthController {
   ) {
     const accessToken = await this.githubService.getGithubAccessToken(code);
     const user = await this.githubService.getUserInfo(accessToken);
-
     let findUser = await this.userService.findUser(user);
     if (findUser === null) {
       await this.userService.addUser(user, 'github');
       findUser = await this.userService.findUser(user);
     }
-
+    this.logger.debug(findUser);
     if (findUser.oauth !== 'github') {
       return { message: '다른 서비스로 가입한 내역이 있습니다.' }; // TODO: set StatusCode
     }

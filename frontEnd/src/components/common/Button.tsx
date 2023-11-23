@@ -13,7 +13,7 @@ function Default({ children, onClick, fontSize }: ButtonProps) {
   return (
     <button
       type="button"
-      className="px-[1.6vw] py-[14px] bg-mainColor text-white rounded-[15px] font-Pretendard"
+      className="px-[1.6vw] py-[14px] bg-primary text-white rounded-[15px] font-Pretendard"
       onClick={onClick}
       style={{ fontSize }}
     >
@@ -26,7 +26,7 @@ function Full({ children, onClick, fontSize }: ButtonProps) {
   return (
     <button
       type="button"
-      className="px-[1.6vw] py-[14px] bg-mainColor text-white rounded-[15px] font-Pretendard w-full"
+      className="px-[1.6vw] py-[14px] bg-primary text-white rounded-[15px] w-full"
       onClick={onClick}
       style={{ fontSize }}
     >

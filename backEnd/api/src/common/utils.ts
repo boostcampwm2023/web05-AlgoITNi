@@ -17,7 +17,7 @@ export const time = {
   DAY: 60 * 60 * 24,
 };
 
-export const calcExpireSeconds = (expireString: string) => {
+export const calcExpireSeconds = (expireString: string): number => {
   const regex = /^(\d+)([smhd])$/;
   const result = expireString.match(regex);
   if (result) {
@@ -41,3 +41,14 @@ export function calcCookieExpire(expireString: string): Date {
   const time = calcExpireSeconds(expireString);
   return new Date(date.getTime() + time);
 }
+
+export const jwtError = {
+  EXPIRED: 'jwt expired',
+  NO_TOKEN: 'jwt must be provided',
+  IN_VALID: 'invalid token',
+};
+
+export const ResponseMessage = {
+  NEED_LOGIN: '로그인이 필요합니다.',
+  INTERNAL_SERVER_ERROR: 'Internal server error',
+};
