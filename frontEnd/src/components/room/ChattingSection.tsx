@@ -67,8 +67,12 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
   };
 
   return (
-    <div className="flex relative flex-col items-center justify-center w-full h-full rounded-lg bg-primary min-w-[150px]">
-      <div ref={messageAreaRef} className="flex flex-col w-full h-full gap-2 px-2 pt-2 overflow-auto grow" onScroll={handleScroll}>
+    <div className="flex relative flex-col items-center justify-center w-full pt-2 h-full rounded-lg bg-primary min-w-[150px]">
+      <div
+        ref={messageAreaRef}
+        className="flex flex-col w-full h-full gap-2 px-2 pt-2 pl-4 mr-4 overflow-auto grow custom-scroll"
+        onScroll={handleScroll}
+      >
         {allMessages.map((messageData, index) => (
           <ChattingMessage messageData={messageData} key={index} />
         ))}
