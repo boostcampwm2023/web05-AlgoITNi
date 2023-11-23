@@ -20,7 +20,7 @@ export default function SaveButton({ plainCode }: { plainCode: string }) {
     downloadLocalFile(plainCode, 'solution.py');
   };
 
-  const handleSaveCloud = async () => {
+  const handleSaveCloud = () => {
     show({ hide, code: plainCode });
   };
 
