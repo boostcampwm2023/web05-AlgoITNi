@@ -1,4 +1,6 @@
+import useModal from '@/hooks/useModal';
 import { downloadLocalFile } from '@/utils/file';
+import SaveModal from '../modal/SaveModal';
 
 function SaveButtonElement({ children, onClick }: { children: React.ReactNode; onClick: React.MouseEventHandler<HTMLButtonElement> }) {
   return (
@@ -13,12 +15,15 @@ function SaveButtonElement({ children, onClick }: { children: React.ReactNode; o
 }
 
 export default function SaveButton({ plainCode }: { plainCode: string }) {
+  const { show, hide } = useModal(SaveModal);
   const handleSaveLocal = () => {
     downloadLocalFile(plainCode, 'solution.py');
   };
 
   // TODO: 클라우드 저장 로직 추가
-  const handleSaveCloud = () => {};
+  const handleSaveCloud = () => {
+    show({ hide });
+  };
 
   return (
     <div className="relative h-full">
