@@ -17,23 +17,6 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
 
   const messageAreaRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    socket = io(VITE_CHAT_URL, {
-      transports: ['websocket'],
-    });
-    socket.on('new_message', (recievedMessage) => {
-      setAllMessage((prev) => [...prev, JSON.parse(recievedMessage)]);
-    });
-    socket.connect();
-
-    socket.emit('join_room', { room: roomId });
-  }, []);
-
-  useEffect(() => {
-    if (isLastMessageView) messageAreaRef.current!.scrollTop = messageAreaRef.current!.scrollHeight;
-    else setIsRecievedMessage(true);
-  }, [allMessages]);
-
   const handleScroll = () => {
     if (!timer) {
       timer = setTimeout(() => {
@@ -47,8 +30,12 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
     }
   };
 
+  const moveToBottom = (ref: React.RefObject<HTMLElement>) => {
+    if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
+  };
+
   const handleMoveToBottom = () => {
-    messageAreaRef.current!.scrollTop = messageAreaRef.current!.scrollHeight;
+    moveToBottom(messageAreaRef);
     setScrollRatio(100);
   };
 
@@ -65,6 +52,23 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
       setScrollRatio(100);
     }
   };
+
+  useEffect(() => {
+    socket = io(VITE_CHAT_URL, {
+      transports: ['websocket'],
+    });
+    socket.on('new_message', (recievedMessage) => {
+      setAllMessage((prev) => [...prev, JSON.parse(recievedMessage)]);
+    });
+    socket.connect();
+
+    socket.emit('join_room', { room: roomId });
+  }, []);
+
+  useEffect(() => {
+    if (isLastMessageView) moveToBottom(messageAreaRef);
+    else setIsRecievedMessage(true);
+  }, [allMessages]);
 
   return (
     <div className="flex relative flex-col items-center justify-center w-full pt-2 h-full rounded-lg bg-primary min-w-[150px]">
