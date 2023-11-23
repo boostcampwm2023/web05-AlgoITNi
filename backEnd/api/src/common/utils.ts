@@ -1,3 +1,5 @@
+import * as process from 'process';
+
 export const requestPath = {
   RUN_PYTHON: '/codes/python',
 };
@@ -49,5 +51,9 @@ export const SOCKET = {};
 
 export const REDIS = {
   CHANNEL: 'completed',
-  QUEUE: 'task',
+  QUEUE: process.env.NODE_ENV === 'dev' ? 'task-dev' : 'task',
+};
+
+export const EVENT = {
+  COMPLETE: 'job-complete',
 };
