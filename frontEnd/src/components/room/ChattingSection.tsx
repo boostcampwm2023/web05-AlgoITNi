@@ -3,7 +3,7 @@ import { Socket, io } from 'socket.io-client/debug';
 import { VITE_CHAT_URL } from '@/constants/env';
 import { MessageData } from '@/types/chatting';
 import ChattingMessage from './chatting/ChattingMessage';
-import useScroll from '@/hooks/useScroll';
+import useLastMessageViewingState from '@/hooks/useLastMessageViewingState';
 import ChattingInput from './chatting/ChattingInput';
 import ScrollDownButton from './chatting/ScrollDownButton';
 
@@ -13,7 +13,7 @@ let timer: NodeJS.Timeout | null;
 export default function ChattingSection({ roomId }: { roomId: string }) {
   const [message, setMessage] = useState('');
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
-  const { setIsRecievedMessage, setScrollRatio, isRecievedMessage, isLastMessageView } = useScroll();
+  const { isViewingLastMessage, isRecievedMessage, setScrollRatio, setIsRecievedMessage } = useLastMessageViewingState();
 
   const messageAreaRef = useRef<HTMLDivElement | null>(null);
 
@@ -66,7 +66,7 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
   }, []);
 
   useEffect(() => {
-    if (isLastMessageView) moveToBottom(messageAreaRef);
+    if (isViewingLastMessage) moveToBottom(messageAreaRef);
     else setIsRecievedMessage(true);
   }, [allMessages]);
 
