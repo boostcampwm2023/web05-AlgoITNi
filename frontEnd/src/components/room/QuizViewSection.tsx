@@ -7,7 +7,7 @@ export default function QuizViewSection() {
   return (
     <button
       type="button"
-      className="flex items-center justify-center w-full h-full text-white rounded-lg bg-mainColor font-Pretendard"
+      className="flex items-center justify-center w-full h-full text-white rounded-lg bg-primary "
       onClick={() => show({ hide })}
     >
       <div className="flex gap-2">
