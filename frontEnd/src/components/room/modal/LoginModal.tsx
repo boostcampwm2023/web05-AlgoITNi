@@ -1,4 +1,8 @@
+import { useParams } from 'react-router-dom';
+
 export default function LoginModal() {
+  const { roomId } = useParams();
+
   return (
     <div className="flex items-center justify-center gap-8 min-w-[600px]">
       <div className="relative flex items-center justify-center">
@@ -8,7 +12,10 @@ export default function LoginModal() {
         <h1 className="text-2xl font-bold">소셜로그인</h1>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col justify-between h-full gap-4">
-            <a href="https://api.algoitni.site/auth/github" className="flex items-center p-4 text-white bg-black rounded-full">
+            <a
+              href={`https://api.algoitni.site/auth/github?next=${roomId}`}
+              className="flex items-center p-4 text-white bg-black rounded-full"
+            >
               <img src="/github.png" className="w-8 h-8" alt="github" />
               <span className="text-xl font-bold px-11 basis-[90%]">Github Login</span>
             </a>
