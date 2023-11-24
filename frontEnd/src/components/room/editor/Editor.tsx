@@ -93,7 +93,7 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
       </div>
       <div className="flex items-center justify-between row-span-1 gap-2 p-[1vh]">
         <div className="h-full">
-          <LoadButton setPlainCode={setPlainCode} />
+          <LoadButton plainCode={plainCode} setPlainCode={setPlainCode} />
         </div>
         <div className="flex h-full gap-2">
           <SaveButton plainCode={plainCode} />

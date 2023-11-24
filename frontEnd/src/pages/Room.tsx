@@ -10,9 +10,10 @@ import ChattingSection from '@/components/room/ChattingSection';
 import ControllSection from '@/components/room/ControllSection';
 
 export default function Room() {
+  const code = localStorage.getItem('code');
   const { roomId } = useParams();
   const mediaObject = useMedia();
-  const [isSetting, setSetting] = useState(false);
+  const [isSetting, setSetting] = useState(!!code || code === '');
   const { streamList, dataChannels } = useRTCConnection(roomId as string, mediaObject.stream as MediaStream, isSetting);
 
   if (!isSetting) return <Setting mediaObject={mediaObject} setSetting={setSetting} />;
