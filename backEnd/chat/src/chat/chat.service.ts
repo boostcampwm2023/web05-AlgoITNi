@@ -1,6 +1,6 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
-import { ERRORS } from 'src/commons/utils';
+import { ERRORS } from '../commons/utils';
 
 @Injectable()
 export class ChatService {
