@@ -6,6 +6,7 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
+  WsException,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
@@ -15,7 +16,7 @@ import { JoinRoomDto } from './dto/join-room.dto';
 import { LeaveRoomDto } from './dto/leave-room.dto';
 import { MessageDto } from './dto/message.dto';
 import * as os from 'os';
-import { SOCKET, SOCKET_EVENT } from '../commons/utils';
+import { ERRORS, SOCKET, SOCKET_EVENT } from '../commons/utils';
 import { ChatService } from './chat.service';
 
 @WebSocketGateway({ namespace: SOCKET.NAME_SPACE, cors: true })
@@ -109,6 +110,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const response = {
       message: message,
     };
-    this.publisherClient.publish(room, JSON.stringify(response));
+
+    try {
+      await this.publisherClient.publish(room, JSON.stringify(response));
+    } catch (error) {
+      throw new WsException({
+        statusCode: ERRORS.FAILED_PUBLISHING.statusCode,
+        message: ERRORS.FAILED_PUBLISHING.message,
+      });
+    }
   }
 }

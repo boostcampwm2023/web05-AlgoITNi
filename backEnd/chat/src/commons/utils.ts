@@ -22,4 +22,8 @@ export const ERRORS = {
     statusCode: HttpStatus.BAD_REQUEST,
     message: '메시지를 입력해주세요.',
   },
+  FAILED_PUBLISHING: {
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: '메시지를 PUB하는데 실패했습니다.',
+  },
 };
