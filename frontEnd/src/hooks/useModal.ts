@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import useModalState, { MODAL_COMPONENTS } from '@/stores/useModalState';
-import { ModalHideContext } from '@/components/common/Modal';
+import { ModalHideContext } from '@/components/modal/Modal';
 
 type CalledByModalInner = { hide: () => void };
 type CalledByModalOuter<P> = { show: (props?: P) => void; hide: () => void };
