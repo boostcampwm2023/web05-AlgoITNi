@@ -2,12 +2,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useState } from 'react';
+import React, { useState, createContext, useCallback } from 'react';
 import cancelImg from '@/assets/cancel.svg';
 import useLayoutFocus from '@/hooks/useLayoutFocus';
 
 const ANIMATION_RENDER = 'relative p-4 bg-white rounded-2xl animate-render';
 const ANIMATION_REMOVE = 'relative p-4 bg-white rounded-2xl animate-remove';
+
+export const ModalHideContext = createContext(() => {});
 
 export default function Modal({
   Component,
@@ -21,7 +23,7 @@ export default function Modal({
   const [className, setClassName] = useState(ANIMATION_RENDER);
   const focusRef = useLayoutFocus<HTMLDivElement>();
 
-  const handleCancel = () => setClassName(ANIMATION_REMOVE);
+  const handleCancel = useCallback(() => setClassName(ANIMATION_REMOVE), []);
   const handleAnimationEnd = () => className === ANIMATION_REMOVE && hide();
   const handleKeyDown = (e: React.KeyboardEvent) => e.key === 'Escape' && handleCancel();
 
@@ -42,7 +44,9 @@ export default function Modal({
           <img src={cancelImg} alt="cancel" />
         </button>
         <div className="py-8 reative">
-          <Component {...{ ...modalProps, hide: handleCancel }} />
+          <ModalHideContext.Provider value={handleCancel}>
+            <Component {...modalProps} />
+          </ModalHideContext.Provider>
         </div>
       </div>
     </div>
