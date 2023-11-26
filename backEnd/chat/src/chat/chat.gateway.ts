@@ -2,6 +2,7 @@ import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -14,11 +15,11 @@ import { JoinRoomDto } from './dto/join-room.dto';
 import { LeaveRoomDto } from './dto/leave-room.dto';
 import { MessageDto } from './dto/message.dto';
 import * as os from 'os';
-import { SOCKET, SOCKET_EVENT } from 'src/commons/utils';
+import { SOCKET, SOCKET_EVENT } from '../commons/utils';
 import { ChatService } from './chat.service';
 
 @WebSocketGateway({ namespace: SOCKET.NAME_SPACE, cors: true })
-export class ChatGateway implements OnGatewayConnection {
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
@@ -41,11 +42,17 @@ export class ChatGateway implements OnGatewayConnection {
     this.logger.log(`Instance ${this.instanceId} - connected: ${socket.id}`);
   }
 
+  handleDisconnect(socket: Socket) {
+    this.logger.log(`Instance ${this.instanceId} - disconnected: ${socket.id}`);
+  }
+
   @SubscribeMessage(SOCKET_EVENT.JOIN_ROOM)
   handleJoin(
     @MessageBody() data: JoinRoomDto,
     @ConnectedSocket() socket: Socket,
   ) {
+    this.logger.log(`Instance ${this.instanceId} - joinRoom: ${socket.id}`);
+
     const { room } = data;
     this.chatService.validateRoom(room);
 
@@ -71,6 +78,8 @@ export class ChatGateway implements OnGatewayConnection {
     @MessageBody() data: LeaveRoomDto,
     @ConnectedSocket() socket: Socket,
   ) {
+    this.logger.log(`Instance ${this.instanceId} - leaveRoom: ${socket.id}`);
+
     const { room } = data;
     this.chatService.validateRoom(room);
 
@@ -86,7 +95,12 @@ export class ChatGateway implements OnGatewayConnection {
   }
 
   @SubscribeMessage(SOCKET_EVENT.SEND_MESSAGE)
-  async handleMessage(@MessageBody() data: MessageDto) {
+  async handleMessage(
+    @MessageBody() data: MessageDto,
+    @ConnectedSocket() socket: Socket,
+  ) {
+    this.logger.log(`Instance ${this.instanceId} - sendMessage: ${socket.id}`);
+
     const { room, message } = data;
 
     this.chatService.validateRoom(room);
