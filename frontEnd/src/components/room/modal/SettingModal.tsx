@@ -6,13 +6,17 @@ import SideBar from './setting/SideBar';
 import AudioSetting from './setting/AudioSetting';
 import Button from '@/components/common/Button';
 import VideoSetting from './setting/VideoSetting';
+import useModal from '@/hooks/useModal';
 
-export default function SettingModal({ mediaObject, hide }: { mediaObject: MediaObject; hide: () => void }) {
+export default function SettingModal({ mediaObject }: { mediaObject: MediaObject }) {
   const [settingType, setSettingType] = useState<SettingType>('audio');
+  const { hide } = useModal();
+
   const {
     mic: { setMic },
     camera: { setCamera },
   } = mediaObject;
+
   const setSpeaker = useSpeaker((state) => state.setSpeaker);
   // settings 모달만의 mediaStream을 새롭게 생성
   const { stream, mic, speaker, camera } = useMedia();

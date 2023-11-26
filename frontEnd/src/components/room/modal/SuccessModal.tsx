@@ -1,6 +1,8 @@
 import Button from '@/components/common/Button';
+import useModal from '@/hooks/useModal';
 
-export default function SuccessModal({ hide }: { hide: () => void }) {
+export default function SuccessModal() {
+  const { hide } = useModal();
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="text-xl">성공적으로 저장되었어요!</div>
