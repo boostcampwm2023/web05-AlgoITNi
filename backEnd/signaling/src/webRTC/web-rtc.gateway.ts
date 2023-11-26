@@ -38,6 +38,7 @@ export class WebRtcGateway implements OnGatewayConnection {
     @MessageBody() data: JoinRoomDto,
     @ConnectedSocket() socket: Socket,
   ) {
+    this.logger.log(`on joinRoom called : ${socket.id}`);
     const { room } = data;
     if (this.users[room]) {
       const length = this.users[room].length;
@@ -65,6 +66,7 @@ export class WebRtcGateway implements OnGatewayConnection {
     data: GetOfferDto,
     @ConnectedSocket() socket: Socket,
   ) {
+    this.logger.log(`on offer called : ${socket.id}`);
     const { sdp, offerSendId, offerReceiveId } = data;
     const postOfferDto: PostOfferDto = { sdp, offerSendId };
     socket.to(offerReceiveId).emit(SOCKET_EVENT.GET_OFFER, postOfferDto);
@@ -76,6 +78,7 @@ export class WebRtcGateway implements OnGatewayConnection {
     data: GetAnswerDto,
     @ConnectedSocket() socket: Socket,
   ) {
+    this.logger.log(`on answer called : ${socket.id}`);
     const { sdp, answerSendId, answerReceiveId } = data;
     const postAnswerDto: PostAnswerDto = { sdp, answerSendId };
     socket.to(answerReceiveId).emit(SOCKET_EVENT.GET_ANSWER, postAnswerDto);
@@ -87,6 +90,7 @@ export class WebRtcGateway implements OnGatewayConnection {
     data: GetIceCandidateDto,
     @ConnectedSocket() socket: Socket,
   ) {
+    this.logger.log(`on candidate called : ${socket.id}`);
     const { candidate, candidateSendId, candidateReceiveId } = data;
     const postIceCandidateDto: PostIceCandidateDto = {
       candidate,
@@ -99,6 +103,7 @@ export class WebRtcGateway implements OnGatewayConnection {
 
   @SubscribeMessage(SOCKET_EVENT.DISCONNECT)
   handleDisconnect(@ConnectedSocket() socket: Socket) {
+    this.logger.log(`on disconnected called : ${socket.id}`);
     const roomID = this.socketToRoom[socket.id];
     let room = this.users[roomID];
     if (room) {
