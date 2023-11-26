@@ -46,10 +46,7 @@ export class WebRtcGateway implements OnGatewayConnection {
 
     const existingRoom = this.roomToUsers.get(room);
     if (existingRoom) {
-      if (existingRoom.length === SOCKET.ROOM_FULL) {
-        socket.emit(SOCKET_EVENT.ROOM_FULL);
-        return;
-      }
+      this.webRtcService.isRoomFull(existingRoom.length);
       existingRoom.push({ id: socket.id });
       this.roomToUsers.set(room, existingRoom);
     } else {

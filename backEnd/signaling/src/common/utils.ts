@@ -23,6 +23,10 @@ export const SOCKET_EVENT = {
 };
 
 export const ERRORS = {
+  ROOM_FULL: {
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: '해당 방에 인원이 가득찼습니다.',
+  },
   FAIL_JOIN_ROOM: {
     statusCode: HttpStatus.BAD_REQUEST,
     message: 'ROOM JOIN에 실패하였습니다.',

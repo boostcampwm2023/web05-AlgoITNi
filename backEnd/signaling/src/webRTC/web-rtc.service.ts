@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
-import { ERRORS } from '../common/utils';
+import { ERRORS, SOCKET } from '../common/utils';
 import { JoinRoomDto } from './dto/join-room.dto';
 import { GetOfferDto } from './dto/get-offer.dto';
 import { GetIceCandidateDto } from './dto/get-ice.dto';
@@ -40,6 +40,15 @@ export class WebRtcService {
       throw new WsException({
         statusCode: ERRORS.FAIL_CANDIDATE.statusCode,
         message: ERRORS.FAIL_CANDIDATE.message,
+      });
+    }
+  }
+
+  isRoomFull(num: number) {
+    if (num === SOCKET.ROOM_FULL) {
+      throw new WsException({
+        statusCode: ERRORS.ROOM_FULL.statusCode,
+        message: ERRORS.ROOM_FULL.message,
       });
     }
   }
