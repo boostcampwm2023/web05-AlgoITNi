@@ -28,7 +28,6 @@ export class WebRtcGateway implements OnGatewayConnection {
 
   roomToUsers: Map<string, any> = new Map();
   socketToRoom: Map<string, string> = new Map();
-  maximum = SOCKET.MAXIMUM;
 
   constructor(private readonly webRtcService: WebRtcService) {}
 
@@ -47,7 +46,7 @@ export class WebRtcGateway implements OnGatewayConnection {
 
     const existingRoom = this.roomToUsers.get(room);
     if (existingRoom) {
-      if (existingRoom.length === this.maximum) {
+      if (existingRoom.length === SOCKET.ROOM_FULL) {
         socket.emit(SOCKET_EVENT.ROOM_FULL);
         return;
       }
@@ -121,7 +120,7 @@ export class WebRtcGateway implements OnGatewayConnection {
     const roomUsers = this.roomToUsers.get(roomID);
     if (roomUsers) {
       const afterLeave = roomUsers.filter((user) => user.id !== socket.id);
-      if (afterLeave.length === 0) {
+      if (afterLeave.length === SOCKET.ROOM_EMPTY) {
         this.roomToUsers.delete(roomID);
       } else {
         this.roomToUsers.set(roomID, afterLeave);

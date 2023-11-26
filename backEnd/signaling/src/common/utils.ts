@@ -2,7 +2,8 @@ import { HttpStatus } from '@nestjs/common';
 
 export const SOCKET = {
   NAME_SPACE: 'signaling',
-  MAXIMUM: 4,
+  ROOM_FULL: 4,
+  ROOM_EMPTY: 0,
 };
 
 export const SOCKET_EVENT = {
