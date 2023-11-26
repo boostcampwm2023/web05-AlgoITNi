@@ -33,7 +33,7 @@ export default function LoadButton({
   const handleLoadCloudCodeFile = async () => {
     try {
       const codeData = await getUserCodes();
-      show({ hide, codeData, setPlainCode });
+      show({ codeData, setPlainCode });
     } catch (err) {
       if (isAxiosError(err) && err.response && (err.response.status === 401 || err.response.status === 403)) {
         showLoginModal({ code: plainCode });
