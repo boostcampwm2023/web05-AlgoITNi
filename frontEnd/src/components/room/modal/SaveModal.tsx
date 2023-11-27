@@ -1,4 +1,4 @@
-import { isAxiosError } from 'axios';
+import { useMutation } from '@tanstack/react-query';
 import Button from '@/components/common/Button';
 import useFocus from '@/hooks/useFocus';
 import useInput from '@/hooks/useInput';
@@ -6,13 +6,27 @@ import useModal from '@/hooks/useModal';
 import SuccessModal from './SuccessModal';
 import LoginModal from './LoginModal';
 import postUserCode from '@/apis/postUserCode';
+import reactQueryClient from '@/configs/reactQueryClient';
+import createAuthFailCallback from '@/utils/authFailCallback';
+import QUERY_KEYS from '@/constants/queryKeys';
 
 export default function SaveModal({ code }: { code: string }) {
   const { inputValue, onChange } = useInput('');
   const ref = useFocus<HTMLInputElement>();
-  const { show: showSuccessModal, hide: hideSuccessModal } = useModal(SuccessModal);
+  const { show: showSuccessModal } = useModal(SuccessModal);
   const { show: showLoginModal } = useModal(LoginModal);
   const { hide } = useModal();
+
+  const mutationSuccess = () => {
+    showSuccessModal();
+    reactQueryClient.invalidateQueries({ queryKey: [QUERY_KEYS.LOAD_CODES] });
+  };
+
+  const { mutate } = useMutation({
+    mutationFn: () => postUserCode(inputValue, code),
+    onSuccess: () => mutationSuccess,
+    onError: createAuthFailCallback(() => showLoginModal({ code })),
+  });
 
   const handleClick = async () => {
     if (!inputValue) {
@@ -20,14 +34,7 @@ export default function SaveModal({ code }: { code: string }) {
       return;
     }
     hide();
-    try {
-      await postUserCode(inputValue, code);
-      showSuccessModal({ hide: hideSuccessModal });
-    } catch (err) {
-      if (isAxiosError(err) && err.response && (err.response.status === 401 || err.response.status === 403)) {
-        showLoginModal({ code });
-      }
-    }
+    mutate();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => e.key === 'Enter' && handleClick();
