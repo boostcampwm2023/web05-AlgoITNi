@@ -53,7 +53,10 @@ async function bootstrap() {
       secret: configService.get<string>('SESSION_SECRET'),
       resave: false,
       saveUninitialized: false,
-      cookie: { sameSite: 'lax', secure: true },
+      cookie: {
+        sameSite: 'lax',
+        secure: configService.get<string>('NODE_ENV') === 'production',
+      },
     }),
   );
   const port = configService.get<number>('PORT');
