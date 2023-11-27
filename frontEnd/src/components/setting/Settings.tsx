@@ -19,6 +19,7 @@ export default function Setting({
   const { inputValue, onChange } = useInput(randomNameGenerator());
   const onClick = () => {
     setNickName(inputValue);
+    localStorage.setItem('nickName', inputValue);
     setSetting(true);
   };
   return (

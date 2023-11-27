@@ -11,10 +11,11 @@ import ControllSection from '@/components/room/ControllSection';
 
 export default function Room() {
   const defaultCode = localStorage.getItem('code');
+  const defaultNickName = localStorage.getItem('nickName');
   const { roomId } = useParams();
   const mediaObject = useMedia();
-  const [isSetting, setSetting] = useState(!!defaultCode || defaultCode === '');
-  const [nickName, setNickName] = useState('');
+  const [isSetting, setSetting] = useState((!!defaultCode || defaultCode === '') && !!defaultNickName);
+  const [nickName, setNickName] = useState(defaultNickName || '');
   const { streamList, dataChannels } = useRTCConnection(roomId as string, mediaObject.stream as MediaStream, isSetting);
 
   if (!isSetting) return <Setting mediaObject={mediaObject} setSetting={setSetting} setNickName={setNickName} />;
