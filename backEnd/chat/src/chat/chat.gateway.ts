@@ -102,13 +102,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     this.logger.log(`Instance ${this.instanceId} - sendMessage: ${socket.id}`);
 
-    const { room, message } = data;
+    const { room, message, nickname } = data;
 
     this.chatService.validateRoom(room);
     this.chatService.validateMessage(message);
+    this.chatService.validateNickname(nickname);
 
     const response = {
       message: message,
+      nickname: nickname,
+      socketId: socket.id,
     };
 
     try {

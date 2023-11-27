@@ -21,4 +21,13 @@ export class ChatService {
       });
     }
   }
+
+  validateNickname(nickname: string) {
+    if (!nickname) {
+      throw new WsException({
+        statusCode: ERRORS.ROOM_EMPTY.statusCode,
+        message: ERRORS.ROOM_EMPTY.message,
+      });
+    }
+  }
 }
