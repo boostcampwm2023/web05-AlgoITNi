@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import getUserCodes from '@/apis/getUserCodes';
 import useModal from '@/hooks/useModal';
@@ -26,6 +26,7 @@ export default function LoadButton({
   plainCode: string;
   setPlainCode: (value: React.SetStateAction<string>) => void;
 }) {
+  const [click, setClick] = useState(false);
   const { show } = useModal(CodeListModal);
   const { show: showLoginModal } = useModal(LoginModal);
   const { data, isError, error, refetch } = useQuery({
@@ -36,9 +37,10 @@ export default function LoadButton({
   const errorCallback = createAuthFailCallback(() => showLoginModal({ code: plainCode }));
 
   useEffect(() => {
-    if (data) show({ codeData: data, setPlainCode });
+    if (data && click) show({ codeData: data, setPlainCode });
     if (isError) errorCallback(error);
-  }, [data, isError]);
+    setClick(false);
+  }, [data, isError, click]);
 
   const handleLoadLocalCodeFile = () => {
     uploadLocalFile((result) => setPlainCode(result));
@@ -46,6 +48,7 @@ export default function LoadButton({
 
   const handleLoadCloudCodeFile = async () => {
     refetch();
+    setClick(true);
   };
   return (
     <div className="relative h-full">
