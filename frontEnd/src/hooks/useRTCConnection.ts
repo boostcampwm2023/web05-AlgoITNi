@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { useState, useEffect } from 'react';
 import { Socket, io } from 'socket.io-client/debug';
-import { SOCKET_EMIT_EVENT, SOCKET_RECEIVE_EVENT } from '@/constants/socketEvents';
+import { RTC_SOCKET_EMIT_EVENT, RTC_SOCKET_RECEIVE_EVENT } from '@/constants/rtcSocketEvents';
 import { VITE_SOCKET_URL, VITE_STUN_URL, VITE_TURN_CREDENTIAL, VITE_TURN_URL, VITE_TURN_USERNAME } from '@/constants/env';
 
 const RTCConnections: Record<string, RTCPeerConnection> = {};
@@ -23,14 +23,14 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
       .then((res) => res.json())
       .then((res) => {
         socket = io(res.result.url);
-        socket.on(SOCKET_RECEIVE_EVENT.ALL_USERS, onAllUser);
-        socket.on(SOCKET_RECEIVE_EVENT.OFFER, onOffer);
-        socket.on(SOCKET_RECEIVE_EVENT.ANSWER, onAnswer);
-        socket.on(SOCKET_RECEIVE_EVENT.CANDIDATE, onCandidate);
-        socket.on(SOCKET_RECEIVE_EVENT.USER_EXIT, onUserExit);
+        socket.on(RTC_SOCKET_RECEIVE_EVENT.ALL_USERS, onAllUser);
+        socket.on(RTC_SOCKET_RECEIVE_EVENT.OFFER, onOffer);
+        socket.on(RTC_SOCKET_RECEIVE_EVENT.ANSWER, onAnswer);
+        socket.on(RTC_SOCKET_RECEIVE_EVENT.CANDIDATE, onCandidate);
+        socket.on(RTC_SOCKET_RECEIVE_EVENT.USER_EXIT, onUserExit);
         socket.connect();
 
-        socket.emit(SOCKET_EMIT_EVENT.JOIN_ROOM, {
+        socket.emit(RTC_SOCKET_EMIT_EVENT.JOIN_ROOM, {
           room: roomId,
         });
         setIsConnect(true);
@@ -108,7 +108,7 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
 
       await value.setLocalDescription(new RTCSessionDescription(offer));
 
-      socket.emit(SOCKET_EMIT_EVENT.OFFER, {
+      socket.emit(RTC_SOCKET_EMIT_EVENT.OFFER, {
         sdp: offer,
         offerSendId: socket.id,
         offerReceiveId: key,
@@ -128,7 +128,7 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
 
     await RTCConnections[data.offerSendId].setLocalDescription(new RTCSessionDescription(answer));
 
-    socket.emit(SOCKET_EMIT_EVENT.ANSWER, {
+    socket.emit(RTC_SOCKET_EMIT_EVENT.ANSWER, {
       sdp: answer,
       answerSendId: socket.id,
       answerReceiveId: data.offerSendId,
