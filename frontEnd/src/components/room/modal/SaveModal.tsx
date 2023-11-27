@@ -7,11 +7,12 @@ import SuccessModal from './SuccessModal';
 import LoginModal from './LoginModal';
 import postUserCode from '@/apis/postUserCode';
 
-export default function SaveModal({ hide, code }: { hide: () => void; code: string }) {
+export default function SaveModal({ code }: { code: string }) {
   const { inputValue, onChange } = useInput('');
   const ref = useFocus<HTMLInputElement>();
   const { show: showSuccessModal, hide: hideSuccessModal } = useModal(SuccessModal);
   const { show: showLoginModal } = useModal(LoginModal);
+  const { hide } = useModal();
 
   const handleClick = async () => {
     if (!inputValue) {

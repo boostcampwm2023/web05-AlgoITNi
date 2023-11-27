@@ -15,13 +15,13 @@ function SaveButtonElement({ children, onClick }: { children: React.ReactNode; o
 }
 
 export default function SaveButton({ plainCode }: { plainCode: string }) {
-  const { show, hide } = useModal(SaveModal);
+  const { show } = useModal(SaveModal);
   const handleSaveLocal = () => {
     downloadLocalFile(plainCode, 'solution.py');
   };
 
   const handleSaveCloud = () => {
-    show({ hide, code: plainCode });
+    show({ code: plainCode });
   };
 
   return (
