@@ -47,7 +47,7 @@ export default function LoadButton({
   };
 
   const handleLoadCloudCodeFile = async () => {
-    refetch();
+    await refetch();
     setClick(true);
   };
   return (
