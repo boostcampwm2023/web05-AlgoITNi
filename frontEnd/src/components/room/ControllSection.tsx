@@ -6,10 +6,10 @@ import useModal from '@/hooks/useModal';
 
 export default function ControllSection({ mediaObject }: { mediaObject: MediaObject }) {
   const { stream } = mediaObject;
-  const { show, hide } = useModal(SettingModal);
+  const { show } = useModal(SettingModal);
 
   return (
-    <div className="flex bg-[#132A37] rounded-lg p-2 justify-between">
+    <div className="flex justify-between p-2 rounded-lg bg-secondary">
       <div className="flex gap-2">
         <MediaControlButton
           stream={stream as MediaStream}
@@ -22,11 +22,7 @@ export default function ControllSection({ mediaObject }: { mediaObject: MediaObj
           className="w-[3vw] p-[1vw] hover:opacity-50 rounded-[15px] border-white"
         />
       </div>
-      <button
-        type="button"
-        className="w-[3vw] p-[1vw] hover:opacity-50 rounded-[15px] border-white"
-        onClick={() => show({ mediaObject, hide })}
-      >
+      <button type="button" className="w-[3vw] p-[1vw] hover:opacity-50 rounded-[15px] border-white" onClick={() => show({ mediaObject })}>
         <img src={settingIcon} alt="setting" />
       </button>
     </div>

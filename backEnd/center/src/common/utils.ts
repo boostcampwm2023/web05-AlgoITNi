@@ -23,3 +23,5 @@ export const EVENT = {
   REGISTER: 'register',
   SIGNALING: 'signaling',
 };
+
+export const USE_FULL = 100;

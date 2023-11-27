@@ -12,6 +12,7 @@ import { WinstonLogger } from './common/logger/winstonLogger.service';
 import { MqModule } from './mq/mq.module';
 import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './auth/auth.module';
+import { CrawlerModule } from './crawler/crawler.module';
 import { CodesModule } from './codes/codes.module';
 
 @Module({
@@ -49,6 +50,7 @@ import { CodesModule } from './codes/codes.module';
     MqModule,
     RedisModule,
     AuthModule,
+    CrawlerModule,
     CodesModule,
   ],
   controllers: [AppController],

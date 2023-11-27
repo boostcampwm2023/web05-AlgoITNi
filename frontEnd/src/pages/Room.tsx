@@ -10,9 +10,10 @@ import ChattingSection from '@/components/room/ChattingSection';
 import ControllSection from '@/components/room/ControllSection';
 
 export default function Room() {
+  const defaultCode = localStorage.getItem('code');
   const { roomId } = useParams();
   const mediaObject = useMedia();
-  const [isSetting, setSetting] = useState(false);
+  const [isSetting, setSetting] = useState(!!defaultCode || defaultCode === '');
   const { streamList, dataChannels } = useRTCConnection(roomId as string, mediaObject.stream as MediaStream, isSetting);
 
   if (!isSetting) return <Setting mediaObject={mediaObject} setSetting={setSetting} />;
@@ -29,11 +30,11 @@ export default function Room() {
               <QuizViewSection />
               <ControllSection mediaObject={mediaObject} />
             </div>
-            <EditorSection dataChannels={dataChannels} />
+            <EditorSection defaultCode={defaultCode} dataChannels={dataChannels} />
           </div>
         </div>
         <div className="flex basis-3/12">
-          <ChattingSection />
+          <ChattingSection roomId={roomId as string} />
         </div>
       </div>
     </div>

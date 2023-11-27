@@ -13,10 +13,10 @@ jobs:
       - name: ✅ 코드 체크아웃
         uses: actions/checkout@v3
 
-      - name : 👻 노드 설정
-        uses : actions/setup-node@v3
+      - name: 👻 노드 설정
+        uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: ⬇️ 의존성 설치
         working-directory: ./backEnd/api
@@ -25,7 +25,7 @@ jobs:
       - name: 📦 프로젝트 빌드
         working-directory: ./backEnd/api
         run: npm run build
-      
+
       - name: 🐳 도커 로그인
         uses: docker/login-action@v3
         with:
@@ -67,6 +67,7 @@ jobs:
             echo "JWT_ACCESS_EXPIRE=${{secrets.JWT_ACCESS_EXPIRE}}" >> .env
             echo "JWT_REFRESH_SECRET=${{secrets.JWT_REFRESH_SECRET}}" >> .env
             echo "JWT_REFRESH_EXPIRE=${{secrets.JWT_REFRESH_EXPIRE}}" >> .env
+            echo "CHROMIUM_PATH=${{secrets.CHROMIUM_PATH}}" >> .env
             echo "SESSION_SECRET=${{secrets.SESSION_SECRET}}" >> .env
             echo "MONGO_PROD=${{secrets.MONGO_PROD}}" >> .env
             bash deploy.sh >> /dev/deploy.log 2>&1
