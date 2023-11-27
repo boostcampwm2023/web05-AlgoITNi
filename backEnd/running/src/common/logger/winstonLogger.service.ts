@@ -29,7 +29,7 @@ export class WinstonLogger implements LoggerService {
       const devConsole = new winston.transports.Console({
         format: combine(
           colorize(),
-          utilities.format.nestLike('api Server', {
+          utilities.format.nestLike('Running Server', {
             prettyPrint: true,
           }),
         ),

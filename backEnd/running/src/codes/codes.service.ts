@@ -58,6 +58,8 @@ export class CodesService {
 
   runCommand(filePath, timeout): Promise<runCommandResult> {
     return new Promise((resolve) => {
+      // eslint-disable-next-line
+      let timer;
       const childProcess = exec(
         `python3 ${filePath}`,
         (error, stdout, stderr) => {
@@ -69,13 +71,14 @@ export class CodesService {
             }
             resolve({ stdout, stderr });
           } else {
+            clearTimeout(timer);
             resolve({ stdout, stderr });
           }
         },
       );
 
       // 일정 시간 후 자식 프로세스 강제 종료
-      setTimeout(() => {
+      timer = setTimeout(() => {
         this.logger.log('timeout!');
         childProcess.kill(this.killSignal);
       }, timeout);

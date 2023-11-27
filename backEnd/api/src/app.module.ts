@@ -12,6 +12,7 @@ import { WinstonLogger } from './common/logger/winstonLogger.service';
 import { MqModule } from './mq/mq.module';
 import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './auth/auth.module';
+import { CrawlerModule } from './crawler/crawler.module';
 import { CodesModule } from './codes/codes.module';
 
 @Module({
@@ -19,18 +20,35 @@ import { CodesModule } from './codes/codes.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: async (configService: ConfigService) => ({
         type: 'mysql',
-        host: configService.get<string>('DB_HOST'),
-        port: +configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USERNAME'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database:
-          configService.get<string>('NODE_ENV') === 'dev'
-            ? configService.get<string>('DEV_DB_DATABASE')
-            : configService.get<string>('DB_DATABASE'),
+        replication: {
+          master: {
+            host: configService.get<string>('DB_HOST'),
+            port:
+              configService.get<string>('NODE_ENV') === 'dev'
+                ? configService.get<number>('DEV_DB_PORT')
+                : configService.get<number>('DB_PORT'),
+            username: configService.get<string>('DB_USERNAME'),
+            password: configService.get<string>('DB_PASSWORD'),
+            database: configService.get<string>('DB_DATABASE'),
+          },
+          slaves: [
+            {
+              host: configService.get<string>('SLAVE_DB_HOST'),
+              port:
+                configService.get<string>('NODE_ENV') === 'dev'
+                  ? configService.get<number>('DEV_DB_PORT')
+                  : configService.get<number>('SLAVE_DB_PORT'),
+              username: configService.get<string>('SLAVE_DB_USERNAME'),
+              password: configService.get<string>('SLAVE_DB_PASSWORD'),
+              database: configService.get<string>('SLAVE_DB_DATABASE'),
+            },
+          ],
+        },
         entities: [__dirname + '/**/entity/*.entity{.ts,.js}'],
-        synchronize: configService.get<string>('SYNCHRONIZED') === 'true',
+        synchronize:
+          configService.get<string>('NODE_ENV') === 'dev' ? true : false,
         logging: ['query', 'error'],
       }),
     }),
@@ -49,6 +67,7 @@ import { CodesModule } from './codes/codes.module';
     MqModule,
     RedisModule,
     AuthModule,
+    CrawlerModule,
     CodesModule,
   ],
   controllers: [AppController],

@@ -3,6 +3,7 @@ import { LoadCodeData } from '@/types/loadCodeData';
 import CodeFileButton from './codeList/CodeFileButton';
 import Button from '@/components/common/Button';
 import useModal from '@/hooks/useModal';
+import WarningCodeLoadModal from './WarningCodeLoadModal';
 
 export default function CodeListModal({
   codeData,
@@ -12,6 +13,7 @@ export default function CodeListModal({
   setPlainCode: (value: React.SetStateAction<string>) => void;
 }) {
   const [selectOne, setSelectOne] = useState<string>('');
+  const { show } = useModal(WarningCodeLoadModal);
   const { hide } = useModal();
 
   const findById = (id: string) => {
@@ -22,7 +24,9 @@ export default function CodeListModal({
   const handleClick = () => {
     hide();
     const result = findById(selectOne);
-    if (result) setPlainCode(result.content);
+    if (result) {
+      show({ callback: () => setPlainCode(result.content) });
+    }
   };
 
   return (
