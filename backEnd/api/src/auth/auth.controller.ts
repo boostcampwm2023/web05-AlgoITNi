@@ -29,8 +29,18 @@ export class AuthController {
   ) {}
 
   @Get('google')
-  async googleProxy(@Res() res: Response, @Req() req: Request) {
-    req.session['returnTo'] = req.headers.referer || '/';
+  async googleProxy(
+    @Res() res: Response,
+    @Req() req: Request,
+    @Query('next') next: string = '/',
+    @Query('dev') dev: boolean = false,
+  ) {
+    req.session['returnTo'] = dev
+      ? `http://${path.join('localhost:3000', next)}`
+      : `https://${path.join('algoitni.site', next)}`;
+    req.session.save((err) => {
+      if (err) this.logger.log(err);
+    });
     const redirectUrl = this.googleService.getAuthUrl();
     return res.redirect(redirectUrl);
   }
@@ -41,7 +51,8 @@ export class AuthController {
     @Res() res: Response,
     @Query('code') code: string,
   ) {
-    const user: UserDto = await this.googleService.getIDToken(code);
+    const id_token: string = await this.googleService.getIDToken(code);
+    const user: UserDto = await this.googleService.getUserInfo(id_token);
     let findUser = await this.userService.findUser(user);
     if (findUser === null) {
       await this.userService.addUser(user, 'google');

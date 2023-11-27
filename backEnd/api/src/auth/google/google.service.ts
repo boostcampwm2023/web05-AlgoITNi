@@ -35,7 +35,7 @@ export class GoogleService {
     return this.authorizationUrl;
   }
 
-  async getIDToken(code) {
+  async getIDToken(code): Promise<string> {
     const { tokens } = await this.oauth2Client.getToken(code);
     return tokens.id_token;
   }
