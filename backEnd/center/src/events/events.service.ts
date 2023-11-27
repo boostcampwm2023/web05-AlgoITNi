@@ -1,13 +1,12 @@
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
-import { HttpCode, HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
+import { HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
 import Redis from 'ioredis';
-import { ResponseUrlDto } from 'src/connections/dto/response-url.dto';
 import { JoinRoomDto } from 'src/connections/dto/join-room.dto';
 import {
   URLNotFoundException,
   ValidateDtoException,
 } from 'src/common/exception/exception';
-import { ERRORS, EVENT } from 'src/common/utils';
+import { ERRORS, EVENT, USE_FULL } from 'src/common/utils';
 import { ResponseDto } from 'src/common/dto/common-response.dto';
 
 @Injectable()
@@ -55,7 +54,7 @@ export class EventsService implements OnModuleInit {
 
   private handleSignaling(url: string, usages: number) {
     const nextServer = this.returnUrl;
-    const minUsages = this.serverToCpus.get(nextServer);
+    const minUsages = this.serverToCpus.get(nextServer) || USE_FULL;
 
     if (usages < minUsages) {
       this.returnUrl = url;
