@@ -1,8 +1,10 @@
+import { QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Socket } from 'socket.io-client/debug';
 import Room from '../Room';
 import * as useRTCConnection from '@/hooks/useRTCConnection';
 import * as useMedia from '@/hooks/useMedia';
+import reactQueryClient from '@/configs/reactQueryClient';
 
 const mockRoomData = {
   socket: {} as Socket,
@@ -29,12 +31,20 @@ describe('Room 조건부 렌더링 테스트', () => {
   jest.spyOn(useMedia, 'default').mockImplementation(() => mockMedia);
 
   it('Room에 처음 입장하면 Setting컴포넌트가 렌더링된다.', () => {
-    render(<Room />);
+    render(
+      <QueryClientProvider client={reactQueryClient}>
+        <Room />
+      </QueryClientProvider>,
+    );
     expect(screen.getByText('참여할 준비가 되셨나요?')).toBeTruthy();
   });
 
   it('Room에서 참여 버튼을 누르면 Setting 컴포넌트가 사라진다.', () => {
-    render(<Room />);
+    render(
+      <QueryClientProvider client={reactQueryClient}>
+        <Room />
+      </QueryClientProvider>,
+    );
     fireEvent.click(screen.getByText('참여'));
     expect(() => screen.getByText('참여할 준비가 되셨나요?')).toThrow();
   });
