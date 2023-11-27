@@ -2,17 +2,17 @@ import { useState } from 'react';
 import { LoadCodeData } from '@/types/loadCodeData';
 import CodeFileButton from './codeList/CodeFileButton';
 import Button from '@/components/common/Button';
+import useModal from '@/hooks/useModal';
 
 export default function CodeListModal({
-  hide,
   codeData,
   setPlainCode,
 }: {
   codeData: LoadCodeData[];
-  hide: () => void;
   setPlainCode: (value: React.SetStateAction<string>) => void;
 }) {
   const [selectOne, setSelectOne] = useState<string>('');
+  const { hide } = useModal();
 
   const findById = (id: string) => {
     const result = codeData.find((data) => data.id === id);

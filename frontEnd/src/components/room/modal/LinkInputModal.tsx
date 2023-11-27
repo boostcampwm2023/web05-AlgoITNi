@@ -1,9 +1,11 @@
 import useFocus from '@/hooks/useFocus';
 import useInput from '@/hooks/useInput';
+import useModal from '@/hooks/useModal';
 
-export default function LinkInputModal({ hide }: { hide: () => void }) {
+export default function LinkInputModal() {
   const inputRef = useFocus<HTMLInputElement>();
   const { inputValue, onChange } = useInput('');
+  const { hide } = useModal();
 
   const handleOK = () => {
     hide();

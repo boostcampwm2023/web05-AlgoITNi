@@ -7,11 +7,12 @@ import SuccessModal from './SuccessModal';
 import LoginModal from './LoginModal';
 import postUserCode from '@/apis/postUserCode';
 
-export default function SaveModal({ hide, code }: { hide: () => void; code: string }) {
+export default function SaveModal({ code }: { code: string }) {
   const { inputValue, onChange } = useInput('');
   const ref = useFocus<HTMLInputElement>();
   const { show: showSuccessModal, hide: hideSuccessModal } = useModal(SuccessModal);
-  const { show: showLoginModal, hide: hideLoginModal } = useModal(LoginModal);
+  const { show: showLoginModal } = useModal(LoginModal);
+  const { hide } = useModal();
 
   const handleClick = async () => {
     if (!inputValue) {
@@ -23,8 +24,8 @@ export default function SaveModal({ hide, code }: { hide: () => void; code: stri
       await postUserCode(inputValue, code);
       showSuccessModal({ hide: hideSuccessModal });
     } catch (err) {
-      if (isAxiosError(err) && err.response && err.response.status === 401) {
-        showLoginModal({ hide: hideLoginModal });
+      if (isAxiosError(err) && err.response && (err.response.status === 401 || err.response.status === 403)) {
+        showLoginModal({ code });
       }
     }
   };

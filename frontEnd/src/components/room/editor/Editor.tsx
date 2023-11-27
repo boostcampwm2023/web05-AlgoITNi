@@ -8,8 +8,14 @@ import OutputArea from './OutputArea';
 import { EDITOR_TAB_SIZE } from '@/constants/env';
 import LoadButton from './LoadButton';
 
-export default function Editor({ dataChannels }: { dataChannels: Array<{ id: string; dataChannel: RTCDataChannel }> }) {
-  const [plainCode, setPlainCode] = useState<string>('');
+export default function Editor({
+  defaultCode,
+  dataChannels,
+}: {
+  defaultCode: string | null;
+  dataChannels: Array<{ id: string; dataChannel: RTCDataChannel }>;
+}) {
+  const [plainCode, setPlainCode] = useState<string>(defaultCode || '');
   // TODO: 코드 실행 요청 후 결과 setState 추가
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [execResult] = useState<string>('');
@@ -17,6 +23,10 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
 
   const ydoc = useRef(new Y.Doc());
   const ytext = useRef(ydoc.current.getText('sharedText'));
+
+  useEffect(() => {
+    localStorage.removeItem('code');
+  }, []);
 
   const handleMessage = (event: MessageEvent) => {
     Y.applyUpdate(ydoc.current, new Uint8Array(event.data));
@@ -93,7 +103,7 @@ export default function Editor({ dataChannels }: { dataChannels: Array<{ id: str
       </div>
       <div className="flex items-center justify-between row-span-1 gap-2 p-[1vh]">
         <div className="h-full">
-          <LoadButton setPlainCode={setPlainCode} />
+          <LoadButton plainCode={plainCode} setPlainCode={setPlainCode} />
         </div>
         <div className="flex h-full gap-2">
           <SaveButton plainCode={plainCode} />
