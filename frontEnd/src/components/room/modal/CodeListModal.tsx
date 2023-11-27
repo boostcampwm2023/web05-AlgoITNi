@@ -3,7 +3,7 @@ import { LoadCodeData } from '@/types/loadCodeData';
 import CodeFileButton from './codeList/CodeFileButton';
 import Button from '@/components/common/Button';
 import useModal from '@/hooks/useModal';
-import WarningCodeLoadModal from './WarningCodeLoadModal';
+import WarningModal from './WarningModal';
 
 export default function CodeListModal({
   codeData,
@@ -13,7 +13,7 @@ export default function CodeListModal({
   setPlainCode: (value: React.SetStateAction<string>) => void;
 }) {
   const [selectOne, setSelectOne] = useState<string>('');
-  const { show } = useModal(WarningCodeLoadModal);
+  const { show } = useModal(WarningModal);
   const { hide } = useModal();
 
   const findById = (id: string) => {
@@ -25,7 +25,7 @@ export default function CodeListModal({
     hide();
     const result = findById(selectOne);
     if (result) {
-      show({ callback: () => setPlainCode(result.content) });
+      show({ warningString: '작업중이던 내용이 모두 지워집니다.', callback: () => setPlainCode(result.content) });
     }
   };
 
