@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import dompurify from 'dompurify';
 import highlightCode from '@/utils/highlightCode';
+import { LanguageInfo } from '@/types/editor';
 
 export default function InputArea({
   plainCode,
@@ -8,14 +9,14 @@ export default function InputArea({
   handleChange,
   handleKeyDown,
   handleClick,
-  codeLanguage,
+  languageInfo,
 }: {
   plainCode: string;
   cursorPosition: number;
   handleChange: React.ChangeEventHandler<HTMLTextAreaElement>;
   handleKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement>;
   handleClick: React.MouseEventHandler<HTMLTextAreaElement>;
-  codeLanguage: string;
+  languageInfo: LanguageInfo;
 }) {
   const [highlightedCode, setHighlightedCode] = useState('');
 
@@ -30,7 +31,7 @@ export default function InputArea({
   };
 
   useEffect(() => {
-    setHighlightedCode(highlightCode(codeLanguage, plainCode));
+    setHighlightedCode(highlightCode(languageInfo.name, plainCode));
 
     if (textareaRef.current) {
       textareaRef.current.selectionStart = cursorPosition;
@@ -39,8 +40,8 @@ export default function InputArea({
   }, [plainCode]);
 
   useEffect(() => {
-    setHighlightedCode(highlightCode(codeLanguage, plainCode));
-  }, [codeLanguage]);
+    setHighlightedCode(highlightCode(languageInfo.name, plainCode));
+  }, [languageInfo]);
 
   return (
     <div className="relative w-full h-full font-normal">

@@ -6,7 +6,8 @@ import EditorButton from './EditorButton';
 import SaveButton from './SaveButton';
 import OutputArea from './OutputArea';
 import LoadButton from './LoadButton';
-import EDITOR_TAB_SIZE from '@/constants/editor';
+import { EDITOR_DEFAULT_LANGUAGE, EDITOR_LANGUAGE_TYPES, EDITOR_TAB_SIZE } from '@/constants/editor';
+import { LanguageInfo } from '@/types/editor';
 
 export default function Editor({
   defaultCode,
@@ -23,7 +24,8 @@ export default function Editor({
   const [execResult] = useState<string>('');
   const [cursorPosition, setCursorPosition] = useState<number>(0);
 
-  const [codeLanguage, setCodeLanguage] = useState<string>('python');
+  const [languageName, setLanguageName] = useState<string>(EDITOR_DEFAULT_LANGUAGE);
+  const [languageInfo, setLanguageInfo] = useState<LanguageInfo>(EDITOR_LANGUAGE_TYPES[EDITOR_DEFAULT_LANGUAGE]);
 
   const ydoc = useRef(new Y.Doc());
   const ytext = useRef(ydoc.current.getText('sharedText'));
@@ -39,7 +41,8 @@ export default function Editor({
   };
 
   const handleRecieveLanguageMessage = (event: MessageEvent) => {
-    setCodeLanguage(event.data);
+    setLanguageName(event.data);
+    setLanguageInfo(EDITOR_LANGUAGE_TYPES[event.data]);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -95,15 +98,15 @@ export default function Editor({
 
   useEffect(() => {
     languageDataChannels.forEach(({ dataChannel }) => {
-      if (dataChannel.readyState === 'open') dataChannel.send(codeLanguage);
+      if (dataChannel.readyState === 'open') dataChannel.send(languageName);
     });
-  }, [codeLanguage]);
+  }, [languageName]);
 
   return (
     <div className="w-full h-full grid grid-rows-[repeat(12,minmax(0,1fr))] rounded-lg bg-primary min-w-[400px] min-h-[400px]">
       <div className="flex items-center justify-between h-full row-span-1 p-2 border-b border-white">
-        <h1 className="text-white text-[max(2vh,15px)]">Solution.py</h1>
-        <select name="language" onChange={(e) => setCodeLanguage(e.target.value)} value={codeLanguage}>
+        <h1 className="text-white text-[max(2vh,15px)]">Solution.{languageInfo.extension}</h1>
+        <select name="language" onChange={(e) => setLanguageName(e.target.value)} value={languageName}>
           <option value="python">Python</option>
           <option value="javascript">JavaScript</option>
         </select>
@@ -115,7 +118,7 @@ export default function Editor({
           </div>
           <InputArea
             plainCode={plainCode}
-            codeLanguage={codeLanguage}
+            languageInfo={languageInfo}
             cursorPosition={cursorPosition}
             handleChange={handleChange}
             handleKeyDown={handleKeyDown}
@@ -131,7 +134,7 @@ export default function Editor({
           <LoadButton plainCode={plainCode} setPlainCode={setPlainCode} />
         </div>
         <div className="flex h-full gap-2">
-          <SaveButton plainCode={plainCode} />
+          <SaveButton plainCode={plainCode} languageInfo={languageInfo} />
           <EditorButton onClick={handleClear}>초기화</EditorButton>
           <EditorButton onClick={handleExecCode}>실행하기</EditorButton>
         </div>

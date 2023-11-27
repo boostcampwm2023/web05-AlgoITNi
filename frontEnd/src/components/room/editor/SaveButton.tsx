@@ -1,6 +1,7 @@
 import useModal from '@/hooks/useModal';
 import { downloadLocalFile } from '@/utils/file';
 import SaveModal from '../modal/SaveModal';
+import { LanguageInfo } from '@/types/editor';
 
 function SaveButtonElement({ children, onClick }: { children: React.ReactNode; onClick: React.MouseEventHandler<HTMLButtonElement> }) {
   return (
@@ -14,10 +15,15 @@ function SaveButtonElement({ children, onClick }: { children: React.ReactNode; o
   );
 }
 
-export default function SaveButton({ plainCode }: { plainCode: string }) {
+interface SaveButtonProps {
+  plainCode: string;
+  languageInfo: LanguageInfo;
+}
+
+export default function SaveButton({ plainCode, languageInfo }: SaveButtonProps) {
   const { show } = useModal(SaveModal);
   const handleSaveLocal = () => {
-    downloadLocalFile(plainCode, 'solution.py');
+    downloadLocalFile(plainCode, 'solution', languageInfo.extension);
   };
 
   const handleSaveCloud = () => {

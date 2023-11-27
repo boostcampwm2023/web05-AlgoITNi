@@ -19,13 +19,13 @@ export const uploadLocalFile = (onLoadCallback: (result: string) => void) => {
   input.click();
 };
 
-export const downloadLocalFile = (contents: string, fileName: string) => {
+export const downloadLocalFile = (contents: string, fileName: string, extension: string) => {
   const element = document.createElement('a');
   const file = new Blob([contents], { type: 'text/plain' });
   const fileURL = URL.createObjectURL(file);
 
   element.href = fileURL;
-  element.download = fileName;
+  element.download = `${fileName}.${extension}`;
   document.body.appendChild(element);
 
   element.click();
