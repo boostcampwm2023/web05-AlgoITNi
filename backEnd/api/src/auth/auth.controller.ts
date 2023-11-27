@@ -15,6 +15,7 @@ import { UsersService } from '../users/users.service';
 import { UserInfoDto } from '../users/dto/userInfo.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './auth.guard';
+import * as path from 'path';
 
 @Controller('auth')
 export class AuthController {
@@ -31,8 +32,11 @@ export class AuthController {
     @Res() res: Response,
     @Req() req: Request,
     @Query('next') next: string,
+    @Query('dev') dev: boolean,
   ) {
-    req.session['returnTo'] = next;
+    req.session['returnTo'] = dev
+      ? `http://${path.join('localhost:3000', next)}`
+      : `https://${path.join('algoitni.site', next)}`;
     req.session.save((err) => {
       if (err) this.logger.log(err);
     });

@@ -55,7 +55,12 @@ export const ResponseMessage = {
   INTERNAL_SERVER_ERROR: 'Internal server error',
 };
 
-export const SOCKET = {};
+export const SOCKET_EVENT = {
+  NAME_SPACE: 'run',
+  CONNECT: 'connected',
+  DISCONNECT: 'disconnect',
+  DONE: 'done',
+};
 
 export const REDIS = {
   CHANNEL: 'completed',

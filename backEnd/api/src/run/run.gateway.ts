@@ -8,10 +8,10 @@ import { Logger } from '@nestjs/common';
 import Redis from 'ioredis';
 import { ConfigService } from '@nestjs/config';
 import { OnEvent } from '@nestjs/event-emitter';
-import { EVENT } from '../common/utils';
+import { EVENT, SOCKET_EVENT } from '../common/utils';
 import { ResponseCodeBlockDto } from './dto/response-codeblock.dto';
 
-@WebSocketGateway({ namespace: 'run', cors: true })
+@WebSocketGateway({ namespace: SOCKET_EVENT.NAME_SPACE, cors: true })
 export class RunGateway implements OnGatewayConnection {
   @WebSocketServer()
   server: Server;
@@ -31,8 +31,8 @@ export class RunGateway implements OnGatewayConnection {
   handleConnection(socket: Socket) {
     this.logger.log(`connected: ${socket.id}`);
     this.connectedSockets.set(socket.id, socket);
-    socket.emit('connected', { id: socket.id });
-    socket.on('disconnect', () => {
+    socket.emit(SOCKET_EVENT.CONNECT, { id: socket.id });
+    socket.on(SOCKET_EVENT.DISCONNECT, () => {
       this.connectedSockets.delete(socket.id);
     });
   }
@@ -46,6 +46,6 @@ export class RunGateway implements OnGatewayConnection {
       data.result,
       data.message,
     );
-    socket.emit('done', response);
+    socket.emit(SOCKET_EVENT.DONE, response);
   }
 }
