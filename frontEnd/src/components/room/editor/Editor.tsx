@@ -42,7 +42,6 @@ export default function Editor({
 
   const handleRecieveLanguageMessage = (event: MessageEvent) => {
     setLanguageName(event.data);
-    setLanguageInfo(EDITOR_LANGUAGE_TYPES[event.data]);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -100,6 +99,8 @@ export default function Editor({
     languageDataChannels.forEach(({ dataChannel }) => {
       if (dataChannel.readyState === 'open') dataChannel.send(languageName);
     });
+
+    setLanguageInfo(EDITOR_LANGUAGE_TYPES[languageName]);
   }, [languageName]);
 
   return (
@@ -134,7 +135,7 @@ export default function Editor({
       </div>
       <div className="flex items-center justify-between row-span-1 gap-2 p-[1vh]">
         <div className="h-full">
-          <LoadButton plainCode={plainCode} setPlainCode={setPlainCode} />
+          <LoadButton plainCode={plainCode} setPlainCode={setPlainCode} setLanguageName={setLanguageName} />
         </div>
         <div className="flex h-full gap-2">
           <SaveButton plainCode={plainCode} languageInfo={languageInfo} />

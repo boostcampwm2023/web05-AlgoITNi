@@ -19,21 +19,25 @@ function LoadButtonElement({ children, onClick }: { children: React.ReactNode; o
     </button>
   );
 }
-export default function LoadButton({
-  plainCode,
-  setPlainCode,
-}: {
+
+interface LoadButtonProps {
   plainCode: string;
   setPlainCode: (value: React.SetStateAction<string>) => void;
-}) {
+  setLanguageName: (value: React.SetStateAction<string>) => void;
+}
+
+export default function LoadButton({ plainCode, setPlainCode, setLanguageName }: LoadButtonProps) {
   const [click, setClick] = useState(false);
+
   const { show } = useModal(CodeListModal);
   const { show: showLoginModal } = useModal(LoginModal);
+
   const { data, isError, error, refetch } = useQuery({
     queryKey: [QUERY_KEYS.LOAD_CODES],
     queryFn: getUserCodes,
     enabled: false,
   });
+
   const errorCallback = createAuthFailCallback(() => showLoginModal({ code: plainCode }));
 
   useEffect(() => {
@@ -43,13 +47,17 @@ export default function LoadButton({
   }, [data, isError, click]);
 
   const handleLoadLocalCodeFile = () => {
-    uploadLocalFile((result) => setPlainCode(result));
+    uploadLocalFile((code, languageName) => {
+      setPlainCode(code);
+      setLanguageName(languageName);
+    });
   };
 
   const handleLoadCloudCodeFile = async () => {
     refetch();
     setClick(true);
   };
+
   return (
     <div className="relative h-full">
       <div className="peer flex items-center min-w-[8vh] justify-center px-[max(2vh,25px)] h-full text-[max(1.2vh,10px)] bg-secondary font-thin text-white rounded whitespace-nowrap">
