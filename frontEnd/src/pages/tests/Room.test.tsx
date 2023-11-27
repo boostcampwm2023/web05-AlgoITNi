@@ -9,7 +9,8 @@ import reactQueryClient from '@/configs/reactQueryClient';
 const mockRoomData = {
   socket: {} as Socket,
   streamList: [] as { id: string; stream: MediaStream }[],
-  dataChannels: [] as { id: string; dataChannel: RTCDataChannel }[],
+  codeDataChannels: [] as { id: string; dataChannel: RTCDataChannel }[],
+  languageDataChannels: [] as { id: string; dataChannel: RTCDataChannel }[],
 };
 const mockMedia = {
   stream: {} as MediaStream,
