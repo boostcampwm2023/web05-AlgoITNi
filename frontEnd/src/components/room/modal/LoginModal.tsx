@@ -1,11 +1,8 @@
-import { useParams } from 'react-router-dom';
-
 export default function LoginModal({ code }: { code: string }) {
-  const { roomId } = useParams();
-
   const handleClick = () => {
     localStorage.setItem('code', code);
   };
+  const nextPath = window.location.pathname.split('/')[1];
 
   return (
     <div className="flex items-center justify-center gap-8 min-w-[600px]">
@@ -17,7 +14,7 @@ export default function LoginModal({ code }: { code: string }) {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col justify-between h-full gap-4">
             <a
-              href={`https://api.algoitni.site/auth/github?next=${roomId}`}
+              href={`https://api.algoitni.site/auth/github?next=${nextPath}`}
               onClick={handleClick}
               className="flex items-center p-4 text-white bg-black rounded-full"
             >
