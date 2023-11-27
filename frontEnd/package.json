@@ -11,6 +11,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.8.7",
     "axios": "^1.6.2",
     "dompurify": "^3.0.6",
     "highlight.js": "^11.9.0",
