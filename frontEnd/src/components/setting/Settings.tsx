@@ -1,15 +1,26 @@
+import randomNameGenerator from '@utils/randomNameGenerator';
 import { MediaObject } from '@/hooks/useMedia';
 import Button from '../common/Button';
 import SettingVideo from './SettingVideo';
 import Header from '../common/Header';
+import useFocus from '@/hooks/useFocus';
+import useInput from '@/hooks/useInput';
 
 export default function Setting({
   mediaObject,
   setSetting,
+  setNickName,
 }: {
   mediaObject: MediaObject;
   setSetting: React.Dispatch<React.SetStateAction<boolean>>;
+  setNickName: React.Dispatch<React.SetStateAction<string>>;
 }) {
+  const ref = useFocus<HTMLInputElement>();
+  const { inputValue, onChange } = useInput(randomNameGenerator());
+  const onClick = () => {
+    setNickName(inputValue);
+    setSetting(true);
+  };
   return (
     <div>
       <div className="mb-[5%]  mx-[7vw] mt-4">
@@ -21,8 +32,13 @@ export default function Setting({
         </div>
         <div className="flex flex-col items-center justify-center w-screen basis-5/12">
           <div className="w-[80%] flex flex-col items-center justify-center gap-[50px]">
-            <div className="text-[2.5vw] font-bold font-Pretendard">참여할 준비가 되셨나요?</div>
-            <Button.Full onClick={() => setSetting(true)} fontSize="1.8vw">
+            <div className="text-[2.5vw] font-bold ">참여할 준비가 되셨나요?</div>
+            <div className="flex flex-col gap-2 text-xl">
+              <h2 className="font-bold">닉네임을 설정해보세요!</h2>
+              <input className="p-2 border-2 border-black" type="text" ref={ref} value={inputValue} onChange={onChange} />
+            </div>
+
+            <Button.Full onClick={onClick} fontSize="1.8vw">
               참여
             </Button.Full>
           </div>

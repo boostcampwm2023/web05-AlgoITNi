@@ -14,9 +14,10 @@ export default function Room() {
   const { roomId } = useParams();
   const mediaObject = useMedia();
   const [isSetting, setSetting] = useState(!!defaultCode || defaultCode === '');
+  const [nickName, setNickName] = useState('');
   const { streamList, dataChannels } = useRTCConnection(roomId as string, mediaObject.stream as MediaStream, isSetting);
 
-  if (!isSetting) return <Setting mediaObject={mediaObject} setSetting={setSetting} />;
+  if (!isSetting) return <Setting mediaObject={mediaObject} setSetting={setSetting} setNickName={setNickName} />;
 
   return (
     <div className="flex flex-col h-screen p-4">
@@ -34,7 +35,7 @@ export default function Room() {
           </div>
         </div>
         <div className="flex basis-3/12">
-          <ChattingSection roomId={roomId as string} nickname="춘식이" />
+          <ChattingSection roomId={roomId as string} nickname={nickName} />
         </div>
       </div>
     </div>
