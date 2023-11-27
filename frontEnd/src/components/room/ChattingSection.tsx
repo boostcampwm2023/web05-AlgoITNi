@@ -7,10 +7,15 @@ import useLastMessageViewingState from '@/hooks/useLastMessageViewingState';
 import ChattingInput from './chatting/ChattingInput';
 import ScrollDownButton from './chatting/ScrollDownButton';
 
+interface ChattingSectionProps {
+  roomId: string;
+  nickname: string;
+}
+
 let socket: Socket;
 let timer: NodeJS.Timeout | null;
 
-export default function ChattingSection({ roomId }: { roomId: string }) {
+export default function ChattingSection({ roomId, nickname }: ChattingSectionProps) {
   const [message, setMessage] = useState('');
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
   const { isViewingLastMessage, isRecievedMessage, setScrollRatio, setIsRecievedMessage } = useLastMessageViewingState();
@@ -47,7 +52,7 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
     event.preventDefault();
 
     if (socket) {
-      socket.emit('send_message', { room: roomId, message });
+      socket.emit('send_message', { room: roomId, message, nickname });
       setMessage('');
       setScrollRatio(100);
     }
@@ -78,7 +83,7 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
         onScroll={handleScroll}
       >
         {allMessages.map((messageData, index) => (
-          <ChattingMessage messageData={messageData} key={index} />
+          <ChattingMessage messageData={messageData} key={index} myMessage={messageData.socketId === socket.id} />
         ))}
       </div>
       {isRecievedMessage && <ScrollDownButton handleMoveToBottom={handleMoveToBottom} />}

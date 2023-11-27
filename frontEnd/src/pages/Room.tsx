@@ -34,7 +34,7 @@ export default function Room() {
           </div>
         </div>
         <div className="flex basis-3/12">
-          <ChattingSection roomId={roomId as string} />
+          <ChattingSection roomId={roomId as string} nickname="춘식이" />
         </div>
       </div>
     </div>
