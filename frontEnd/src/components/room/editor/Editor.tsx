@@ -105,11 +105,16 @@ export default function Editor({
 
   return (
     <div className="w-full h-full grid grid-rows-[repeat(12,minmax(0,1fr))] rounded-lg bg-primary min-w-[400px] min-h-[400px]">
-      <div className="flex items-center justify-between h-full row-span-1 p-2 border-b border-white">
+      <div className="flex items-center justify-between h-full row-span-1 p-2 px-4 border-b border-white">
         <h1 className="text-white text-[max(2vh,15px)]">Solution.{languageInfo.extension}</h1>
-        <select name="language" onChange={(e) => setLanguageName(e.target.value)} value={languageName}>
+        <select
+          name="language"
+          onChange={(e) => setLanguageName(e.target.value)}
+          value={languageName}
+          className="p-2 text-white bg-primary focus:outline-none"
+        >
           {Object.values(EDITOR_LANGUAGE_TYPES).map((languageData, index) => (
-            <option key={index + languageData.name} value={languageData.name}>
+            <option className="text-black bg-white" key={index + languageData.name} value={languageData.name}>
               {languageData.optionText}
             </option>
           ))}
