@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 jobs:
-  api-server-ci:
+  api-server-cd:
     runs-on: ubuntu-latest
     steps:
       - name: ✅ 코드 체크아웃
@@ -20,7 +20,7 @@ jobs:
 
       - name: ⬇️ 의존성 설치
         working-directory: ./backEnd/api
-        run: npm install
+        run: npm ci
 
       - name: 📦 프로젝트 빌드
         working-directory: ./backEnd/api
