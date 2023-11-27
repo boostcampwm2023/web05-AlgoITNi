@@ -39,8 +39,6 @@ export default function Editor({
   };
 
   const handleRecieveLanguageMessage = (event: MessageEvent) => {
-    console.log('언어 변경:', event.data, typeof event.data);
-
     setCodeLanguage(event.data);
   };
 
@@ -117,6 +115,7 @@ export default function Editor({
           </div>
           <InputArea
             plainCode={plainCode}
+            codeLanguage={codeLanguage}
             cursorPosition={cursorPosition}
             handleChange={handleChange}
             handleKeyDown={handleKeyDown}
