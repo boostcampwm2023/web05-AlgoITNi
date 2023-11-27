@@ -6,11 +6,17 @@ import ChattingMessage from './chatting/ChattingMessage';
 import useLastMessageViewingState from '@/hooks/useLastMessageViewingState';
 import ChattingInput from './chatting/ChattingInput';
 import ScrollDownButton from './chatting/ScrollDownButton';
+import { CHATTING_SOCKET_EMIT_EVNET, CHATTING_SOCKET_RECIEVE_EVNET } from '@/constants/chattingSocketEvents';
+
+interface ChattingSectionProps {
+  roomId: string;
+  nickname: string;
+}
 
 let socket: Socket;
 let timer: NodeJS.Timeout | null;
 
-export default function ChattingSection({ roomId }: { roomId: string }) {
+export default function ChattingSection({ roomId, nickname }: ChattingSectionProps) {
   const [message, setMessage] = useState('');
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
   const { isViewingLastMessage, isRecievedMessage, setScrollRatio, setIsRecievedMessage } = useLastMessageViewingState();
@@ -47,7 +53,7 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
     event.preventDefault();
 
     if (socket) {
-      socket.emit('send_message', { room: roomId, message });
+      socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname });
       setMessage('');
       setScrollRatio(100);
     }
@@ -57,12 +63,12 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
     socket = io(VITE_CHAT_URL, {
       transports: ['websocket'],
     });
-    socket.on('new_message', (recievedMessage) => {
+    socket.on(CHATTING_SOCKET_RECIEVE_EVNET.NEW_MESSAGE, (recievedMessage) => {
       setAllMessage((prev) => [...prev, JSON.parse(recievedMessage)]);
     });
     socket.connect();
 
-    socket.emit('join_room', { room: roomId });
+    socket.emit(CHATTING_SOCKET_EMIT_EVNET.JOIN_ROOM, { room: roomId });
   }, []);
 
   useEffect(() => {
@@ -78,7 +84,7 @@ export default function ChattingSection({ roomId }: { roomId: string }) {
         onScroll={handleScroll}
       >
         {allMessages.map((messageData, index) => (
-          <ChattingMessage messageData={messageData} key={index} />
+          <ChattingMessage messageData={messageData} key={index} isMyMessage={messageData.socketId === socket.id} />
         ))}
       </div>
       {isRecievedMessage && <ScrollDownButton handleMoveToBottom={handleMoveToBottom} />}
