@@ -11,6 +11,8 @@ import { WinstonLogger } from './common/logger/winstonLogger.service';
 import * as cookieParser from 'cookie-parser';
 import * as session from 'express-session';
 import { ValidationPipe } from '@nestjs/common';
+import RedisStore from 'connect-redis';
+import Redis from 'ioredis';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
@@ -35,12 +37,23 @@ async function bootstrap() {
     credentials: true,
   });
 
+  const redisStore = new RedisStore({
+    client: new Redis({
+      port: configService.get<number>('REDIS_PORT'),
+      host: configService.get<string>('REDIS_HOST'),
+      password: configService.get<string>('REDIS_PASSWORD'),
+    }),
+    prefix: 'sess:',
+  });
+
   app.use(cookieParser());
   app.use(
     session({
+      store: redisStore,
       secret: configService.get<string>('SESSION_SECRET'),
       resave: false,
       saveUninitialized: false,
+      cookie: { sameSite: 'lax', secure: true },
     }),
   );
   const port = configService.get<number>('PORT');

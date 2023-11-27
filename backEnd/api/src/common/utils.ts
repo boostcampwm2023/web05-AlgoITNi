@@ -1,3 +1,5 @@
+import * as process from 'process';
+
 export const requestPath = {
   RUN_PYTHON: '/codes/python',
 };
@@ -51,4 +53,15 @@ export const jwtError = {
 export const ResponseMessage = {
   NEED_LOGIN: '로그인이 필요합니다.',
   INTERNAL_SERVER_ERROR: 'Internal server error',
+};
+
+export const SOCKET = {};
+
+export const REDIS = {
+  CHANNEL: 'completed',
+  QUEUE: process.env.NODE_ENV === 'dev' ? 'task-dev' : 'task',
+};
+
+export const EVENT = {
+  COMPLETE: 'job-complete',
 };

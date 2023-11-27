@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common';
 import { RunService } from './run.service';
 import { RequestCodeblockDto } from './dto/request-codeblock.dto';
 import { returnCode } from '../common/returnCode';
@@ -48,5 +48,21 @@ export class RunController {
   @Get('avgTime')
   showAvgTrialTime() {
     return this.redisService.showTrialTimeAvg();
+  }
+
+  @HttpCode(202)
+  @Post('v3')
+  async requestRunCodeV3(
+    @Query('id') socketID: string,
+    @Body() codeBlock: RequestCodeblockDto,
+  ): Promise<void> {
+    const { code } = codeBlock;
+    const securityCheck = this.runService.securityCheck(code);
+    if (securityCheck === returnCode['vulnerable']) {
+      // fail
+      throw new VulnerableException();
+    }
+
+    await this.runService.requestRunningMQPubSub(codeBlock, socketID);
   }
 }
