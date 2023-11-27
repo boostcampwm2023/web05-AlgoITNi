@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { WebRtcGateway } from './webRTC/web-rtc.gateway';
 import { WinstonLogger } from './common/logger/winstonLogger.service';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { EventsModule } from './events/events.module';
+import { WebRtcModule } from './webRTC/web-rtc.module';
 
 @Module({
   imports: [
@@ -23,8 +23,9 @@ import { EventsModule } from './events/events.module';
       inject: [ConfigService],
     }),
     EventsModule,
+    WebRtcModule,
   ],
   controllers: [AppController],
-  providers: [AppService, WebRtcGateway, WinstonLogger],
+  providers: [AppService, WinstonLogger],
 })
 export class AppModule {}
