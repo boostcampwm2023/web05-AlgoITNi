@@ -23,6 +23,8 @@ export default function Editor({
   const [execResult] = useState<string>('');
   const [cursorPosition, setCursorPosition] = useState<number>(0);
 
+  const [codeLanguage, setCodeLanguage] = useState<string>('python');
+
   const ydoc = useRef(new Y.Doc());
   const ytext = useRef(ydoc.current.getText('sharedText'));
 
@@ -31,14 +33,15 @@ export default function Editor({
   }, []);
 
   const handleRecieveCodeMessage = (event: MessageEvent) => {
-    console.log(event.data);
     Y.applyUpdate(ydoc.current, new Uint8Array(event.data));
 
     setPlainCode(ytext.current.toString());
   };
 
   const handleRecieveLanguageMessage = (event: MessageEvent) => {
-    console.log(event.data);
+    console.log('언어 변경:', event.data, typeof event.data);
+
+    setCodeLanguage(event.data);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -92,10 +95,20 @@ export default function Editor({
     });
   }, [plainCode]);
 
+  useEffect(() => {
+    languageDataChannels.forEach(({ dataChannel }) => {
+      if (dataChannel.readyState === 'open') dataChannel.send(codeLanguage);
+    });
+  }, [codeLanguage]);
+
   return (
     <div className="w-full h-full grid grid-rows-[repeat(12,minmax(0,1fr))] rounded-lg bg-primary min-w-[400px] min-h-[400px]">
-      <div className="flex items-center justify-start h-full row-span-1 p-2 border-b border-white">
+      <div className="flex items-center justify-between h-full row-span-1 p-2 border-b border-white">
         <h1 className="text-white text-[max(2vh,15px)]">Solution.py</h1>
+        <select name="language" onChange={(e) => setCodeLanguage(e.target.value)} value={codeLanguage}>
+          <option value="python">Python</option>
+          <option value="javascript">JavaScript</option>
+        </select>
       </div>
       <div className="flex flex-col overflow-y-auto row-[span_7_/_span_7] custom-scroll">
         <div className="flex flex-grow">
