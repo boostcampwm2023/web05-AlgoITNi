@@ -10,7 +10,7 @@ let socket: Socket;
 const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: boolean) => {
   const [isConnect, setIsConnect] = useState(false);
   const [streamList, setStreamList] = useState<{ id: string; stream: MediaStream }[]>([]);
-  const [dataChannels, setDataChannels] = useState<{ id: string; dataChannel: RTCDataChannel }[]>([]);
+  const [codeDataChannels, setCodeDataChannels] = useState<{ id: string; dataChannel: RTCDataChannel }[]>([]);
 
   const socketConnect = () => {
     fetch(VITE_SOCKET_URL, {
@@ -91,7 +91,7 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
         return [...newArray, { id: socketId, stream: e.streams[0] }];
       });
     });
-    setDataChannels((prev) => [...prev, { id: socketId, dataChannel: newDataChannel }]);
+    setCodeDataChannels((prev) => [...prev, { id: socketId, dataChannel: newDataChannel }]);
 
     return RTCConnection;
   };
@@ -147,11 +147,11 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
     RTCConnections[data.id].close();
     delete RTCConnections[data.id];
 
-    setDataChannels((prev) => prev.filter(({ id }) => id !== data.id));
+    setCodeDataChannels((prev) => prev.filter(({ id }) => id !== data.id));
     setStreamList((prev) => prev.filter((stream) => stream.id !== data.id));
   };
 
-  return { socket, streamList, dataChannels };
+  return { socket, streamList, codeDataChannels };
 };
 
 export default useRTCConnection;

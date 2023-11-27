@@ -2,10 +2,10 @@ import Editor from './editor/Editor';
 
 export default function EditorSection({
   defaultCode,
-  dataChannels,
+  codeDataChannels,
 }: {
   defaultCode: string | null;
-  dataChannels: {
+  codeDataChannels: {
     id: string;
     dataChannel: RTCDataChannel;
   }[];
@@ -13,7 +13,7 @@ export default function EditorSection({
   return (
     <div className="basis-3/5">
       <div className="w-full h-full">
-        <Editor defaultCode={defaultCode} dataChannels={dataChannels} />
+        <Editor defaultCode={defaultCode} codeDataChannels={codeDataChannels} />
       </div>
     </div>
   );

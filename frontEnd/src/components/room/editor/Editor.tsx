@@ -10,10 +10,10 @@ import EDITOR_TAB_SIZE from '@/constants/editor';
 
 export default function Editor({
   defaultCode,
-  dataChannels,
+  codeDataChannels,
 }: {
   defaultCode: string | null;
-  dataChannels: Array<{ id: string; dataChannel: RTCDataChannel }>;
+  codeDataChannels: Array<{ id: string; dataChannel: RTCDataChannel }>;
 }) {
   const [plainCode, setPlainCode] = useState<string>(defaultCode || '');
   // TODO: 코드 실행 요청 후 결과 setState 추가
@@ -68,13 +68,13 @@ export default function Editor({
   const handleExecCode = () => {};
 
   useEffect(() => {
-    dataChannels.forEach(({ dataChannel }) => {
+    codeDataChannels.forEach(({ dataChannel }) => {
       dataChannel.onmessage = handleMessage;
     });
-  }, [dataChannels]);
+  }, [codeDataChannels]);
 
   useEffect(() => {
-    dataChannels.forEach(({ dataChannel }) => {
+    codeDataChannels.forEach(({ dataChannel }) => {
       if (dataChannel.readyState === 'open') dataChannel.send(Y.encodeStateAsUpdate(ydoc.current) as Uint8Array);
     });
   }, [plainCode]);
