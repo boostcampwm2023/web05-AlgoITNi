@@ -23,7 +23,7 @@ export default function LoadButton({
   plainCode: string;
   setPlainCode: (value: React.SetStateAction<string>) => void;
 }) {
-  const { show, hide } = useModal(CodeListModal);
+  const { show } = useModal(CodeListModal);
   const { show: showLoginModal } = useModal(LoginModal);
 
   const handleLoadLocalCodeFile = () => {

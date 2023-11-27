@@ -11,7 +11,7 @@ export default function SaveModal({ code }: { code: string }) {
   const { inputValue, onChange } = useInput('');
   const ref = useFocus<HTMLInputElement>();
   const { show: showSuccessModal, hide: hideSuccessModal } = useModal(SuccessModal);
-  const { show: showLoginModal, hide: hideLoginModal } = useModal(LoginModal);
+  const { show: showLoginModal } = useModal(LoginModal);
   const { hide } = useModal();
 
   const handleClick = async () => {
