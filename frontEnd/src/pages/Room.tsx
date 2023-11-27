@@ -14,7 +14,11 @@ export default function Room() {
   const { roomId } = useParams();
   const mediaObject = useMedia();
   const [isSetting, setSetting] = useState(!!defaultCode || defaultCode === '');
-  const { streamList, codeDataChannels } = useRTCConnection(roomId as string, mediaObject.stream as MediaStream, isSetting);
+  const { streamList, codeDataChannels, languageDataChannels } = useRTCConnection(
+    roomId as string,
+    mediaObject.stream as MediaStream,
+    isSetting,
+  );
 
   if (!isSetting) return <Setting mediaObject={mediaObject} setSetting={setSetting} />;
 
@@ -30,7 +34,7 @@ export default function Room() {
               <QuizViewSection />
               <ControllSection mediaObject={mediaObject} />
             </div>
-            <EditorSection defaultCode={defaultCode} codeDataChannels={codeDataChannels} />
+            <EditorSection defaultCode={defaultCode} codeDataChannels={codeDataChannels} languageDataChannels={languageDataChannels} />
           </div>
         </div>
         <div className="flex basis-3/12">

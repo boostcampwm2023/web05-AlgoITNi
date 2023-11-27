@@ -11,6 +11,7 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
   const [isConnect, setIsConnect] = useState(false);
   const [streamList, setStreamList] = useState<{ id: string; stream: MediaStream }[]>([]);
   const [codeDataChannels, setCodeDataChannels] = useState<{ id: string; dataChannel: RTCDataChannel }[]>([]);
+  const [languageDataChannels, setLanguageDataChannels] = useState<{ id: string; dataChannel: RTCDataChannel }[]>([]);
 
   const socketConnect = () => {
     fetch(VITE_SOCKET_URL, {
@@ -68,7 +69,8 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
       ],
     });
 
-    const newDataChannel = RTCConnection.createDataChannel('edit', { negotiated: true, id: 0 });
+    const newCodeDataChannel = RTCConnection.createDataChannel('code', { negotiated: true, id: 0 });
+    const newLanguageDataChannel = RTCConnection.createDataChannel('language', { negotiated: true, id: 1 });
 
     if (localStream) {
       localStream.getTracks().forEach((track) => {
@@ -91,7 +93,9 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
         return [...newArray, { id: socketId, stream: e.streams[0] }];
       });
     });
-    setCodeDataChannels((prev) => [...prev, { id: socketId, dataChannel: newDataChannel }]);
+
+    setCodeDataChannels((prev) => [...prev, { id: socketId, dataChannel: newCodeDataChannel }]);
+    setLanguageDataChannels((prev) => [...prev, { id: socketId, dataChannel: newLanguageDataChannel }]);
 
     return RTCConnection;
   };
@@ -148,10 +152,12 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
     delete RTCConnections[data.id];
 
     setCodeDataChannels((prev) => prev.filter(({ id }) => id !== data.id));
+    setLanguageDataChannels((prev) => prev.filter(({ id }) => id !== data.id));
+
     setStreamList((prev) => prev.filter((stream) => stream.id !== data.id));
   };
 
-  return { socket, streamList, codeDataChannels };
+  return { socket, streamList, codeDataChannels, languageDataChannels };
 };
 
 export default useRTCConnection;

@@ -11,9 +11,11 @@ import EDITOR_TAB_SIZE from '@/constants/editor';
 export default function Editor({
   defaultCode,
   codeDataChannels,
+  languageDataChannels,
 }: {
   defaultCode: string | null;
   codeDataChannels: Array<{ id: string; dataChannel: RTCDataChannel }>;
+  languageDataChannels: Array<{ id: string; dataChannel: RTCDataChannel }>;
 }) {
   const [plainCode, setPlainCode] = useState<string>(defaultCode || '');
   // TODO: 코드 실행 요청 후 결과 setState 추가
@@ -28,10 +30,15 @@ export default function Editor({
     localStorage.removeItem('code');
   }, []);
 
-  const handleMessage = (event: MessageEvent) => {
+  const handleRecieveCodeMessage = (event: MessageEvent) => {
+    console.log(event.data);
     Y.applyUpdate(ydoc.current, new Uint8Array(event.data));
 
     setPlainCode(ytext.current.toString());
+  };
+
+  const handleRecieveLanguageMessage = (event: MessageEvent) => {
+    console.log(event.data);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -69,9 +76,15 @@ export default function Editor({
 
   useEffect(() => {
     codeDataChannels.forEach(({ dataChannel }) => {
-      dataChannel.onmessage = handleMessage;
+      dataChannel.onmessage = handleRecieveCodeMessage;
     });
   }, [codeDataChannels]);
+
+  useEffect(() => {
+    languageDataChannels.forEach(({ dataChannel }) => {
+      dataChannel.onmessage = handleRecieveLanguageMessage;
+    });
+  }, [languageDataChannels]);
 
   useEffect(() => {
     codeDataChannels.forEach(({ dataChannel }) => {
