@@ -8,6 +8,7 @@ import LoginModal from './LoginModal';
 import postUserCode from '@/apis/postUserCode';
 import reactQueryClient from '@/configs/reactQueryClient';
 import createAuthFailCallback from '@/utils/authFailCallback';
+import QUERY_KEYS from '@/constants/queryKeys';
 
 export default function SaveModal({ code }: { code: string }) {
   const { inputValue, onChange } = useInput('');
@@ -18,7 +19,7 @@ export default function SaveModal({ code }: { code: string }) {
 
   const mutationSuccess = () => {
     showSuccessModal();
-    reactQueryClient.invalidateQueries({ queryKey: ['codesData'] });
+    reactQueryClient.invalidateQueries({ queryKey: [QUERY_KEYS.LOAD_CODES] });
   };
 
   const { mutate } = useMutation({

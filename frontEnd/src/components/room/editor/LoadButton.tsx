@@ -6,6 +6,7 @@ import { uploadLocalFile } from '@/utils/file';
 import CodeListModal from '../modal/CodeListModal';
 import LoginModal from '../modal/LoginModal';
 import createAuthFailCallback from '@/utils/authFailCallback';
+import QUERY_KEYS from '@/constants/queryKeys';
 
 function LoadButtonElement({ children, onClick }: { children: React.ReactNode; onClick: React.MouseEventHandler<HTMLButtonElement> }) {
   return (
@@ -28,7 +29,7 @@ export default function LoadButton({
   const { show } = useModal(CodeListModal);
   const { show: showLoginModal } = useModal(LoginModal);
   const { data, isError, error, refetch } = useQuery({
-    queryKey: ['codesData'],
+    queryKey: [QUERY_KEYS.LOAD_CODES],
     queryFn: getUserCodes,
     enabled: false,
   });
