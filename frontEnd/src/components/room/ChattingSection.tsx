@@ -83,7 +83,7 @@ export default function ChattingSection({ roomId, nickname }: ChattingSectionPro
         onScroll={handleScroll}
       >
         {allMessages.map((messageData, index) => (
-          <ChattingMessage messageData={messageData} key={index} myMessage={messageData.socketId === socket.id} />
+          <ChattingMessage messageData={messageData} key={index} isMyMessage={messageData.socketId === socket.id} />
         ))}
       </div>
       {isRecievedMessage && <ScrollDownButton handleMoveToBottom={handleMoveToBottom} />}
