@@ -16,6 +16,7 @@ import { UserInfoDto } from '../users/dto/userInfo.dto';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './auth.guard';
 import { UserDto } from '../users/dto/user.dto';
+import * as path from 'path';
 
 @Controller('auth')
 export class AuthController {
@@ -66,8 +67,8 @@ export class AuthController {
   async githubProxy(
     @Res() res: Response,
     @Req() req: Request,
-    @Query('next') next: string,
-    @Query('dev') dev: boolean,
+    @Query('next') next: string = '/',
+    @Query('dev') dev: boolean = false,
   ) {
     req.session['returnTo'] = dev
       ? `http://${path.join('localhost:3000', next)}`
