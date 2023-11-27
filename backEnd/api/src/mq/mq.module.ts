@@ -3,6 +3,7 @@ import { BullModule } from '@nestjs/bull';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MqService } from './mq.service';
 import { RedisModule } from '../redis/redis.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -21,8 +22,9 @@ import { RedisModule } from '../redis/redis.module';
       name: 'runningRequest',
     }),
     RedisModule,
+    EventEmitterModule.forRoot(),
   ],
   providers: [MqService],
-  exports: [MqService],
+  exports: [MqService, EventEmitterModule],
 })
 export class MqModule {}

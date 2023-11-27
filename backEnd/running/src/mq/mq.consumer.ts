@@ -5,6 +5,8 @@ import { HttpStatus, Logger } from '@nestjs/common';
 import { CodesService } from '../codes/codes.service';
 import { ResponseCodeDto } from '../codes/dto/response-code.dto ';
 import { ResponseCodeBlockDto } from './dto/response-codeblock.dto';
+import * as process from 'process';
+import { REDIS } from '../common/utils';
 @Processor('runningRequest')
 export class MqConsumer {
   private logger = new Logger(MqConsumer.name);
@@ -16,11 +18,12 @@ export class MqConsumer {
     private redisService: RedisService,
     private codesService: CodesService,
   ) {}
-  @Process('task')
+  @Process(REDIS.QUEUE)
   async getMessageQueue(job: Job) {
     this.logger.debug(`getMessageQueue ${job.id}, ${job.data}`);
     let result: ResponseCodeDto | string;
     const responseCodeBlockDTO = new ResponseCodeBlockDto();
+
     try {
       result = await this.codesService.testCode(job.data);
       const output: string | string[] =
@@ -31,7 +34,7 @@ export class MqConsumer {
       responseCodeBlockDTO.result = output;
       responseCodeBlockDTO.message = this.errorMessage[HttpStatus.CREATED];
     } catch (e) {
-      console.log(e);
+      this.logger.error(e);
       responseCodeBlockDTO.statusCode = e.status;
       if (e.status === HttpStatus.INTERNAL_SERVER_ERROR) {
         responseCodeBlockDTO.message = e.message;
@@ -41,7 +44,12 @@ export class MqConsumer {
       }
     } finally {
       this.logger.log(`${job.id} complete`);
-      return this.redisService.addCompletedJob(job.id, responseCodeBlockDTO);
+
+      const mode = process.env.MODE || 'V3';
+      if (mode !== 'V3') {
+        return this.redisService.addCompletedJob(job.id, responseCodeBlockDTO);
+      }
+      return this.redisService.publish(job.id, responseCodeBlockDTO);
     }
   }
 }

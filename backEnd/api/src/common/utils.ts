@@ -1,3 +1,5 @@
+import * as process from 'process';
+
 export const requestPath = {
   RUN_PYTHON: '/codes/python',
 };
@@ -7,6 +9,14 @@ const timeUnit = {
   MINUTE: 'm',
   HOUR: 'h',
   DAY: 'd',
+};
+
+export const time = {
+  SECOND: 1,
+  MINUTE: 60,
+  FIVE_MINUTE: 5 * 60,
+  HOUR: 60 * 60,
+  DAY: 60 * 60 * 24,
 };
 
 export const calcExpireSeconds = (expireString: string): number => {
@@ -43,4 +53,15 @@ export const jwtError = {
 export const ResponseMessage = {
   NEED_LOGIN: '로그인이 필요합니다.',
   INTERNAL_SERVER_ERROR: 'Internal server error',
+};
+
+export const SOCKET = {};
+
+export const REDIS = {
+  CHANNEL: 'completed',
+  QUEUE: process.env.NODE_ENV === 'dev' ? 'task-dev' : 'task',
+};
+
+export const EVENT = {
+  COMPLETE: 'job-complete',
 };

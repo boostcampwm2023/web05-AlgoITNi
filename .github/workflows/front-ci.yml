@@ -33,6 +33,7 @@ jobs:
           echo "VITE_STUN_URL=${{secrets.VITE_STUN_URL}}" >> .env
           echo "VITE_STUN_USERNAME=${{secrets.VITE_STUN_USERNAME}}" >> .env
           echo "VITE_STUN_CREDENTIAL=${{secrets.VITE_STUN_CREDENTIAL}}" >> .env
+          echo "VITE_CHAT_URL=${{secrets.VITE_CHAT_URL}}" >> .env
 
       - name: 📦 프로젝트 빌드
         working-directory: ./frontEnd

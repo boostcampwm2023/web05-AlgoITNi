@@ -4,15 +4,16 @@ import useRTCConnection from '@/hooks/useRTCConnection';
 import Setting from '@/components/setting/Settings';
 import useMedia from '@/hooks/useMedia';
 import VideoSection from '@/components/room/VideoSection';
-import LinkInputSection from '@/components/room/LinkInputSection';
+import QuizViewSection from '@/components/room/QuizViewSection';
 import EditorSection from '@/components/room/EditorSection';
 import ChattingSection from '@/components/room/ChattingSection';
 import ControllSection from '@/components/room/ControllSection';
 
 export default function Room() {
+  const defaultCode = localStorage.getItem('code');
   const { roomId } = useParams();
   const mediaObject = useMedia();
-  const [isSetting, setSetting] = useState(false);
+  const [isSetting, setSetting] = useState(!!defaultCode || defaultCode === '');
   const { streamList, dataChannels } = useRTCConnection(roomId as string, mediaObject.stream as MediaStream, isSetting);
 
   if (!isSetting) return <Setting mediaObject={mediaObject} setSetting={setSetting} />;
@@ -26,14 +27,14 @@ export default function Room() {
           </div>
           <div className="flex h-full gap-4 basis-9/12">
             <div className="flex flex-col w-full h-full gap-4 basis-2/5">
-              <LinkInputSection />
+              <QuizViewSection />
               <ControllSection mediaObject={mediaObject} />
             </div>
-            <EditorSection dataChannels={dataChannels} />
+            <EditorSection defaultCode={defaultCode} dataChannels={dataChannels} />
           </div>
         </div>
         <div className="flex basis-3/12">
-          <ChattingSection />
+          <ChattingSection roomId={roomId as string} />
         </div>
       </div>
     </div>

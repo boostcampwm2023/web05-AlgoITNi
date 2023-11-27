@@ -1,6 +1,6 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
-import { ERRORS } from 'src/commons/utils';
+import { ERRORS } from '../commons/utils';
 
 @Injectable()
 export class ChatService {
@@ -18,6 +18,15 @@ export class ChatService {
       throw new WsException({
         statusCode: ERRORS.MESSAGE_EMPTY.statusCode,
         message: ERRORS.MESSAGE_EMPTY.message,
+      });
+    }
+  }
+
+  validateNickname(nickname: string) {
+    if (!nickname) {
+      throw new WsException({
+        statusCode: ERRORS.ROOM_EMPTY.statusCode,
+        message: ERRORS.ROOM_EMPTY.message,
       });
     }
   }
