@@ -47,7 +47,7 @@ jobs:
           port: ${{secrets.API_PORT}}
           script: |
             cd /root
-            echo "WEB_HOOK_URL=${{secrets.WEB_HOOK_URL}}" >> .env
+            echo "WEB_HOOK_URL=${{secrets.WEB_HOOK_URL}}" > .env
             echo "PORT=${{secrets.PORT}}" >> .env
             echo "DB_HOST=${{secrets.DB_HOST}}" >> .env
             echo "DB_PORT=${{secrets.DB_PORT}}" >> .env
@@ -70,4 +70,11 @@ jobs:
             echo "CHROMIUM_PATH=${{secrets.CHROMIUM_PATH}}" >> .env
             echo "SESSION_SECRET=${{secrets.SESSION_SECRET}}" >> .env
             echo "MONGO_PROD=${{secrets.MONGO_PROD}}" >> .env
+
+            echo "DEV_DB_PORT=${{secrets.DEV_DB_PORT}}" >> .env
+            echo "SLAVE_DB_HOST=${{secrets.SLAVE_DB_HOST}}" >> .env
+            echo "SLAVE_DB_PORT=${{secrets.SLAVE_DB_PORT}}" >> .env
+            echo "SLAVE_DB_USERNAME=${{secrets.SLAVE_DB_USERNAME}}" >> .env
+            echo "SLAVE_DB_PASSWORD=${{secrets.SLAVE_DB_PASSWORD}}" >> .env
+            echo "SLAVE_DB_DATABASE=${{secrets.SLAVE_DB_DATABASE}}" >> .env
             bash deploy.sh >> /dev/deploy.log 2>&1
