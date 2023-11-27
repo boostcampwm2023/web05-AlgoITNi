@@ -1,7 +1,7 @@
 import { LanguageInfo } from '@/types/editor';
 
 export const EDITOR_TAB_SIZE = 4;
-export const EDITOR_LANGUAGE_TYPES: { [key: string]: LanguageInfo } = {
+export const EDITOR_LANGUAGE_TYPES: Record<string, LanguageInfo> = {
   python: {
     name: 'python',
     optionText: 'Python',

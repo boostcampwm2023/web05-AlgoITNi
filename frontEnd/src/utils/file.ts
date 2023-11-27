@@ -1,8 +1,13 @@
+import { EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
+
 export const uploadLocalFile = (onLoadCallback: (result: string) => void) => {
   const input = document.createElement('input');
+  const extensions = Object.values(EDITOR_LANGUAGE_TYPES)
+    .map((languageData) => `.${languageData.extension}`)
+    .join(', ');
 
   input.type = 'file';
-  input.accept = '.py';
+  input.accept = extensions;
   input.onchange = (changeFileEvent) => {
     const file = (changeFileEvent.target as HTMLInputElement).files?.[0];
     if (file) {

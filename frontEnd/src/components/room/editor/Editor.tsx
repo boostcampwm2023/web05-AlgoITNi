@@ -107,8 +107,11 @@ export default function Editor({
       <div className="flex items-center justify-between h-full row-span-1 p-2 border-b border-white">
         <h1 className="text-white text-[max(2vh,15px)]">Solution.{languageInfo.extension}</h1>
         <select name="language" onChange={(e) => setLanguageName(e.target.value)} value={languageName}>
-          <option value="python">Python</option>
-          <option value="javascript">JavaScript</option>
+          {Object.values(EDITOR_LANGUAGE_TYPES).map((languageData, index) => (
+            <option key={index + languageData.name} value={languageData.name}>
+              {languageData.optionText}
+            </option>
+          ))}
         </select>
       </div>
       <div className="flex flex-col overflow-y-auto row-[span_7_/_span_7] custom-scroll">
