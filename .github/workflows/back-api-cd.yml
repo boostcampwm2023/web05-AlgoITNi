@@ -49,6 +49,7 @@ jobs:
             cd /root
             echo "WEB_HOOK_URL=${{secrets.WEB_HOOK_URL}}" > .env
             echo "PORT=${{secrets.PORT}}" >> .env
+            echo "API_DOMAIN=${{secrets.API_DOMAIN}}" >> .env
             echo "DB_HOST=${{secrets.DB_HOST}}" >> .env
             echo "DB_PORT=${{secrets.DB_PORT}}" >> .env
             echo "DB_USERNAME=${{secrets.DB_USERNAME}}" >> .env
@@ -77,4 +78,7 @@ jobs:
             echo "SLAVE_DB_USERNAME=${{secrets.SLAVE_DB_USERNAME}}" >> .env
             echo "SLAVE_DB_PASSWORD=${{secrets.SLAVE_DB_PASSWORD}}" >> .env
             echo "SLAVE_DB_DATABASE=${{secrets.SLAVE_DB_DATABASE}}" >> .env
+            
+            echo "CLIENT_ID_GOOGLE=${{secrets.CLIENT_ID_GOOGLE}}" >> .env
+            echo "CLIENT_SECRET_GOOGLE=${{secrets.CLIENT_SECRET_GOOGLE}}" >> .env
             bash deploy.sh >> /dev/deploy.log 2>&1
