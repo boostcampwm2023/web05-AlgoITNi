@@ -5,8 +5,8 @@ import InputArea from './InputArea';
 import EditorButton from './EditorButton';
 import SaveButton from './SaveButton';
 import OutputArea from './OutputArea';
-import { EDITOR_TAB_SIZE } from '@/constants/env';
 import LoadButton from './LoadButton';
+import EDITOR_TAB_SIZE from '@/constants/editor';
 
 export default function Editor({
   defaultCode,
