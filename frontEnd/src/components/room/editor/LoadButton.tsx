@@ -1,12 +1,9 @@
-import { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import getUserCodes from '@/apis/getUserCodes';
 import useModal from '@/hooks/useModal';
 import { uploadLocalFile } from '@/utils/file';
 import CodeListModal from '../modal/CodeListModal';
 import LoginModal from '../modal/LoginModal';
 import createAuthFailCallback from '@/utils/authFailCallback';
-import QUERY_KEYS from '@/constants/queryKeys';
 
 function LoadButtonElement({ children, onClick }: { children: React.ReactNode; onClick: React.MouseEventHandler<HTMLButtonElement> }) {
   return (
@@ -27,24 +24,10 @@ interface LoadButtonProps {
 }
 
 export default function LoadButton({ plainCode, setPlainCode, setLanguageName }: LoadButtonProps) {
-  const [click, setClick] = useState(false);
-
   const { show } = useModal(CodeListModal);
   const { show: showLoginModal } = useModal(LoginModal);
 
-  const { data, isError, error, refetch } = useQuery({
-    queryKey: [QUERY_KEYS.LOAD_CODES],
-    queryFn: getUserCodes,
-    enabled: false,
-  });
-
   const errorCallback = createAuthFailCallback(() => showLoginModal({ code: plainCode }));
-
-  useEffect(() => {
-    if (data && click) show({ codeData: data, setPlainCode });
-    if (isError) errorCallback(error);
-    setClick(false);
-  }, [data, isError, click]);
 
   const handleLoadLocalCodeFile = () => {
     uploadLocalFile((code, languageName) => {
@@ -54,8 +37,12 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName }:
   };
 
   const handleLoadCloudCodeFile = async () => {
-    refetch();
-    setClick(true);
+    try {
+      const data = await getUserCodes();
+      show({ codeData: data, setPlainCode });
+    } catch (err) {
+      errorCallback(err as Error);
+    }
   };
 
   return (
