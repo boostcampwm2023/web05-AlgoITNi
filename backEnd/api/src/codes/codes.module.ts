@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Code, CodeSchema } from './schemas/code.schemas';
 import { AuthModule } from '../auth/auth.module';
+import { SaveCodePipe } from './pipes/saveCode.pipe';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { AuthModule } from '../auth/auth.module';
     AuthModule,
   ],
   controllers: [CodesController],
-  providers: [CodesService],
+  providers: [CodesService, SaveCodePipe],
 })
 export class CodesModule {}

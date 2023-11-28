@@ -20,7 +20,7 @@ export class GoogleService {
     this.oauth2Client = new google.auth.OAuth2(
       this.client_id,
       this.configService.get<string>('CLIENT_SECRET_GOOGLE'),
-      `${this.configService.get<string>('API_DOMAIN')}/google-callback`,
+      `${this.configService.get<string>('API_DOMAIN')}/auth/google-callback`,
     );
 
     this.authorizationUrl = this.oauth2Client.generateAuthUrl({
