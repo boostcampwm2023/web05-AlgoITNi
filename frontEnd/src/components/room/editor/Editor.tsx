@@ -3,18 +3,24 @@ import InputArea from './InputArea';
 import LineNumber from './LineNumber';
 import { EDITOR_TAB_SIZE } from '@/constants/editor';
 import { LanguageInfo } from '@/types/editor';
+import { DataChannel } from '@/types/RTCConnection';
+import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
 
 interface EditorProps {
   plainCode: string;
   languageInfo: LanguageInfo;
   setPlainCode: React.Dispatch<React.SetStateAction<string>>;
+  codeDataChannels: DataChannel[];
 }
 
-export default function Editor({ plainCode, languageInfo, setPlainCode }: EditorProps) {
+export default function Editor({ plainCode, languageInfo, setPlainCode, codeDataChannels }: EditorProps) {
   const [cursorPosition, setCursorPosition] = useState<number>(0);
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setCursorPosition(event.target.selectionStart);
+
+    // FIXME: 현재 state로 임시 CRDT 구현
+    sendMessageDataChannels(codeDataChannels, event.target.value);
     setPlainCode(event.target.value);
   };
 

@@ -1,5 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
-import * as Y from 'yjs';
+import { useEffect, useState } from 'react';
 import { EDITOR_DEFAULT_LANGUAGE, EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
 import OutputArea from './editor/OutputArea';
 import LoadButton from './editor/LoadButton';
@@ -26,17 +25,12 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
 
   const languageInfo = EDITOR_LANGUAGE_TYPES[languageName];
 
-  const ydoc = useRef(new Y.Doc());
-  const ytext = useRef(ydoc.current.getText('sharedText'));
-
   useEffect(() => {
     localStorage.removeItem('code');
   }, []);
 
-  const handleRecieveCodeMessage = (event: MessageEvent) => {
-    Y.applyUpdate(ydoc.current, new Uint8Array(event.data));
-
-    setPlainCode(ytext.current.toString());
+  const handleRecieveCodeMessage = (event: MessageEvent<string>) => {
+    setPlainCode(event.data);
   };
 
   const handleRecieveLanguageMessage = (event: MessageEvent) => {
@@ -44,9 +38,10 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
   };
 
   const handleClear = () => {
-    ytext.current.delete(0, ytext.current.length);
-
     setPlainCode('');
+
+    // FIXME: 현재 state로 임시 CRDT 구현
+    sendMessageDataChannels(codeDataChannels, '');
   };
 
   // TODO: 코드 실행 핸들러 추가
@@ -55,12 +50,8 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
   useDataChannelOnMessage(codeDataChannels, handleRecieveCodeMessage);
   useDataChannelOnMessage(languageDataChannels, handleRecieveLanguageMessage);
 
-  useEffect(() => {
-    ytext.current.delete(0, ytext.current.length);
-    ytext.current.insert(0, plainCode);
-
-    sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(ydoc.current) as Uint8Array);
-  }, [plainCode]);
+  // TODO: CRDT 로직 추가
+  // 현재는 state를 이용해 문자열이 중첩되는 문제만 해결한 상태
 
   useEffect(() => {
     sendMessageDataChannels(languageDataChannels, languageName);
@@ -74,14 +65,19 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
           <LanguageTypeDropDown languageName={languageName} setLanguageName={setLanguageName} />
         </div>
         <div className="flex flex-col overflow-y-auto row-[span_7_/_span_7] custom-scroll">
-          <Editor plainCode={plainCode} languageInfo={languageInfo} setPlainCode={setPlainCode} />
+          <Editor plainCode={plainCode} languageInfo={languageInfo} setPlainCode={setPlainCode} codeDataChannels={codeDataChannels} />
         </div>
         <div className="row-span-3">
           <OutputArea execResult={execResult} />
         </div>
         <div className="flex items-center justify-between row-span-1 gap-2 p-[1vh]">
           <div className="h-full">
-            <LoadButton plainCode={plainCode} setPlainCode={setPlainCode} setLanguageName={setLanguageName} />
+            <LoadButton
+              plainCode={plainCode}
+              setPlainCode={setPlainCode}
+              setLanguageName={setLanguageName}
+              codeDataChannels={codeDataChannels}
+            />
           </div>
           <div className="flex h-full gap-2">
             <SaveButton plainCode={plainCode} languageInfo={languageInfo} />

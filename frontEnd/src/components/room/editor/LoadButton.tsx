@@ -4,6 +4,8 @@ import { uploadLocalFile } from '@/utils/file';
 import CodeListModal from '../modal/CodeListModal';
 import LoginModal from '../modal/LoginModal';
 import createAuthFailCallback from '@/utils/authFailCallback';
+import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
+import { DataChannel } from '@/types/RTCConnection';
 
 function LoadButtonElement({ children, onClick }: { children: React.ReactNode; onClick: React.MouseEventHandler<HTMLButtonElement> }) {
   return (
@@ -21,9 +23,10 @@ interface LoadButtonProps {
   plainCode: string;
   setPlainCode: (value: React.SetStateAction<string>) => void;
   setLanguageName: (value: React.SetStateAction<string>) => void;
+  codeDataChannels: DataChannel[];
 }
 
-export default function LoadButton({ plainCode, setPlainCode, setLanguageName }: LoadButtonProps) {
+export default function LoadButton({ plainCode, setPlainCode, setLanguageName, codeDataChannels }: LoadButtonProps) {
   const { show } = useModal(CodeListModal);
   const { show: showLoginModal } = useModal(LoginModal);
 
@@ -33,6 +36,9 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName }:
     uploadLocalFile((code, languageName) => {
       setPlainCode(code);
       setLanguageName(languageName);
+
+      // FIXME: 현재 state로 임시 CRDT 구현
+      sendMessageDataChannels(codeDataChannels, code);
     });
   };
 
