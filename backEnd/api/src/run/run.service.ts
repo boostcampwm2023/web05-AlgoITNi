@@ -14,6 +14,7 @@ import { MqService } from '../mq/mq.service';
 import { RedisService } from '../redis/redis.service';
 import { TimeoutCodeRunning } from '../common/exception/exception';
 import { ResponseCodeBlockDto } from './dto/response-codeblock.dto';
+import { supportLang } from '../common/type';
 
 @Injectable()
 export class RunService {
@@ -24,7 +25,16 @@ export class RunService {
     private mqService: MqService,
     private redisService: RedisService,
   ) {}
-  securityCheck(data): number {
+  securityCheck(code: string, language: supportLang): number {
+    switch (language) {
+      case 'python':
+        return this.pythonCheck(code);
+      case 'javascript':
+        return this.javascriptCheck(code);
+    }
+  }
+
+  pythonCheck(code: string) {
     // 모듈 제한
     const blockedModules = [
       'os',
@@ -51,13 +61,17 @@ export class RunService {
 
     // check
     for (const pattern of [...blockModulesPattern, ...inputPattern]) {
-      if (pattern.test(data)) {
-        this.logger.warn(`⚠️Invalid Code Requested⚠️\n${data}`);
+      if (pattern.test(code)) {
+        this.logger.warn(`⚠️Invalid Code Requested⚠️\n${code}`);
         return returnCode['vulnerable'];
       }
     }
 
     return returnCode['safe'];
+  }
+
+  javascriptCheck(code: string) {
+    return returnCode['vulnerable'];
   }
 
   async requestRunningApi(
@@ -67,15 +81,14 @@ export class RunService {
       'http://' +
       path.join(
         this.configService.get<string>('RUNNING_SERVER'),
-        requestPath.RUN_PYTHON,
+        requestPath[codeBlock.language],
       );
-    // console.log(url);
     try {
       const result = await axios.post(url, codeBlock);
       return new ResponseCodeBlockDto(
         result.status,
         result.data.output,
-        'Running Python Code Success',
+        'Running Code Success',
       );
     } catch (e) {
       this.logger.error(e.message);

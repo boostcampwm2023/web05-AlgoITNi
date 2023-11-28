@@ -1,7 +1,13 @@
 import * as process from 'process';
+import { supportLang } from './type';
+export const supportLangEnum = {
+  PYTHON: 'python',
+  JAVASCRIPT: 'javascript',
+};
 
-export const requestPath = {
-  RUN_PYTHON: '/codes/python',
+export const requestPath: Record<supportLang, string> = {
+  python: '/codes/python',
+  javascript: '/codes/js',
 };
 
 const timeUnit = {

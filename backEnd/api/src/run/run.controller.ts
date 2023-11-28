@@ -17,12 +17,7 @@ export class RunController {
   @HttpCode(200)
   @Post('v1')
   async requestRunCode(@Body() codeBlock: RequestCodeblockDto) {
-    const { code } = codeBlock;
-    const securityCheck = this.runService.securityCheck(code);
-    if (securityCheck === returnCode['vulnerable']) {
-      // fail
-      throw new VulnerableException();
-    }
+    this.securityCheck(codeBlock);
 
     const responseCodeBlockDto =
       await this.runService.requestRunningApi(codeBlock);
@@ -32,22 +27,12 @@ export class RunController {
   @HttpCode(200)
   @Post('v2')
   async requestRunCodeV2(@Body() codeBlock: RequestCodeblockDto) {
-    const { code } = codeBlock;
-    const securityCheck = this.runService.securityCheck(code);
-    if (securityCheck === returnCode['vulnerable']) {
-      // fail
-      throw new VulnerableException();
-    }
+    this.securityCheck(codeBlock);
 
     const responseCodeBlockDto =
       await this.runService.requestRunningMQ(codeBlock);
 
     return responseCodeBlockDto;
-  }
-
-  @Get('avgTime')
-  showAvgTrialTime() {
-    return this.redisService.showTrialTimeAvg();
   }
 
   @HttpCode(202)
@@ -56,13 +41,23 @@ export class RunController {
     @Query('id') socketID: string,
     @Body() codeBlock: RequestCodeblockDto,
   ): Promise<void> {
-    const { code } = codeBlock;
-    const securityCheck = this.runService.securityCheck(code);
+    this.securityCheck(codeBlock);
+
+    await this.runService.requestRunningMQPubSub(codeBlock, socketID);
+  }
+
+  securityCheck(codeBlock: RequestCodeblockDto) {
+    const { code, language } = codeBlock;
+    const securityCheck = this.runService.securityCheck(code, language);
+
     if (securityCheck === returnCode['vulnerable']) {
       // fail
       throw new VulnerableException();
     }
+  }
 
-    await this.runService.requestRunningMQPubSub(codeBlock, socketID);
+  @Get('avgTime')
+  showAvgTrialTime() {
+    return this.redisService.showTrialTimeAvg();
   }
 }
