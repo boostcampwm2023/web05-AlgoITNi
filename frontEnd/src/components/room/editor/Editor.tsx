@@ -1,60 +1,52 @@
-import { useEffect, useRef, useState } from 'react';
-import dompurify from 'dompurify';
-import highlightCode from '@/utils/highlightCode';
+import { useState } from 'react';
+import InputArea from './InputArea';
+import LineNumber from './LineNumber';
+import { EDITOR_TAB_SIZE } from '@/constants/editor';
 import { LanguageInfo } from '@/types/editor';
 
 interface EditorProps {
   plainCode: string;
-  cursorPosition: number;
-  handleChange: React.ChangeEventHandler<HTMLTextAreaElement>;
-  handleKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement>;
-  handleClick: React.MouseEventHandler<HTMLTextAreaElement>;
   languageInfo: LanguageInfo;
+  setPlainCode: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default function Editor({ plainCode, cursorPosition, handleChange, handleKeyDown, handleClick, languageInfo }: EditorProps) {
-  const [highlightedCode, setHighlightedCode] = useState('');
+export default function Editor({ plainCode, languageInfo, setPlainCode }: EditorProps) {
+  const [cursorPosition, setCursorPosition] = useState<number>(0);
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const preRef = useRef<HTMLPreElement>(null);
-
-  const handleScroll = (event: React.UIEvent<HTMLPreElement | HTMLTextAreaElement>) => {
-    if (!preRef.current || !textareaRef.current) return;
-
-    if (event.target === textareaRef.current) preRef.current.scrollLeft = textareaRef.current.scrollLeft;
-    else textareaRef.current.scrollLeft = preRef.current.scrollLeft;
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCursorPosition(event.target.selectionStart);
+    setPlainCode(event.target.value);
   };
 
-  useEffect(() => {
-    setHighlightedCode(highlightCode(languageInfo.name, plainCode));
+  const handleClick = (event: React.MouseEvent<HTMLTextAreaElement>) => {
+    setCursorPosition((event.target as EventTarget & HTMLTextAreaElement).selectionStart);
+  };
 
-    if (textareaRef.current) {
-      textareaRef.current.selectionStart = cursorPosition;
-      textareaRef.current.selectionEnd = cursorPosition;
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const { selectionStart } = event.target as EventTarget & HTMLTextAreaElement;
+    setCursorPosition(selectionStart);
+
+    if (event.key === 'Tab') {
+      event.preventDefault();
+
+      setCursorPosition((prev) => prev + EDITOR_TAB_SIZE);
+      setPlainCode((prev) => `${prev.slice(0, selectionStart)}    ${prev.slice(selectionStart)}`);
     }
-  }, [plainCode]);
-
-  useEffect(() => {
-    setHighlightedCode(highlightCode(languageInfo.name, plainCode));
-  }, [languageInfo]);
+  };
 
   return (
-    <div className="relative w-full h-full font-normal">
-      <textarea
-        onScroll={handleScroll}
-        ref={textareaRef}
-        value={plainCode}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        onClick={handleClick}
-        className="z-10 absolute w-full tracking-[3px] h-full p-2 pb-0 leading-7 overflow-hidden overflow-x-scroll text-base bg-transparent text-transparent resize-none caret-white custom-scroll whitespace-nowrap focus:outline-none"
+    <div className="flex flex-grow">
+      <div className="w-10 py-2 pr-2 overflow-hidden border-r border-white">
+        <LineNumber plainCode={plainCode} />
+      </div>
+      <InputArea
+        plainCode={plainCode}
+        languageInfo={languageInfo}
+        cursorPosition={cursorPosition}
+        handleChange={handleChange}
+        handleKeyDown={handleKeyDown}
+        handleClick={handleClick}
       />
-      <pre onScroll={handleScroll} className="absolute top-0 left-0 z-0 w-full h-full p-2 overflow-hidden" ref={preRef}>
-        <code
-          className="tracking-[3px] text-white text-base leading-7 w-full h-full text-ellipsis"
-          dangerouslySetInnerHTML={{ __html: dompurify.sanitize(highlightedCode) }}
-        />
-      </pre>
     </div>
   );
 }
