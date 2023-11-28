@@ -1,6 +1,8 @@
 import useModal from '@/hooks/useModal';
 import { downloadLocalFile } from '@/utils/file';
 import SaveModal from '../modal/SaveModal';
+import useModifyState from '@/stores/useModifyState';
+import SaveChoiceModal from '../modal/SaveChoiceModal';
 import { LanguageInfo } from '@/types/editor';
 
 function SaveButtonElement({ children, onClick }: { children: React.ReactNode; onClick: React.MouseEventHandler<HTMLButtonElement> }) {
@@ -21,13 +23,20 @@ interface SaveButtonProps {
 }
 
 export default function SaveButton({ plainCode, languageInfo }: SaveButtonProps) {
-  const { show } = useModal(SaveModal);
+  const { show: showSaveModal } = useModal(SaveModal);
+  const { show: showChoice } = useModal(SaveChoiceModal);
+  const { modifyId } = useModifyState();
+
   const handleSaveLocal = () => {
     downloadLocalFile(plainCode, 'solution', languageInfo.extension);
   };
 
   const handleSaveCloud = () => {
-    show({ code: plainCode });
+    if (modifyId) {
+      showChoice({ code: plainCode });
+    } else {
+      showSaveModal({ code: plainCode });
+    }
   };
 
   return (
