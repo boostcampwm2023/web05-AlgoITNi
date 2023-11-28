@@ -82,7 +82,6 @@ export class AuthService {
         name: 'dev-user',
       },
       {
-        secret: this.refreshSecret,
         expiresIn: this.refreshExpire,
       },
     );
