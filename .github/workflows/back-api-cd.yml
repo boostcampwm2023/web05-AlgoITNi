@@ -81,4 +81,6 @@ jobs:
             
             echo "CLIENT_ID_GOOGLE=${{secrets.CLIENT_ID_GOOGLE}}" >> .env
             echo "CLIENT_SECRET_GOOGLE=${{secrets.CLIENT_SECRET_GOOGLE}}" >> .env
+            echo "ALLOWED_ORIGIN=${{secrets.API_ALLOWED_ORIGIN}}" >> .env
+            echo "EXPOSE_HEADER=${{secret.EXPOSE_HEADER}}" >> .env
             bash deploy.sh >> /dev/deploy.log 2>&1
