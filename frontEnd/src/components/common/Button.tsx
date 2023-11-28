@@ -5,6 +5,7 @@ type ButtonProps = {
   onClick: () => void;
   fontSize: string;
 };
+
 function Button({ children }: { children: ReactNode }) {
   return <div>{children}</div>;
 }
@@ -35,7 +36,21 @@ function Full({ children, onClick, fontSize }: ButtonProps) {
   );
 }
 
+function White({ children, onClick, fontSize }: ButtonProps) {
+  return (
+    <button
+      type="button"
+      className="border-2 border-light-gray text-gray rounded-[15px] px-[1.6vw] py-[14px]"
+      onClick={onClick}
+      style={{ fontSize }}
+    >
+      {children}
+    </button>
+  );
+}
+
 export default Object.assign(Button, {
   Default,
   Full,
+  White,
 });
