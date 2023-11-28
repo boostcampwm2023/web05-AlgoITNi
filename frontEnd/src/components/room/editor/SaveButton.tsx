@@ -23,7 +23,7 @@ interface SaveButtonProps {
 }
 
 export default function SaveButton({ plainCode, languageInfo }: SaveButtonProps) {
-  const { show } = useModal(SaveModal);
+  const { show: showSaveModal } = useModal(SaveModal);
   const { show: showChoice } = useModal(SaveChoiceModal);
   const { modifyId } = useModifyState();
 
@@ -35,7 +35,7 @@ export default function SaveButton({ plainCode, languageInfo }: SaveButtonProps)
     if (modifyId) {
       showChoice({ code: plainCode });
     } else {
-      show({ code: plainCode });
+      showSaveModal({ code: plainCode });
     }
   };
 
