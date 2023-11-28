@@ -1,26 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import dompurify from 'dompurify';
-import hljs from 'highlight.js';
+import highlightCode from '@/utils/highlightCode';
+import { LanguageInfo } from '@/types/editor';
 
-export default function InputArea({
-  plainCode,
-  cursorPosition,
-  handleChange,
-  handleKeyDown,
-  handleClick,
-}: {
+interface EditorProps {
   plainCode: string;
   cursorPosition: number;
   handleChange: React.ChangeEventHandler<HTMLTextAreaElement>;
   handleKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement>;
   handleClick: React.MouseEventHandler<HTMLTextAreaElement>;
-}) {
+  languageInfo: LanguageInfo;
+}
+
+export default function InputArea({ plainCode, cursorPosition, handleChange, handleKeyDown, handleClick, languageInfo }: EditorProps) {
   const [highlightedCode, setHighlightedCode] = useState('');
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const preRef = useRef<HTMLPreElement>(null);
-
-  const sanitizer = dompurify.sanitize;
 
   const handleScroll = (event: React.UIEvent<HTMLPreElement | HTMLTextAreaElement>) => {
     if (!preRef.current || !textareaRef.current) return;
@@ -29,18 +25,18 @@ export default function InputArea({
     else textareaRef.current.scrollLeft = preRef.current.scrollLeft;
   };
 
-  const highlightCode = (language: string, code: string) => {
-    return hljs.highlight(code, { language }).value.replace(/" "/g, '&nbsp; ');
-  };
-
   useEffect(() => {
-    setHighlightedCode(highlightCode('python', plainCode));
+    setHighlightedCode(highlightCode(languageInfo.name, plainCode));
 
     if (textareaRef.current) {
       textareaRef.current.selectionStart = cursorPosition;
       textareaRef.current.selectionEnd = cursorPosition;
     }
   }, [plainCode]);
+
+  useEffect(() => {
+    setHighlightedCode(highlightCode(languageInfo.name, plainCode));
+  }, [languageInfo]);
 
   return (
     <div className="relative w-full h-full font-normal">
@@ -56,7 +52,7 @@ export default function InputArea({
       <pre onScroll={handleScroll} className="absolute top-0 left-0 z-0 w-full h-full p-2 overflow-hidden" ref={preRef}>
         <code
           className="tracking-[3px] text-white text-base leading-7 w-full h-full text-ellipsis"
-          dangerouslySetInnerHTML={{ __html: sanitizer(highlightedCode) }}
+          dangerouslySetInnerHTML={{ __html: dompurify.sanitize(highlightedCode) }}
         />
       </pre>
     </div>
