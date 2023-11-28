@@ -38,9 +38,9 @@ export class GithubService {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    const member = new UserDto();
-    member.name = githubUser.data.name;
-    member.authServiceID = githubUser.data.login;
-    return member;
+    const user = new UserDto();
+    user.name = githubUser.data.name;
+    user.authServiceID = githubUser.data.login;
+    return user;
   }
 }
