@@ -25,6 +25,7 @@ export default {
         secondary: '#132A37',
         base: '#F0F2F5',
         black: '#0C151C',
+        'ligh-gray': '##D3D8E1',
       },
       screens: {
         mobile: { min: '360px', max: '767px' },
