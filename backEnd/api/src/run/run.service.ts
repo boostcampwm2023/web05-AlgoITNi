@@ -77,10 +77,6 @@ export class RunService {
   async requestRunningApi(
     codeBlock: RequestCodeblockDto,
   ): Promise<ResponseCodeBlockDto> {
-    console.log(
-      this.configService.get<string>('RUNNING_SERVER'),
-      requestPath[codeBlock.language],
-    );
     const url =
       'http://' +
       path.join(
@@ -120,7 +116,7 @@ export class RunService {
       this.logger.error(`${job.id} failed to find completed job : ${result}`);
       throw new TimeoutCodeRunning();
     }
-    this.logger.log(`get completed result ${result}`);
+    this.logger.log(`get completed result ${JSON.stringify(result)}`);
     return result;
   }
   async requestRunningMQPubSub(

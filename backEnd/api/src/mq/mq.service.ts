@@ -48,7 +48,7 @@ export class MqService {
   }
 
   async addMessage(data: RequestCodeblockDto) {
-    const job = await this.queue.add(REDIS.QUEUE, data.code, {
+    const job = await this.queue.add(REDIS.QUEUE, data, {
       removeOnComplete: true,
     });
     this.logger.log(`push to task Queue ${job.id}`);

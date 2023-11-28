@@ -11,10 +11,12 @@ import { exec } from 'child_process';
 import { LanguageCommand, Messages } from '../common/utils';
 import { supportLang, runCommandResult } from '../common/type';
 import { RequestCodeDto } from './dto/request-code.dto';
+import * as process from 'process';
 @Injectable()
 export class CodesService {
   private logger = new Logger(CodesService.name);
-  private tempDir = path.join(__dirname, '..', 'tmp');
+  private tempDir =
+    process.env.NODE_ENV === 'dev' ? path.join(__dirname, '..', 'tmp') : '/';
   private killSignal: NodeJS.Signals = 'SIGINT';
   private readonly timeOut = 5000;
 

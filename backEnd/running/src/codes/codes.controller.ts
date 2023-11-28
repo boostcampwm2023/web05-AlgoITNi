@@ -8,7 +8,6 @@ export class CodesController {
 
   @Post('/python')
   async runPython(@Body() codeBlock: RequestCodeDto) {
-    console.log(codeBlock);
     return await this.codesService.runCode(codeBlock);
   }
 
