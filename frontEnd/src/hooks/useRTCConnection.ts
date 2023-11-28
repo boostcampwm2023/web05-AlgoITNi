@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Socket, io } from 'socket.io-client/debug';
 import { RTC_SOCKET_EMIT_EVENT, RTC_SOCKET_RECEIVE_EVENT } from '@/constants/rtcSocketEvents';
 import { VITE_SOCKET_URL, VITE_STUN_URL, VITE_TURN_CREDENTIAL, VITE_TURN_URL, VITE_TURN_USERNAME } from '@/constants/env';
+import { DataChannel } from '@/types/RTCConnection';
 
 const RTCConnections: Record<string, RTCPeerConnection> = {};
 let socket: Socket;
@@ -10,8 +11,8 @@ let socket: Socket;
 const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: boolean) => {
   const [isConnect, setIsConnect] = useState(false);
   const [streamList, setStreamList] = useState<{ id: string; stream: MediaStream }[]>([]);
-  const [codeDataChannels, setCodeDataChannels] = useState<{ id: string; dataChannel: RTCDataChannel }[]>([]);
-  const [languageDataChannels, setLanguageDataChannels] = useState<{ id: string; dataChannel: RTCDataChannel }[]>([]);
+  const [codeDataChannels, setCodeDataChannels] = useState<DataChannel[]>([]);
+  const [languageDataChannels, setLanguageDataChannels] = useState<DataChannel[]>([]);
 
   const socketConnect = () => {
     fetch(VITE_SOCKET_URL, {

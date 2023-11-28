@@ -8,17 +8,14 @@ import EditorButton from './editor/EditorButton';
 import LanguageTypeDropDown from './editor/LanguageTypeDropDown';
 import EditorFileName from './editor/EditorHeader';
 import Editor from './editor/Editor';
+import useDataChannelOnMessage from '@/hooks/useDataChannelOnMessage';
+import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
+import { DataChannel } from '@/types/RTCConnection';
 
 interface EditorSectionProps {
   defaultCode: string | null;
-  codeDataChannels: {
-    id: string;
-    dataChannel: RTCDataChannel;
-  }[];
-  languageDataChannels: {
-    id: string;
-    dataChannel: RTCDataChannel;
-  }[];
+  codeDataChannels: DataChannel[];
+  languageDataChannels: DataChannel[];
 }
 
 export default function EditorSection({ defaultCode, codeDataChannels, languageDataChannels }: EditorSectionProps) {
@@ -55,31 +52,18 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
   // TODO: 코드 실행 핸들러 추가
   const handleExecCode = () => {};
 
-  useEffect(() => {
-    codeDataChannels.forEach(({ dataChannel }) => {
-      dataChannel.onmessage = handleRecieveCodeMessage;
-    });
-  }, [codeDataChannels]);
-
-  useEffect(() => {
-    languageDataChannels.forEach(({ dataChannel }) => {
-      dataChannel.onmessage = handleRecieveLanguageMessage;
-    });
-  }, [languageDataChannels]);
+  useDataChannelOnMessage(codeDataChannels, handleRecieveCodeMessage);
+  useDataChannelOnMessage(languageDataChannels, handleRecieveLanguageMessage);
 
   useEffect(() => {
     ytext.current.delete(0, ytext.current.length);
     ytext.current.insert(0, plainCode);
 
-    codeDataChannels.forEach(({ dataChannel }) => {
-      if (dataChannel.readyState === 'open') dataChannel.send(Y.encodeStateAsUpdate(ydoc.current) as Uint8Array);
-    });
+    sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(ydoc.current) as Uint8Array);
   }, [plainCode]);
 
   useEffect(() => {
-    languageDataChannels.forEach(({ dataChannel }) => {
-      if (dataChannel.readyState === 'open') dataChannel.send(languageName);
-    });
+    sendMessageDataChannels(languageDataChannels, languageName);
   }, [languageName]);
 
   return (
