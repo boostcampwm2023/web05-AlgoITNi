@@ -5,7 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { returnCode } from '../common/returnCode';
-import { RequestCodeblockDto } from './dto/request-codeblock.dto';
+import { RequestCodeBlockDto } from './dto/request-codeblock.dto';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { requestPath } from '../common/utils';
@@ -75,7 +75,7 @@ export class RunService {
   }
 
   async requestRunningApi(
-    codeBlock: RequestCodeblockDto,
+    codeBlock: RequestCodeBlockDto,
   ): Promise<ResponseCodeBlockDto> {
     const url =
       'http://' +
@@ -105,7 +105,7 @@ export class RunService {
   }
 
   async requestRunningMQ(
-    codeBlock: RequestCodeblockDto,
+    codeBlock: RequestCodeBlockDto,
   ): Promise<ResponseCodeBlockDto> {
     const job = await this.mqService.addMessage(codeBlock);
     this.logger.log(`added message queue job#${job.id}`);
@@ -120,7 +120,7 @@ export class RunService {
     return result;
   }
   async requestRunningMQPubSub(
-    codeBlock: RequestCodeblockDto,
+    codeBlock: RequestCodeBlockDto,
     socketID: string,
   ): Promise<void> {
     const job = await this.mqService.addMessage(codeBlock);

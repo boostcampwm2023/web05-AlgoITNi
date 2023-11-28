@@ -59,6 +59,7 @@ export const jwtError = {
 export const ResponseMessage = {
   NEED_LOGIN: '로그인이 필요합니다.',
   INTERNAL_SERVER_ERROR: 'Internal server error',
+  NOT_SUPPORT: '지원하지 않는 언어 타입입니다.',
 };
 
 export const SOCKET_EVENT = {

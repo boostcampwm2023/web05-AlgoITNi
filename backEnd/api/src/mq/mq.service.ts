@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { ConfigService } from '@nestjs/config';
-import { RequestCodeblockDto } from '../run/dto/request-codeblock.dto';
+import { RequestCodeBlockDto } from '../run/dto/request-codeblock.dto';
 import Redis from 'ioredis';
 import { EVENT, REDIS } from '../common/utils';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -47,7 +47,7 @@ export class MqService {
     });
   }
 
-  async addMessage(data: RequestCodeblockDto) {
+  async addMessage(data: RequestCodeBlockDto) {
     const job = await this.queue.add(REDIS.QUEUE, data, {
       removeOnComplete: true,
     });
