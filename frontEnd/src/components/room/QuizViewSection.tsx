@@ -7,11 +7,12 @@ import getQuizData from '@/apis/getQuizData';
 import Button from '../common/Button';
 import ClickToQuizInput from './quizView/ClickToQuizInput';
 import QuizIframe from './quizView/QuizIframe';
+import Loading from './quizView/Loading';
 
 export default function QuizViewSection() {
   const [url, setURL] = useState('');
   const { show: showLinkInputModal } = useModal(LinkInputModal);
-  const { data } = useQuery({ queryKey: [QUERY_KEYS, url], queryFn: () => getQuizData(url), enabled: !!url });
+  const { data, isLoading } = useQuery({ queryKey: [QUERY_KEYS, url], queryFn: () => getQuizData(url), enabled: !!url });
 
   if (url === '' && !data)
     return (
@@ -23,6 +24,8 @@ export default function QuizViewSection() {
         <ClickToQuizInput />
       </button>
     );
+
+  if (isLoading) return <Loading />;
 
   return (
     <div className="flex flex-col w-full h-full gap-2 p-4 rounded-lg ovelrflow-hidden bg-primary">
