@@ -25,7 +25,7 @@ export class MqConsumer {
     const responseCodeBlockDTO = new ResponseCodeBlockDto();
 
     try {
-      result = await this.codesService.testCode(job.data);
+      result = await this.codesService.runCode(job.data);
       const output: string | string[] =
         typeof result === 'string' ? result : result.output;
       this.logger.debug(JSON.stringify(result));

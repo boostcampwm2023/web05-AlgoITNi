@@ -71,18 +71,23 @@ export class RunService {
   }
 
   javascriptCheck(code: string) {
-    return returnCode['vulnerable'];
+    return returnCode['safe'];
   }
 
   async requestRunningApi(
     codeBlock: RequestCodeblockDto,
   ): Promise<ResponseCodeBlockDto> {
+    console.log(
+      this.configService.get<string>('RUNNING_SERVER'),
+      requestPath[codeBlock.language],
+    );
     const url =
       'http://' +
       path.join(
         this.configService.get<string>('RUNNING_SERVER'),
         requestPath[codeBlock.language],
       );
+
     try {
       const result = await axios.post(url, codeBlock);
       return new ResponseCodeBlockDto(

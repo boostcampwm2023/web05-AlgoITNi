@@ -18,7 +18,6 @@ export class RunController {
   @Post('v1')
   async requestRunCode(@Body() codeBlock: RequestCodeblockDto) {
     this.securityCheck(codeBlock);
-
     const responseCodeBlockDto =
       await this.runService.requestRunningApi(codeBlock);
     return responseCodeBlockDto;
