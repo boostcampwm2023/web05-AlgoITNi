@@ -62,7 +62,7 @@ export class CodesController {
   async update(
     @Req() req: Request,
     @Param('id') id: string,
-    @Body() saveCodeDto: SaveCodeDto,
+    @Body(SaveCodePipe) saveCodeDto: SaveCodeDto,
   ) {
     const user: UserInfoDto = req.user as UserInfoDto;
     const userID = user.id;
