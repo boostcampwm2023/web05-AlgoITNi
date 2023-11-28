@@ -6,7 +6,7 @@ type ModifyState = {
 };
 
 const useModifyState = create<ModifyState>((set) => ({
-  modifyId: '123',
+  modifyId: '',
   setModifyId: (value: string) => set((state) => ({ ...state, modifyId: value })),
 }));
 
