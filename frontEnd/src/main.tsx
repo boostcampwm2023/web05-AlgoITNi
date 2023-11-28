@@ -8,6 +8,9 @@ import Room from '@pages/Room.tsx';
 
 import Modals from './components/modal/Modals';
 import reactQueryClient from './configs/reactQueryClient';
+import RouteChangeTracker from './RouterChangeTracker';
+
+RouteChangeTracker();
 
 const router = createBrowserRouter([
   {
@@ -28,4 +31,5 @@ function Main() {
     </QueryClientProvider>
   );
 }
+
 ReactDOM.createRoot(document.getElementById('root')!).render(<Main />);
