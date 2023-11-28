@@ -30,42 +30,27 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     const accessResult = await this.verifyAccessToken(accessToken);
-    const refreshResult = await this.verifyRefreshToken(refreshToken);
     if (accessResult) {
-      if (!refreshResult) {
-        const newRefreshToken =
-          await this.authService.getRefreshToken(accessResult);
-        this.authService.setRefreshToken(
-          response,
-          newRefreshToken,
-          accessResult.sub,
-        );
-      }
-
       request.user = this.serializeUser(accessResult);
       return true;
     }
 
-    if (!accessResult && refreshResult) {
-      const refreshTokenHave = await this.redisService.getRefreshToken(
-        refreshResult.sub,
+    const refreshResult = await this.verifyRefreshToken(refreshToken);
+    const refreshTokenHave = await this.redisService.getRefreshToken(
+      refreshResult.sub,
+    );
+    if (refreshTokenHave !== refreshToken) {
+      this.logger.warn(
+        `${refreshResult} 사용자가 변형된 리프레시 토큰을 보유함`,
       );
-      if (refreshTokenHave !== refreshToken) {
-        this.logger.warn(
-          `${refreshResult} 사용자가 변형된 리프레시 토큰을 보유함`,
-        );
-        return false;
-      }
-
-      const newAccessToken =
-        await this.authService.getAccessToken(refreshResult);
-      this.authService.setAccessToken(response, newAccessToken);
-
-      request.user = this.serializeUser(refreshResult);
-      return true;
+      return false;
     }
+    const user = this.serializeUser(refreshResult);
 
-    return false;
+    const newAccessToken = await this.authService.getAccessToken(user);
+    this.authService.setAccessToken(response, newAccessToken);
+    request.user = user;
+    return true;
   }
 
   serializeUser(user) {

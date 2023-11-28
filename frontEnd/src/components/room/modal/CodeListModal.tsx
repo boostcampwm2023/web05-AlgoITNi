@@ -7,6 +7,7 @@ import useModal from '@/hooks/useModal';
 import WarningModal from './WarningModal';
 import getUserCodes from '@/apis/getUserCodes';
 import QUERY_KEYS from '@/constants/queryKeys';
+import useModifyState from '@/stores/useModifyState';
 
 export default function CodeListModal({
   codeData,
@@ -19,7 +20,7 @@ export default function CodeListModal({
     queryKey: [QUERY_KEYS.LOAD_CODES],
     queryFn: getUserCodes,
   });
-
+  const { setModifyId } = useModifyState();
   const [selectOne, setSelectOne] = useState<string>('');
   const { show } = useModal(WarningModal);
   const { hide } = useModal();
@@ -33,7 +34,13 @@ export default function CodeListModal({
     hide();
     const result = findById(selectOne);
     if (result) {
-      show({ warningString: '작업중이던 내용이 모두 지워집니다.', callback: () => setPlainCode(result.content) });
+      show({
+        warningString: '작업중이던 내용이 모두 지워집니다.',
+        callback: () => {
+          setPlainCode(result.content);
+          setModifyId(result.id);
+        },
+      });
     }
   };
   const renderData = data || codeData;
