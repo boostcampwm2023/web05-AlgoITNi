@@ -71,6 +71,34 @@ export class RunService {
   }
 
   javascriptCheck(code: string) {
+    // 모듈 제한
+    const blockedModules = [
+      'child_process',
+      'process',
+      'fs',
+      'os',
+      'path',
+      'readline',
+    ];
+    const blockModulesPattern = [
+      new RegExp(
+        `(?!["'])require\\s*\\(\\s*["'](${blockedModules.join('|')})`,
+        'g',
+      ),
+    ];
+
+    const blockExpression = [
+      new RegExp(`(?!["'])process\\.(.*)`, 'y'),
+      new RegExp(`(?!["'])\\s*__dirname\\s*(?!["'])`, 'y'),
+    ];
+
+    // check
+    for (const pattern of [...blockModulesPattern, ...blockExpression]) {
+      if (pattern.test(code)) {
+        this.logger.warn(`⚠️Invalid Code Requested⚠️\n${code}`);
+        return returnCode['vulnerable'];
+      }
+    }
     return returnCode['safe'];
   }
 
