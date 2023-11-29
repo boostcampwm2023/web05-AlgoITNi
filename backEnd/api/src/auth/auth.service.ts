@@ -75,6 +75,17 @@ export class AuthService {
       },
     );
   }
+  async getDevToken() {
+    return await this.jwtService.signAsync(
+      {
+        sub: 0,
+        name: 'dev-user',
+      },
+      {
+        expiresIn: this.refreshExpire,
+      },
+    );
+  }
 
   setAccessToken(res: Response, access_token) {
     res.cookie('access_token', access_token, {

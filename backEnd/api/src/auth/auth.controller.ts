@@ -107,6 +107,12 @@ export class AuthController {
     return res.json({ message: 'Logout success' });
   }
 
+  @Get('dev')
+  async devToken(@Res() res: Response) {
+    const token = await this.authService.getDevToken();
+    res.setHeader('Authorization', `Bearer ${token}`).send();
+  }
+
   getRedirectionPath(dev: boolean, next: string) {
     return dev
       ? `http://${path.join('localhost:3000', next)}`
