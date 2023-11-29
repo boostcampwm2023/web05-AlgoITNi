@@ -47,7 +47,6 @@ export class RunService {
   async requestRunningApi(
     codeBlock: RequestCodeBlockDto,
   ): Promise<ResponseCodeBlockDto> {
-    console.log('requestRunningAPI');
     const url =
       'http://' +
       path.join(
