@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Socket, io } from 'socket.io-client/debug';
 import { EDITOR_DEFAULT_LANGUAGE, EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
 import OutputArea from './editor/OutputArea';
 import LoadButton from './editor/LoadButton';
@@ -10,6 +11,9 @@ import Editor from './editor/Editor';
 import useDataChannelOnMessage from '@/hooks/useDataChannelOnMessage';
 import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
 import { DataChannel } from '@/types/RTCConnection';
+import postRunCode from '@/apis/postRunCode';
+import { VITE_CODE_RUNNING_SOCKET_URL } from '@/constants/env';
+import { RunCodeResponse } from '@/types/runCode';
 
 interface EditorSectionProps {
   defaultCode: string | null;
@@ -17,10 +21,11 @@ interface EditorSectionProps {
   languageDataChannels: DataChannel[];
 }
 
+let executionSocket: Socket;
+
 export default function EditorSection({ defaultCode, codeDataChannels, languageDataChannels }: EditorSectionProps) {
   const [plainCode, setPlainCode] = useState<string>(defaultCode || '');
-  // TODO: 코드 실행 요청 후 결과 setState 추가
-  const [execResult] = useState<string>('');
+  const [execResult, setExecResult] = useState<string>('');
   const [languageName, setLanguageName] = useState<string>(EDITOR_DEFAULT_LANGUAGE);
 
   const languageInfo = EDITOR_LANGUAGE_TYPES[languageName];
@@ -44,8 +49,16 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
     sendMessageDataChannels(codeDataChannels, '');
   };
 
-  // TODO: 코드 실행 핸들러 추가
-  const handleExecCode = () => {};
+  const handleExecCode = async () => {
+    executionSocket = io(VITE_CODE_RUNNING_SOCKET_URL);
+
+    executionSocket.on('done', (response: RunCodeResponse) => {
+      setExecResult(`${response.message}\n\n${response.result}\n\n${response.timestamp}`);
+      executionSocket.disconnect();
+    });
+
+    executionSocket.on('connect', () => postRunCode(executionSocket.id, plainCode, languageName));
+  };
 
   useDataChannelOnMessage(codeDataChannels, handleRecieveCodeMessage);
   useDataChannelOnMessage(languageDataChannels, handleRecieveLanguageMessage);
