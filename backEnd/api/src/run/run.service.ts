@@ -5,7 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { returnCode } from '../common/returnCode';
-import { RequestCodeblockDto } from './dto/request-codeblock.dto';
+import { RequestCodeBlockDto } from './dto/request-codeblock.dto';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { requestPath } from '../common/utils';
@@ -14,6 +14,7 @@ import { MqService } from '../mq/mq.service';
 import { RedisService } from '../redis/redis.service';
 import { TimeoutCodeRunning } from '../common/exception/exception';
 import { ResponseCodeBlockDto } from './dto/response-codeblock.dto';
+import { supportLang } from '../common/type';
 
 @Injectable()
 export class RunService {
@@ -24,7 +25,16 @@ export class RunService {
     private mqService: MqService,
     private redisService: RedisService,
   ) {}
-  securityCheck(data): number {
+  securityCheck(code: string, language: supportLang): number {
+    switch (language) {
+      case 'python':
+        return this.pythonCheck(code);
+      case 'javascript':
+        return this.javascriptCheck(code);
+    }
+  }
+
+  pythonCheck(code: string) {
     // 모듈 제한
     const blockedModules = [
       'os',
@@ -51,8 +61,8 @@ export class RunService {
 
     // check
     for (const pattern of [...blockModulesPattern, ...inputPattern]) {
-      if (pattern.test(data)) {
-        this.logger.warn(`⚠️Invalid Code Requested⚠️\n${data}`);
+      if (pattern.test(code)) {
+        this.logger.warn(`⚠️Invalid Code Requested⚠️\n${code}`);
         return returnCode['vulnerable'];
       }
     }
@@ -60,22 +70,26 @@ export class RunService {
     return returnCode['safe'];
   }
 
+  javascriptCheck(code: string) {
+    return returnCode['safe'];
+  }
+
   async requestRunningApi(
-    codeBlock: RequestCodeblockDto,
+    codeBlock: RequestCodeBlockDto,
   ): Promise<ResponseCodeBlockDto> {
     const url =
       'http://' +
       path.join(
         this.configService.get<string>('RUNNING_SERVER'),
-        requestPath.RUN_PYTHON,
+        requestPath[codeBlock.language],
       );
-    // console.log(url);
+
     try {
       const result = await axios.post(url, codeBlock);
       return new ResponseCodeBlockDto(
         result.status,
         result.data.output,
-        'Running Python Code Success',
+        'Running Code Success',
       );
     } catch (e) {
       this.logger.error(e.message);
@@ -91,7 +105,7 @@ export class RunService {
   }
 
   async requestRunningMQ(
-    codeBlock: RequestCodeblockDto,
+    codeBlock: RequestCodeBlockDto,
   ): Promise<ResponseCodeBlockDto> {
     const job = await this.mqService.addMessage(codeBlock);
     this.logger.log(`added message queue job#${job.id}`);
@@ -102,11 +116,11 @@ export class RunService {
       this.logger.error(`${job.id} failed to find completed job : ${result}`);
       throw new TimeoutCodeRunning();
     }
-    this.logger.log(`get completed result ${result}`);
+    this.logger.log(`get completed result ${JSON.stringify(result)}`);
     return result;
   }
   async requestRunningMQPubSub(
-    codeBlock: RequestCodeblockDto,
+    codeBlock: RequestCodeBlockDto,
     socketID: string,
   ): Promise<void> {
     const job = await this.mqService.addMessage(codeBlock);

@@ -35,3 +35,9 @@ export class ResourceNotFound extends HttpException {
     super(message, HttpStatus.BAD_REQUEST);
   }
 }
+
+export class ExtNameException extends HttpException {
+  constructor(message = '저장 파일의 확장자와 설정 언어가 일치하지 않습니다.') {
+    super(message, HttpStatus.BAD_REQUEST);
+  }
+}
