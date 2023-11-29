@@ -1,6 +1,6 @@
 import { EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
 
-export const uploadLocalFile = (onLoadCallback: (code: string, languageName: string) => void) => {
+export const uploadLocalFile = (onLoadCallback: (fileName: string, code: string, languageName: string) => void) => {
   const input = document.createElement('input');
   const extensions = Object.values(EDITOR_LANGUAGE_TYPES)
     .map((languageData) => `.${languageData.extension}`)
@@ -13,10 +13,10 @@ export const uploadLocalFile = (onLoadCallback: (code: string, languageName: str
     if (file) {
       const reader = new FileReader();
       reader.onload = (fileLoadEvent) => {
-        const extension = file.name.split('.').pop();
+        const [name, extension] = file.name.split('.');
         const languageName = Object.keys(EDITOR_LANGUAGE_TYPES).find((key) => EDITOR_LANGUAGE_TYPES[key].extension === extension) || '';
 
-        onLoadCallback((fileLoadEvent.target?.result as string) || '', languageName);
+        onLoadCallback(name, (fileLoadEvent.target?.result as string) || '', languageName);
         input.remove();
       };
 

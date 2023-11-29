@@ -10,8 +10,17 @@ import reactQueryClient from '@/configs/reactQueryClient';
 import createAuthFailCallback from '@/utils/authFailCallback';
 import QUERY_KEYS from '@/constants/queryKeys';
 import { Language } from '@/types/editor';
+import { EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
 
-export default function SaveModal({ code, language }: { code: string; language: Language }) {
+export default function SaveModal({
+  code,
+  language,
+  setFileName,
+}: {
+  code: string;
+  language: Language;
+  setFileName: (value: React.SetStateAction<string>) => void;
+}) {
   const { inputValue, onChange } = useInput('');
   const ref = useFocus<HTMLInputElement>();
   const { show: showSuccessModal } = useModal(SuccessModal);
@@ -24,7 +33,7 @@ export default function SaveModal({ code, language }: { code: string; language: 
   };
 
   const { mutate } = useMutation({
-    mutationFn: () => postUserCode(inputValue, code, language),
+    mutationFn: () => postUserCode(`${inputValue}.${EDITOR_LANGUAGE_TYPES[language].extension}`, code, language),
     onSuccess: () => mutationSuccess,
     onError: createAuthFailCallback(() => showLoginModal({ code })),
   });
@@ -34,6 +43,7 @@ export default function SaveModal({ code, language }: { code: string; language: 
       if (ref.current) ref.current.focus();
       return;
     }
+    setFileName(`${inputValue}.${EDITOR_LANGUAGE_TYPES[language].extension}`);
     hide();
     mutate();
   };
@@ -50,7 +60,7 @@ export default function SaveModal({ code, language }: { code: string; language: 
           onChange={onChange}
           onKeyDown={handleKeyDown}
           className="px-4 py-2 text-xl"
-          placeholder="solution.py"
+          placeholder="solution"
         />
         <div className={inputValue ? '' : 'opacity-50'}>
           <Button.Default onClick={handleClick} fontSize="1vw">

@@ -23,17 +23,19 @@ interface LoadButtonProps {
   plainCode: string;
   setPlainCode: (value: React.SetStateAction<string>) => void;
   setLanguageName: (value: React.SetStateAction<string>) => void;
+  setFileName: (value: React.SetStateAction<string>) => void;
   codeDataChannels: DataChannel[];
 }
 
-export default function LoadButton({ plainCode, setPlainCode, setLanguageName, codeDataChannels }: LoadButtonProps) {
+export default function LoadButton({ plainCode, setPlainCode, setLanguageName, setFileName, codeDataChannels }: LoadButtonProps) {
   const { show } = useModal(CodeListModal);
   const { show: showLoginModal } = useModal(LoginModal);
 
   const errorCallback = createAuthFailCallback(() => showLoginModal({ code: plainCode }));
 
   const handleLoadLocalCodeFile = () => {
-    uploadLocalFile((code, languageName) => {
+    uploadLocalFile((name, code, languageName) => {
+      setFileName(name);
       setPlainCode(code);
       setLanguageName(languageName);
 
@@ -45,7 +47,7 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName, c
   const handleLoadCloudCodeFile = async () => {
     try {
       const data = await getUserCodes();
-      show({ codeData: data, setPlainCode, setLanguage: setLanguageName });
+      show({ codeData: data, setPlainCode, setLanguage: setLanguageName, setFileName });
     } catch (err) {
       errorCallback(err as Error);
     }
