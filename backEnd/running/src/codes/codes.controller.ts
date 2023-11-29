@@ -7,13 +7,12 @@ export class CodesController {
   constructor(private readonly codesService: CodesService) {}
 
   @Post('/python')
-  async runPython(@Body() data: RequestCodeDto) {
-    return await this.codesService.testCode(data.code);
+  async runPython(@Body() codeBlock: RequestCodeDto) {
+    return await this.codesService.runCode(codeBlock);
   }
 
-  @Post('/test')
-  async test() {
-    const code = 'N,M = 5,6; print(N+M)';
-    return await this.codesService.testCode(code);
+  @Post('/js')
+  async runJavascript(@Body() codeBlock: RequestCodeDto) {
+    return await this.codesService.runCode(codeBlock);
   }
 }

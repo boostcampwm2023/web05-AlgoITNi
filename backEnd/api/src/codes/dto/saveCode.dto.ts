@@ -1,4 +1,5 @@
 import { IsString } from 'class-validator';
+import { supportLang } from '../../common/type';
 
 export class SaveCodeDto {
   userID?: number;
@@ -8,4 +9,7 @@ export class SaveCodeDto {
 
   @IsString()
   content: string;
+
+  @IsString()
+  language: supportLang;
 }

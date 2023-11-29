@@ -25,6 +25,9 @@ jest.mock('@/constants/env', () => ({
   VITE_TURN_URL: '',
   VITE_TURN_USERNAME: '',
   VITE_TURN_CREDENTIAL: '',
+  VITE_API_URL: '',
+  VITE_CHAT_URL: '',
+  MODE: '',
 }));
 
 describe('Room 조건부 렌더링 테스트', () => {

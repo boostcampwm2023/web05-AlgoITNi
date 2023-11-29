@@ -19,6 +19,7 @@ import { ResourceNotFound } from '../common/exception/exception';
 import { Serialize } from '../common/interceptor/serialize.interceptor';
 import { SaveResultDto } from './dto/saveResult.dto';
 import { GetCodeDto } from './dto/getCode.dto';
+import { SaveCodePipe } from './pipes/saveCode.pipe';
 
 @UseGuards(JwtAuthGuard)
 @Controller('codes')
@@ -28,7 +29,10 @@ export class CodesController {
 
   @Post()
   @Serialize(SaveResultDto)
-  async save(@Body() saveCodeDto: SaveCodeDto, @Req() req: Request) {
+  async save(
+    @Body(SaveCodePipe) saveCodeDto: SaveCodeDto,
+    @Req() req: Request,
+  ) {
     const user: UserInfoDto = req.user as UserInfoDto;
     saveCodeDto.userID = user.id;
     return await this.codesService.save(saveCodeDto);
@@ -58,7 +62,7 @@ export class CodesController {
   async update(
     @Req() req: Request,
     @Param('id') id: string,
-    @Body() saveCodeDto: SaveCodeDto,
+    @Body(SaveCodePipe) saveCodeDto: SaveCodeDto,
   ) {
     const user: UserInfoDto = req.user as UserInfoDto;
     const userID = user.id;

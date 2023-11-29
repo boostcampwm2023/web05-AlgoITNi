@@ -1,7 +1,7 @@
 export class ResponseCodeBlockDto {
   jobID?: string | number;
   statusCode: number;
-  result: string | string[];
+  result: string;
   message: string;
   timestamp: string;
   constructor() {
