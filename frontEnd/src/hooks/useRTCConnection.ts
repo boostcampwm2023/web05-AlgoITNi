@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Socket, io } from 'socket.io-client/debug';
 import { RTC_SOCKET_EMIT_EVENT, RTC_SOCKET_RECEIVE_EVENT } from '@/constants/rtcSocketEvents';
 import { VITE_SOCKET_URL, VITE_STUN_URL, VITE_TURN_CREDENTIAL, VITE_TURN_URL, VITE_TURN_USERNAME } from '@/constants/env';
+import { DataChannel } from '@/types/RTCConnection';
 
 const RTCConnections: Record<string, RTCPeerConnection> = {};
 let socket: Socket;
@@ -10,7 +11,8 @@ let socket: Socket;
 const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: boolean) => {
   const [isConnect, setIsConnect] = useState(false);
   const [streamList, setStreamList] = useState<{ id: string; stream: MediaStream }[]>([]);
-  const [dataChannels, setDataChannels] = useState<{ id: string; dataChannel: RTCDataChannel }[]>([]);
+  const [codeDataChannels, setCodeDataChannels] = useState<DataChannel[]>([]);
+  const [languageDataChannels, setLanguageDataChannels] = useState<DataChannel[]>([]);
 
   const socketConnect = () => {
     fetch(VITE_SOCKET_URL, {
@@ -68,7 +70,8 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
       ],
     });
 
-    const newDataChannel = RTCConnection.createDataChannel('edit', { negotiated: true, id: 0 });
+    const newCodeDataChannel = RTCConnection.createDataChannel('code', { negotiated: true, id: 0 });
+    const newLanguageDataChannel = RTCConnection.createDataChannel('language', { negotiated: true, id: 1 });
 
     if (localStream) {
       localStream.getTracks().forEach((track) => {
@@ -91,7 +94,9 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
         return [...newArray, { id: socketId, stream: e.streams[0] }];
       });
     });
-    setDataChannels((prev) => [...prev, { id: socketId, dataChannel: newDataChannel }]);
+
+    setCodeDataChannels((prev) => [...prev, { id: socketId, dataChannel: newCodeDataChannel }]);
+    setLanguageDataChannels((prev) => [...prev, { id: socketId, dataChannel: newLanguageDataChannel }]);
 
     return RTCConnection;
   };
@@ -147,11 +152,13 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
     RTCConnections[data.id].close();
     delete RTCConnections[data.id];
 
-    setDataChannels((prev) => prev.filter(({ id }) => id !== data.id));
+    setCodeDataChannels((prev) => prev.filter(({ id }) => id !== data.id));
+    setLanguageDataChannels((prev) => prev.filter(({ id }) => id !== data.id));
+
     setStreamList((prev) => prev.filter((stream) => stream.id !== data.id));
   };
 
-  return { socket, streamList, dataChannels };
+  return { socket, streamList, codeDataChannels, languageDataChannels };
 };
 
 export default useRTCConnection;

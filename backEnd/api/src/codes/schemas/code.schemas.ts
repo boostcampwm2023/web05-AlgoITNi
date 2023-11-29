@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { supportLang } from '../../common/type';
 
 export type CodeDocument = HydratedDocument<Code>;
 
@@ -13,6 +14,9 @@ export class Code {
 
   @Prop({ require: true })
   content: string;
+
+  @Prop({ require: true, default: 'python' })
+  language: supportLang;
 }
 
 export const CodeSchema = SchemaFactory.createForClass(Code);

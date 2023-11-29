@@ -1,4 +1,5 @@
 import { Expose } from 'class-transformer';
+import { supportLang } from '../../common/type';
 
 export class GetCodeDto {
   @Expose()
@@ -9,4 +10,7 @@ export class GetCodeDto {
 
   @Expose()
   content: string;
+
+  @Expose()
+  language: supportLang;
 }

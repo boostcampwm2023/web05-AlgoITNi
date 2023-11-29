@@ -29,12 +29,14 @@ async function bootstrap() {
     new AuthErrorFilter(),
   );
 
-  // const origin = configService.get<string>('ALLOWED_ORIGIN');
   app.useLogger(app.get(WinstonLogger));
 
+  const origin = configService.get<string>('ALLOWED_ORIGIN').split(',');
+  const header = configService.get<string>('EXPOSE_HEADER').split(',');
   app.enableCors({
-    origin: true,
+    origin: origin,
     credentials: true,
+    exposedHeaders: header,
   });
 
   const redisStore = new RedisStore({
@@ -53,10 +55,6 @@ async function bootstrap() {
       secret: configService.get<string>('SESSION_SECRET'),
       resave: false,
       saveUninitialized: false,
-      cookie: {
-        sameSite: 'lax',
-        secure: configService.get<string>('NODE_ENV') === 'production',
-      },
     }),
   );
   const port = configService.get<number>('PORT');

@@ -1,16 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserInfoDto } from '../users/dto/userInfo.dto';
 import { ConfigService } from '@nestjs/config';
 import { RedisService } from '../redis/redis.service';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { calcCookieExpire } from '../common/utils';
+import { UserEntity } from '../users/entity/user.entity';
 
 @Injectable()
 export class AuthService {
   private readonly refreshSecret;
   private readonly refreshExpire;
   private readonly accessExpire;
+  private logger = new Logger(AuthService.name);
+
   constructor(
     private configService: ConfigService,
     private jwtService: JwtService,
@@ -21,7 +24,27 @@ export class AuthService {
     this.accessExpire = this.configService.get<string>('JWT_ACCESS_EXPIRE');
   }
 
-  async login(userInfo: UserInfoDto, res) {
+  async login(
+    findUser: UserEntity,
+    res: Response,
+    req: Request,
+  ): Promise<string> {
+    const loginUser = new UserInfoDto();
+    loginUser.id = findUser.id;
+    loginUser.name = findUser.name;
+
+    await this.setTokens(loginUser, res);
+
+    const returnTo: string = req.session['returnTo'];
+    delete req.session['returnTo'];
+    req.session.save((err) => {
+      if (err) this.logger.log(err);
+    });
+
+    return returnTo;
+  }
+
+  async setTokens(userInfo: UserInfoDto, res) {
     const access_token = await this.getAccessToken(userInfo);
     const refresh_token = await this.getRefreshToken(userInfo);
 
@@ -48,6 +71,17 @@ export class AuthService {
       },
       {
         secret: this.refreshSecret,
+        expiresIn: this.refreshExpire,
+      },
+    );
+  }
+  async getDevToken() {
+    return await this.jwtService.signAsync(
+      {
+        sub: 0,
+        name: 'dev-user',
+      },
+      {
         expiresIn: this.refreshExpire,
       },
     );
