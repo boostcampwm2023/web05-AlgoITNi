@@ -2,8 +2,9 @@
 import { useState, useEffect } from 'react';
 import { Socket, io } from 'socket.io-client/debug';
 import { RTC_SOCKET_EMIT_EVENT, RTC_SOCKET_RECEIVE_EVENT } from '@/constants/rtcSocketEvents';
-import { VITE_SOCKET_URL, VITE_STUN_URL, VITE_TURN_CREDENTIAL, VITE_TURN_URL, VITE_TURN_USERNAME } from '@/constants/env';
+import { VITE_STUN_URL, VITE_TURN_CREDENTIAL, VITE_TURN_URL, VITE_TURN_USERNAME } from '@/constants/env';
 import { DataChannel } from '@/types/RTCConnection';
+import getSocketURL from '@/apis/getSocketURL';
 
 const RTCConnections: Record<string, RTCPeerConnection> = {};
 let socket: Socket;
@@ -14,29 +15,22 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
   const [codeDataChannels, setCodeDataChannels] = useState<DataChannel[]>([]);
   const [languageDataChannels, setLanguageDataChannels] = useState<DataChannel[]>([]);
 
-  const socketConnect = () => {
-    fetch(VITE_SOCKET_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ roomName: roomId }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        socket = io(res.result.url);
-        socket.on(RTC_SOCKET_RECEIVE_EVENT.ALL_USERS, onAllUser);
-        socket.on(RTC_SOCKET_RECEIVE_EVENT.OFFER, onOffer);
-        socket.on(RTC_SOCKET_RECEIVE_EVENT.ANSWER, onAnswer);
-        socket.on(RTC_SOCKET_RECEIVE_EVENT.CANDIDATE, onCandidate);
-        socket.on(RTC_SOCKET_RECEIVE_EVENT.USER_EXIT, onUserExit);
-        socket.connect();
+  const socketConnect = async () => {
+    const socketURL = await getSocketURL(roomId);
 
-        socket.emit(RTC_SOCKET_EMIT_EVENT.JOIN_ROOM, {
-          room: roomId,
-        });
-        setIsConnect(true);
-      });
+    socket = io(socketURL);
+    socket.on(RTC_SOCKET_RECEIVE_EVENT.ALL_USERS, onAllUser);
+    socket.on(RTC_SOCKET_RECEIVE_EVENT.OFFER, onOffer);
+    socket.on(RTC_SOCKET_RECEIVE_EVENT.ANSWER, onAnswer);
+    socket.on(RTC_SOCKET_RECEIVE_EVENT.CANDIDATE, onCandidate);
+    socket.on(RTC_SOCKET_RECEIVE_EVENT.USER_EXIT, onUserExit);
+    socket.connect();
+
+    socket.emit(RTC_SOCKET_EMIT_EVENT.JOIN_ROOM, {
+      room: roomId,
+    });
+
+    setIsConnect(true);
   };
 
   useEffect(() => {
