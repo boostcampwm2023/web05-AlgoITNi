@@ -45,7 +45,7 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName, c
   const handleLoadCloudCodeFile = async () => {
     try {
       const data = await getUserCodes();
-      show({ codeData: data, setPlainCode });
+      show({ codeData: data, setPlainCode, setLanguage: setLanguageName });
     } catch (err) {
       errorCallback(err as Error);
     }
