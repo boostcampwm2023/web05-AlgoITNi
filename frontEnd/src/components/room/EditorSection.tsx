@@ -53,6 +53,8 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
   const handleExecCode = async () => {
     executionSocket = io(VITE_CODE_RUNNING_SOCKET_URL);
 
+    console.log(VITE_CODE_RUNNING_SOCKET_URL);
+
     executionSocket.on('done', (response: RunCodeResponse) => {
       setExecResult(`${response.result}\n\n실행시간: ${dateFormatter(response.timestamp)}`);
       executionSocket.disconnect();
