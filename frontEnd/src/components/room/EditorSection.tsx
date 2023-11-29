@@ -14,7 +14,7 @@ import { DataChannel } from '@/types/RTCConnection';
 import postRunCode from '@/apis/postRunCode';
 import { VITE_CODE_RUNNING_SOCKET_URL } from '@/constants/env';
 import { RunCodeResponse } from '@/types/runCode';
-import dateFormatter from '@/utils/dateFormatter';
+import getOutputString from '@/utils/getOutputString';
 
 interface EditorSectionProps {
   defaultCode: string | null;
@@ -50,13 +50,11 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
     sendMessageDataChannels(codeDataChannels, '');
   };
 
-  const handleExecCode = async () => {
+  const handleExecCode = () => {
     executionSocket = io(VITE_CODE_RUNNING_SOCKET_URL);
 
-    console.log(VITE_CODE_RUNNING_SOCKET_URL);
-
     executionSocket.on('done', (response: RunCodeResponse) => {
-      setExecResult(`${response.result}\n\n실행시간: ${dateFormatter(response.timestamp)}`);
+      setExecResult(getOutputString(response));
       executionSocket.disconnect();
     });
 
