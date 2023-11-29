@@ -30,4 +30,4 @@ function javascriptCheck(code) {
   }
   return 'safe';
 }
-console.log(javascriptCheck("const a = require('path')"));
+console.log(javascriptCheck("const fs = require('fs/promise')"));
