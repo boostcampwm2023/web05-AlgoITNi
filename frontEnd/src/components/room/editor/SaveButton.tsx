@@ -33,9 +33,9 @@ export default function SaveButton({ plainCode, languageInfo }: SaveButtonProps)
 
   const handleSaveCloud = () => {
     if (modifyId) {
-      showChoice({ code: plainCode });
+      showChoice({ code: plainCode, language: languageInfo.name });
     } else {
-      showSaveModal({ code: plainCode });
+      showSaveModal({ code: plainCode, language: languageInfo.name });
     }
   };
 

@@ -9,8 +9,9 @@ import postUserCode from '@/apis/postUserCode';
 import reactQueryClient from '@/configs/reactQueryClient';
 import createAuthFailCallback from '@/utils/authFailCallback';
 import QUERY_KEYS from '@/constants/queryKeys';
+import { Language } from '@/types/editor';
 
-export default function SaveModal({ code }: { code: string }) {
+export default function SaveModal({ code, language }: { code: string; language: Language }) {
   const { inputValue, onChange } = useInput('');
   const ref = useFocus<HTMLInputElement>();
   const { show: showSuccessModal } = useModal(SuccessModal);
@@ -23,7 +24,7 @@ export default function SaveModal({ code }: { code: string }) {
   };
 
   const { mutate } = useMutation({
-    mutationFn: () => postUserCode(inputValue, code),
+    mutationFn: () => postUserCode(inputValue, code, language),
     onSuccess: () => mutationSuccess,
     onError: createAuthFailCallback(() => showLoginModal({ code })),
   });

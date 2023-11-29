@@ -4,8 +4,9 @@ import useModal from '@/hooks/useModal';
 import SuccessModal from './SuccessModal';
 import useModifyState from '@/stores/useModifyState';
 import patchUserCode from '@/apis/putUserCode';
+import { Language } from '@/types/editor';
 
-export default function SaveChoiceModal({ code }: { code: string }) {
+export default function SaveChoiceModal({ code, language }: { code: string; language: Language }) {
   const { hide } = useModal();
   const { show: showSaveModal } = useModal(SaveModal);
   const { show: showSuccessModal } = useModal(SuccessModal);
@@ -14,12 +15,12 @@ export default function SaveChoiceModal({ code }: { code: string }) {
   const handleModifyClick = async () => {
     hide();
     // TODO: 파일제목, 파일 타입 추가하기
-    await patchUserCode(modifyId, 'solution.py', code, 'python');
+    await patchUserCode(modifyId, 'solution.py', code, language);
     showSuccessModal();
   };
   const handleNewFileClick = () => {
     hide();
-    showSaveModal({ code });
+    showSaveModal({ code, language });
   };
   return (
     <div className="flex flex-col gap-4 px-11">
