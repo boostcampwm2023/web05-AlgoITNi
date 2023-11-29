@@ -14,6 +14,7 @@ import { RedisModule } from './redis/redis.module';
 import { AuthModule } from './auth/auth.module';
 import { CrawlerModule } from './crawler/crawler.module';
 import { CodesModule } from './codes/codes.module';
+import { CatsModule } from './cats/cats.module';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { CodesModule } from './codes/codes.module';
     AuthModule,
     CrawlerModule,
     CodesModule,
+    CatsModule,
   ],
   controllers: [AppController],
   providers: [AppService, TimeoutInterceptor, WinstonLogger],
