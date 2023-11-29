@@ -35,3 +35,9 @@ export class ResourceNotFound extends HttpException {
     super(message, HttpStatus.BAD_REQUEST);
   }
 }
+
+export class RedisResponseError extends HttpException {
+  constructor(message = '레디스에 병목 현상이 발생하였습니다.') {
+    super(message, HttpStatus.TOO_MANY_REQUESTS);
+  }
+}

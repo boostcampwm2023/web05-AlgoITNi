@@ -4,6 +4,7 @@ import puppeteer from 'puppeteer';
 import { Cache } from 'cache-manager';
 import { time } from '../common/utils';
 import { ConfigService } from '@nestjs/config';
+import { RedisResponseError } from 'src/common/exception/exception';
 
 @Injectable()
 export class CrawlerService {
@@ -18,14 +19,19 @@ export class CrawlerService {
   }
 
   async findOneUsingCache(url: string) {
-    const cachedContent = await this.cacheManager.get<string>(url);
-    if (cachedContent) {
-      return cachedContent;
+    try {
+      const cachedContent = await this.cacheManager.get<string>(url);
+
+      if (cachedContent) {
+        return cachedContent;
+      }
+    } catch (error) {
+      throw new RedisResponseError();
     }
 
     const contents = await this.getHtml(url);
 
-    await this.cacheManager.set(url, contents, time.FIVE_MINUTE);
+    await this.cacheManager.set(url, contents, 6000);
     return contents;
   }
 
