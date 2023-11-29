@@ -47,7 +47,7 @@ export default function InputArea({ plainCode, cursorPosition, handleChange, han
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         onClick={handleClick}
-        className="z-10 absolute w-full tracking-[3px] h-full p-2 pb-0 leading-7 overflow-hidden overflow-x-scroll text-base bg-transparent text-transparent resize-none caret-white custom-scroll whitespace-nowrap focus:outline-none"
+        className="z-10 absolute w-full tracking-[3px] h-full p-2 pb-0 leading-7 overflow-x-scroll text-base bg-transparent text-transparent resize-none caret-white custom-scroll whitespace-nowrap focus:outline-none"
       />
       <pre onScroll={handleScroll} className="absolute top-0 left-0 z-0 w-full h-full p-2 overflow-hidden" ref={preRef}>
         <code

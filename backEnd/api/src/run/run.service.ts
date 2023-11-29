@@ -19,64 +19,35 @@ import { supportLang } from '../common/type';
 @Injectable()
 export class RunService {
   private readonly logger = new Logger('RunService');
-
   constructor(
     private readonly configService: ConfigService,
     private mqService: MqService,
     private redisService: RedisService,
   ) {}
   securityCheck(code: string, language: supportLang): number {
+    let patterns;
     switch (language) {
       case 'python':
-        return this.pythonCheck(code);
+        patterns = this.pythonCheck();
+        break;
       case 'javascript':
-        return this.javascriptCheck(code);
+        patterns = this.javascriptCheck();
+        break;
     }
-  }
 
-  pythonCheck(code: string) {
-    // 모듈 제한
-    const blockedModules = [
-      'os',
-      'sys',
-      'shutil',
-      'subprocess',
-      'threading',
-      'multiprocessing',
-    ];
-    const blockModulesPattern = [
-      new RegExp(
-        `(?!["'])import\\s+(${blockedModules.join('|')})\\s*(?!["'])`,
-        'g',
-      ),
-      new RegExp(`from\\s+(${blockedModules.join('|')})\\s*`, 'g'),
-    ];
-
-    // 사용자 함수 사용 제한
-    const blockedFunctions = ['input', 'open'];
-    const inputPattern = [
-      new RegExp(`\(${blockedFunctions.join('|')}) *\\(`, 'g'),
-      new RegExp(`(\\w+) *= *(${blockedFunctions.join('|')}) *`, 'g'),
-    ];
-
-    // check
-    for (const pattern of [...blockModulesPattern, ...inputPattern]) {
+    for (const pattern of patterns) {
       if (pattern.test(code)) {
         this.logger.warn(`⚠️Invalid Code Requested⚠️\n${code}`);
         return returnCode['vulnerable'];
       }
     }
-
-    return returnCode['safe'];
-  }
-
-  javascriptCheck(code: string) {
     return returnCode['safe'];
   }
 
   async requestRunningApi(
     codeBlock: RequestCodeBlockDto,
   ): Promise<ResponseCodeBlockDto> {
+    console.log('requestRunningAPI');
     const url =
       'http://' +
       path.join(
@@ -128,5 +99,58 @@ export class RunService {
 
     // start subscribe
     this.mqService.setInfo(job.id, socketID);
+  }
+
+  pythonCheck() {
+    // 모듈 제한
+    const blockedModules = [
+      'os',
+      'sys',
+      'shutil',
+      'subprocess',
+      'threading',
+      'multiprocessing',
+    ];
+    const blockModulesPattern = [
+      new RegExp(
+        `(?!["'])import\\s+(${blockedModules.join('|')})\\s*(?!["'])`,
+        'g',
+      ),
+      new RegExp(`from\\s+(${blockedModules.join('|')})\\s*`, 'g'),
+    ];
+
+    // 사용자 함수 사용 제한
+    const blockedFunctions = ['input', 'open'];
+    const inputPattern = [
+      new RegExp(`\(${blockedFunctions.join('|')}) *\\(`, 'g'),
+      new RegExp(`(\\w+) *= *(${blockedFunctions.join('|')}) *`, 'g'),
+    ];
+
+    return [...blockModulesPattern, ...inputPattern];
+  }
+
+  javascriptCheck() {
+    // 모듈 제한
+    const blockedModules = [
+      'child_process',
+      'process',
+      'fs',
+      'os',
+      'path',
+      'readline',
+    ];
+    const blockModulesPattern = [
+      new RegExp(
+        `(?!["'])require\\s*\\(\\s*["'](${blockedModules.join('|')})`,
+        'g',
+      ),
+    ];
+
+    const blockExpression = [
+      new RegExp(`(?!["'])process\\.(.*)`, 'y'),
+      new RegExp(`(?!["'])\\s*__dirname\\s*(?!["'])`, 'y'),
+    ];
+
+    return [...blockModulesPattern, ...blockExpression];
   }
 }

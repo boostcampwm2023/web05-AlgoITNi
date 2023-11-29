@@ -12,6 +12,7 @@ import { LanguageCommand, Messages } from '../common/utils';
 import { supportLang, runCommandResult } from '../common/type';
 import { RequestCodeDto } from './dto/request-code.dto';
 import * as process from 'process';
+import { errorMessage } from './errorMessage';
 @Injectable()
 export class CodesService {
   private logger = new Logger(CodesService.name);
@@ -19,7 +20,6 @@ export class CodesService {
     process.env.NODE_ENV === 'dev' ? path.join(__dirname, '..', 'tmp') : '/';
   private killSignal: NodeJS.Signals = 'SIGINT';
   private readonly timeOut = 5000;
-
   constructor() {
     if (!fs.existsSync(this.tempDir)) {
       fs.mkdirSync(this.tempDir);
@@ -37,7 +37,7 @@ export class CodesService {
       if (stderr === Messages.UNKNOWN) {
         throw new InternalServerErrorException();
       }
-      const errorMessage = this.getErrorMessage(stderr);
+      const errorMessage = this.getErrorMessage(stderr, language);
       throw new RunningException(errorMessage);
     }
     fs.unlinkSync(filePath);
@@ -77,22 +77,13 @@ export class CodesService {
     return { output: stdout.trim() };
   }
 
-  getErrorMessage(stderr: string): string {
+  getErrorMessage(stderr: string, language: supportLang): string {
     if (stderr === Messages.TIMEOUT) return stderr;
 
     const errorLines = stderr.split('\n');
-
-    const errorLineIndex = errorLines.findIndex(
-      (line) =>
-        line.trim().startsWith('NameError:') ||
-        line.trim().startsWith('SyntaxError:') ||
-        line.trim().startsWith('TypeError:') ||
-        line.trim().startsWith('IndexError:') ||
-        line.trim().startsWith('ValueError:') ||
-        line.trim().startsWith('KeyError:') ||
-        line.trim().startsWith('AttributeError:') ||
-        line.trim().startsWith('IndentationError:') ||
-        line.trim().startsWith('FileNotFoundError:'),
+    const errorList = errorMessage[language];
+    const errorLineIndex = errorLines.findIndex((line) =>
+      errorList.some((keyword) => line.trim().startsWith(keyword)),
     );
 
     if (errorLineIndex !== -1) {
