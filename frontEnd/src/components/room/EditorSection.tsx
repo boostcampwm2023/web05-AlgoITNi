@@ -14,6 +14,7 @@ import { DataChannel } from '@/types/RTCConnection';
 import postRunCode from '@/apis/postRunCode';
 import { VITE_CODE_RUNNING_SOCKET_URL } from '@/constants/env';
 import { RunCodeResponse } from '@/types/runCode';
+import dateFormatter from '@/utils/dateFormatter';
 
 interface EditorSectionProps {
   defaultCode: string | null;
@@ -53,7 +54,7 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
     executionSocket = io(VITE_CODE_RUNNING_SOCKET_URL);
 
     executionSocket.on('done', (response: RunCodeResponse) => {
-      setExecResult(`${response.message}\n\n${response.result}\n\n${response.timestamp}`);
+      setExecResult(`${response.result}\n\n${dateFormatter(response.timestamp)}`);
       executionSocket.disconnect();
     });
 
