@@ -6,6 +6,16 @@ import reactQueryClient from '@/configs/reactQueryClient';
 
 const hide = jest.fn();
 jest.mock('@/apis/postUserCode', () => {});
+jest.mock('@/constants/env', () => ({
+  VITE_SOCKET_URL: '',
+  VITE_STUN_URL: '',
+  VITE_TURN_URL: '',
+  VITE_TURN_USERNAME: '',
+  VITE_TURN_CREDENTIAL: '',
+  VITE_API_URL: '',
+  VITE_CHAT_URL: '',
+  MODE: '',
+}));
 
 describe('SaveModal기능테스트', () => {
   it('값이 없을때는 저장 버튼을 눌러도 제출하지 않는다.', () => {
