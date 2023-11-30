@@ -20,22 +20,24 @@ function SaveButtonElement({ children, onClick }: { children: React.ReactNode; o
 interface SaveButtonProps {
   plainCode: string;
   languageInfo: LanguageInfo;
+  fileName: string;
+  setFileName: (value: React.SetStateAction<string>) => void;
 }
 
-export default function SaveButton({ plainCode, languageInfo }: SaveButtonProps) {
+export default function SaveButton({ plainCode, languageInfo, fileName, setFileName }: SaveButtonProps) {
   const { show: showSaveModal } = useModal(SaveModal);
   const { show: showChoice } = useModal(SaveChoiceModal);
   const { modifyId } = useModifyState();
 
   const handleSaveLocal = () => {
-    downloadLocalFile(plainCode, 'solution', languageInfo.extension);
+    downloadLocalFile(plainCode, fileName, languageInfo.extension);
   };
 
   const handleSaveCloud = () => {
     if (modifyId) {
-      showChoice({ code: plainCode });
+      showChoice({ code: plainCode, language: languageInfo.name, fileName, setFileName });
     } else {
-      showSaveModal({ code: plainCode });
+      showSaveModal({ code: plainCode, language: languageInfo.name, setFileName });
     }
   };
 

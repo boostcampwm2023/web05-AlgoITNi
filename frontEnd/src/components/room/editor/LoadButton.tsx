@@ -6,6 +6,7 @@ import LoginModal from '../modal/LoginModal';
 import createAuthFailCallback from '@/utils/authFailCallback';
 import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
 import { DataChannel } from '@/types/RTCConnection';
+import { EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
 
 function LoadButtonElement({ children, onClick }: { children: React.ReactNode; onClick: React.MouseEventHandler<HTMLButtonElement> }) {
   return (
@@ -23,17 +24,19 @@ interface LoadButtonProps {
   plainCode: string;
   setPlainCode: (value: React.SetStateAction<string>) => void;
   setLanguageName: (value: React.SetStateAction<string>) => void;
+  setFileName: (value: React.SetStateAction<string>) => void;
   codeDataChannels: DataChannel[];
 }
 
-export default function LoadButton({ plainCode, setPlainCode, setLanguageName, codeDataChannels }: LoadButtonProps) {
+export default function LoadButton({ plainCode, setPlainCode, setLanguageName, setFileName, codeDataChannels }: LoadButtonProps) {
   const { show } = useModal(CodeListModal);
   const { show: showLoginModal } = useModal(LoginModal);
 
   const errorCallback = createAuthFailCallback(() => showLoginModal({ code: plainCode }));
 
   const handleLoadLocalCodeFile = () => {
-    uploadLocalFile((code, languageName) => {
+    uploadLocalFile((name, code, languageName) => {
+      setFileName(`${name}.${EDITOR_LANGUAGE_TYPES[languageName].extension}`);
       setPlainCode(code);
       setLanguageName(languageName);
 
@@ -45,7 +48,7 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName, c
   const handleLoadCloudCodeFile = async () => {
     try {
       const data = await getUserCodes();
-      show({ codeData: data, setPlainCode });
+      show({ codeData: data, setPlainCode, setLanguage: setLanguageName, setFileName });
     } catch (err) {
       errorCallback(err as Error);
     }

@@ -1,5 +1,7 @@
 import {
+  ConnectedSocket,
   OnGatewayConnection,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
@@ -32,9 +34,6 @@ export class RunGateway implements OnGatewayConnection {
     this.logger.log(`connected: ${socket.id}`);
     this.connectedSockets.set(socket.id, socket);
     socket.emit(SOCKET_EVENT.CONNECT, { id: socket.id });
-    socket.on(SOCKET_EVENT.DISCONNECT, () => {
-      this.connectedSockets.delete(socket.id);
-    });
   }
 
   @OnEvent(EVENT.COMPLETE)
@@ -47,5 +46,10 @@ export class RunGateway implements OnGatewayConnection {
       data.message,
     );
     socket.emit(SOCKET_EVENT.DONE, response);
+  }
+
+  @SubscribeMessage(SOCKET_EVENT.DISCONNECT)
+  disconnect(@ConnectedSocket() socket: Socket) {
+    this.connectedSockets.delete(socket.id);
   }
 }
