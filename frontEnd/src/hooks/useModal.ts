@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import useModalState, { MODAL_COMPONENTS } from '@/stores/useModalState';
 import { ModalHideContext } from '@/components/modal/Modal';
@@ -22,16 +22,16 @@ function useModal<P extends Record<string, unknown>>(Component?: React.Component
     };
   }, [modalId]);
 
-  const show = useCallback((props?: P) => {
+  const show = (props?: P) => {
     if (!Component) return;
     MODAL_COMPONENTS[modalId].props = props;
     showModal(modalId);
-  }, []);
+  };
 
-  const hide = useCallback(() => {
+  const hide = () => {
     if (Component) hideModal(modalId);
     else hideThisModal();
-  }, []);
+  };
 
   if (Component) return { show, hide };
   return { hide };
