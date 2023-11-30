@@ -25,6 +25,7 @@ interface EditorSectionProps {
 let executionSocket: Socket;
 
 export default function EditorSection({ defaultCode, codeDataChannels, languageDataChannels }: EditorSectionProps) {
+  const [fileName, setFileName] = useState<string>('');
   const [plainCode, setPlainCode] = useState<string>(defaultCode || '');
   const [execResult, setExecResult] = useState<string>('');
   const [languageName, setLanguageName] = useState<string>(EDITOR_DEFAULT_LANGUAGE);
@@ -74,7 +75,7 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
   return (
     <div className="w-full h-full grid grid-rows-[repeat(12,minmax(0,1fr))] rounded-lg bg-primary">
       <div className="flex items-center justify-between h-full row-span-1 p-2 px-4 border-b border-white">
-        <EditorFileName>Solution.{languageInfo.extension}</EditorFileName>
+        <EditorFileName>{fileName}</EditorFileName>
         <LanguageTypeDropDown languageName={languageName} setLanguageName={setLanguageName} />
       </div>
       <div className="flex flex-col overflow-y-auto row-[span_7_/_span_7] custom-scroll">
@@ -89,11 +90,12 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
             plainCode={plainCode}
             setPlainCode={setPlainCode}
             setLanguageName={setLanguageName}
+            setFileName={setFileName}
             codeDataChannels={codeDataChannels}
           />
         </div>
         <div className="flex h-full gap-2">
-          <SaveButton plainCode={plainCode} languageInfo={languageInfo} />
+          <SaveButton plainCode={plainCode} languageInfo={languageInfo} fileName={fileName} setFileName={setFileName} />
           <EditorButton onClick={handleClear}>초기화</EditorButton>
           <EditorButton onClick={handleExecCode}>실행하기</EditorButton>
         </div>
