@@ -19,6 +19,10 @@ export default defineConfig({
         target: 'https://api.algoitni.site/',
         changeOrigin: true,
       },
+      '/cache': {
+        target: 'https://api.algoitni.site/',
+        changeOrigin: true,
+      },
     },
   },
   resolve: {
