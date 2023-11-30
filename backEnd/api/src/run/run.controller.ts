@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { RunService } from './run.service';
 import { RequestCodeBlockDto } from './dto/request-codeblock.dto';
 import { returnCode } from '../common/returnCode';
@@ -33,17 +33,6 @@ export class RunController {
       await this.runService.requestRunningMQ(codeBlock);
 
     return responseCodeBlockDto;
-  }
-
-  @HttpCode(202)
-  @Post('v3')
-  async requestRunCodeV3(
-    @Query('id') socketID: string,
-    @Body(RequestRunPipe) codeBlock: RequestCodeBlockDto,
-  ): Promise<void> {
-    this.securityCheck(codeBlock);
-
-    await this.runService.requestRunningMQPubSub(codeBlock, socketID);
   }
 
   securityCheck(codeBlock: RequestCodeBlockDto) {

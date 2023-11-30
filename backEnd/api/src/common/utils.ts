@@ -64,8 +64,8 @@ export const ResponseMessage = {
 
 export const SOCKET_EVENT = {
   NAME_SPACE: 'run',
-  CONNECT: 'connected',
   DISCONNECT: 'disconnect',
+  REQUEST: 'request',
   DONE: 'done',
 };
 
