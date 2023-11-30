@@ -6,6 +6,7 @@ import LoginModal from '../modal/LoginModal';
 import createAuthFailCallback from '@/utils/authFailCallback';
 import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
 import { DataChannel } from '@/types/RTCConnection';
+import { EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
 
 function LoadButtonElement({ children, onClick }: { children: React.ReactNode; onClick: React.MouseEventHandler<HTMLButtonElement> }) {
   return (
@@ -35,7 +36,7 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName, s
 
   const handleLoadLocalCodeFile = () => {
     uploadLocalFile((name, code, languageName) => {
-      setFileName(name);
+      setFileName(`${name}.${EDITOR_LANGUAGE_TYPES[languageName].extension}`);
       setPlainCode(code);
       setLanguageName(languageName);
 
