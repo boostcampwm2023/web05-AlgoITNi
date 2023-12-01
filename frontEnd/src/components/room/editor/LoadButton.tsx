@@ -65,9 +65,7 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName, s
     });
   };
 
-  const handleLoadCloudCodeFile = async () => {
-    setClick(true);
-  };
+  const handleLoadCloudCodeFile = () => setClick(true);
 
   return (
     <div className="relative h-full">
