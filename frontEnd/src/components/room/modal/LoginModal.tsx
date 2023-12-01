@@ -1,6 +1,9 @@
 import { ReactNode } from 'react';
 import { MODE } from '@/constants/env';
 import getDevCookie from '@/apis/getDevCookie';
+import reactQueryClient from '@/configs/reactQueryClient';
+import QUERY_KEYS from '@/constants/queryKeys';
+import useModal from '@/hooks/useModal';
 
 type LoginButtonWrapperProps = {
   handleClick: () => void;
@@ -27,12 +30,15 @@ function LoginButtonWrapper({ handleClick, className, type, children }: LoginBut
 }
 
 export default function LoginModal({ code }: { code: string }) {
+  const { hide } = useModal();
   const handleClick = async () => {
+    localStorage.setItem('code', code);
     if (MODE === 'development') {
       const token = await getDevCookie();
       document.cookie = `access_token=${token};`;
+      hide();
     }
-    localStorage.setItem('code', code);
+    reactQueryClient.invalidateQueries({ queryKey: [QUERY_KEYS.LOAD_CODES] });
   };
 
   return (
