@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import getUserCodes from '@/apis/getUserCodes';
 import useModal from '@/hooks/useModal';
 import { uploadLocalFile } from '@/utils/file';
@@ -7,6 +9,7 @@ import createAuthFailCallback from '@/utils/authFailCallback';
 import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
 import { DataChannel } from '@/types/RTCConnection';
 import { EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
+import QUERY_KEYS from '@/constants/queryKeys';
 
 function LoadButtonElement({ children, onClick }: { children: React.ReactNode; onClick: React.MouseEventHandler<HTMLButtonElement> }) {
   return (
@@ -29,10 +32,27 @@ interface LoadButtonProps {
 }
 
 export default function LoadButton({ plainCode, setPlainCode, setLanguageName, setFileName, codeDataChannels }: LoadButtonProps) {
+  const [click, setClick] = useState(false);
   const { show } = useModal(CodeListModal);
   const { show: showLoginModal } = useModal(LoginModal);
+  const { data, isError, error } = useQuery({
+    queryKey: [QUERY_KEYS.LOAD_CODES],
+    queryFn: getUserCodes,
+    enabled: click,
+  });
 
   const errorCallback = createAuthFailCallback(() => showLoginModal({ code: plainCode }));
+
+  useEffect(() => {
+    if (data && click) {
+      show({ codeData: data, setPlainCode, setLanguage: setLanguageName, setFileName });
+      setClick(false);
+    }
+    if (isError && click) {
+      errorCallback(error);
+      setClick(false);
+    }
+  }, [click, data, isError]);
 
   const handleLoadLocalCodeFile = () => {
     uploadLocalFile((name, code, languageName) => {
@@ -46,12 +66,7 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName, s
   };
 
   const handleLoadCloudCodeFile = async () => {
-    try {
-      const data = await getUserCodes();
-      show({ codeData: data, setPlainCode, setLanguage: setLanguageName, setFileName });
-    } catch (err) {
-      errorCallback(err as Error);
-    }
+    setClick(true);
   };
 
   return (
