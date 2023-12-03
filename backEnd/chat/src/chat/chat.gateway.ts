@@ -123,4 +123,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
     }
   }
+
+  public getRoomCount(room: string): number {
+    return this.roomToCount.get(room) || 0;
+  }
+
+  public getRoom(room: string): boolean {
+    return this.rooms.get(room) || false;
+  }
 }
