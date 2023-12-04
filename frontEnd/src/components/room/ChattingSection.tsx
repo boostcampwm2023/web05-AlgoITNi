@@ -20,6 +20,7 @@ let timer: NodeJS.Timeout | null;
 export default function ChattingSection({ roomId, nickname }: ChattingSectionProps) {
   const [message, setMessage] = useState('');
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
+  const [usingAi, setUsingAi] = useState<boolean>(false);
   const { isViewingLastMessage, isRecievedMessage, setScrollRatio, setIsRecievedMessage } = useLastMessageViewingState();
 
   const messageAreaRef = useRef<HTMLDivElement | null>(null);
@@ -53,7 +54,11 @@ export default function ChattingSection({ roomId, nickname }: ChattingSectionPro
   const handleMessageSend = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (socket) {
+    if (!socket) return;
+
+    if (usingAi) {
+      // TODO: AI 관련 SOCKET 전송
+    } else {
       socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname });
       setMessage('');
       setScrollRatio(100);
