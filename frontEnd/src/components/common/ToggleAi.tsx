@@ -9,7 +9,7 @@ export default function ToggleAi({ usingAi, setUsingAi }: ToggleAiProps) {
   };
 
   return (
-    <div className="flex gap-3 font-light">
+    <div className="flex items-center gap-3 font-light whitespace-nowrap">
       <button
         onClick={handleChangeMessageType}
         type="button"
@@ -21,7 +21,7 @@ export default function ToggleAi({ usingAi, setUsingAi }: ToggleAiProps) {
           }`}
         />
       </button>
-      <span>AI 기능을 이용해보세요!</span>
+      <span className="text-xs">AI 기능을 이용해보세요!</span>
     </div>
   );
 }
