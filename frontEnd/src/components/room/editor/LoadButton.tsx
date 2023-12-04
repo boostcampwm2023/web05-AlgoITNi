@@ -16,7 +16,7 @@ function LoadButtonElement({ children, onClick }: { children: React.ReactNode; o
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center justify-center w-32 px-4 py-2 text-sm text-black duration-300 rounded-lg hover:text-black hover:bg-base whitespace-nowrap"
+      className="flex items-center justify-center px-4 py-2 text-sm text-black duration-300 rounded-lg hover:text-black hover:bg-base whitespace-nowrap"
     >
       {children}
     </button>
