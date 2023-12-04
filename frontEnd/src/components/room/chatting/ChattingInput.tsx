@@ -1,10 +1,10 @@
-import aiIcon from '@/assets/ai.svg';
 import Spinner from '@/components/common/Spinner';
+import ToggleAi from '@/components/common/ToggleAi';
 
 function SendButtonText({ usingAi, postingAi }: { usingAi: boolean; postingAi: boolean }) {
   if (!usingAi) return '전송';
 
-  if (postingAi) return <Spinner size={7} width={4} />;
+  if (postingAi) return <Spinner />;
   return '질문';
 }
 
@@ -25,27 +25,22 @@ export default function ChattingInput({
   setUsingAi,
   postingAi,
 }: ChattingInputProps) {
-  const handleChangeMessageType = () => {
-    setUsingAi((prev) => !prev);
-  };
-
   return (
-    <form onSubmit={handleMessageSend} className="w-full p-2 rounded-b-lg bg-primary">
-      <div className="flex items-center h-10 border rounded-lg border-base">
-        <button onClick={handleChangeMessageType} type="button" className="min-w-[40px] h-full ml-2 p-1 bg-transparent">
-          <img src={aiIcon} alt="AI 아이콘" />
-        </button>
+    <form onSubmit={handleMessageSend} className="w-full p-2 rounded-b-lg bg-base">
+      <ToggleAi usingAi={usingAi} setUsingAi={setUsingAi} />
+      <div className="flex items-center w-full h-12 rounded-lg drop-shadow-lg">
         <input
           disabled={usingAi && postingAi}
           type="text"
           value={message}
           onChange={handleInputMessage}
-          className="w-full h-10 p-2 rounded-s-lg focus:outline-none"
+          className={`w-full h-12 p-2 px-4 focus:outline-none rounded-s-lg ${usingAi ? 'border-point-blue border-2' : ''}`}
+          placeholder={usingAi ? 'AI에게 질문해보세요' : 'Message'}
         />
         <button
           type="submit"
-          className={`h-full px-4 py-1 font-light text-white rounded-e-lg whitespace-nowrap w-16 flex items-center justify-center ${
-            usingAi ? 'bg-[#347DFF]' : 'bg-secondary'
+          className={`h-full px-4 py-1 font-normal rounded-e-lg whitespace-nowrap w-16 flex items-center justify-center ${
+            usingAi ? 'bg-point-blue text-white' : 'bg-primary text-black'
           }`}
           disabled={usingAi && postingAi}
         >

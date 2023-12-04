@@ -92,7 +92,7 @@ export default function ChattingSection({ roomId, nickname }: ChattingSectionPro
       <div className="flex relative flex-col items-center justify-center w-full pt-2 h-full rounded-lg bg-primary min-w-[150px]">
         <div
           ref={messageAreaRef}
-          className="flex flex-col w-full h-full gap-2 px-2 pt-2 pl-4 mr-4 overflow-auto grow custom-scroll"
+          className="flex flex-col w-full h-full gap-2 px-2 py-2 pl-4 mr-4 overflow-auto grow custom-scroll"
           onScroll={handleScroll}
         >
           {allMessages.map((messageData, index) => (
