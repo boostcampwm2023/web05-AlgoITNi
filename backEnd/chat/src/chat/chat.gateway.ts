@@ -151,16 +151,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   public async useLLM(room: string, message: string, socketId: string) {
     const url = this.configService.get<string>('LLM_URL');
     const headers = {
-      'X-NCP-CLOVASTUDIO-API-KEY': this.configService.get<string>(
-        'X-NCP-CLOVASTUDIO-API-KEY',
-      ),
-      'X-NCP-APIGW-API-KEY': this.configService.get<string>(
-        'X-NCP-APIGW-API-KEY',
-      ),
-      'X-NCP-CLOVASTUDIO-REQUEST-ID': this.configService.get<string>(
-        'X-NCP-CLOVASTUDIO-REQUEST-ID',
-      ),
-      'Content-Type': this.configService.get<string>('Content-Type'),
+      'X-NCP-CLOVASTUDIO-API-KEY':
+        this.configService.get<string>('CLOVASTUDIO'),
+      'X-NCP-APIGW-API-KEY': this.configService.get<string>('APIGW'),
+      'X-NCP-CLOVASTUDIO-REQUEST-ID':
+        this.configService.get<string>('REQUESTID'),
+      ContentType: this.configService.get<string>('ContentType'),
       Accept: this.configService.get<string>('Accept'),
     };
 
