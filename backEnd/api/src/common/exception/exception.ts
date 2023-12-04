@@ -39,7 +39,9 @@ export class ResourceNotFound extends HttpException {
 export class RedisResponseError extends HttpException {
   constructor(message = '레디스에 병목 현상이 발생하였습니다.') {
     super(message, HttpStatus.TOO_MANY_REQUESTS);
-    
+  }
+}
+
 export class ExtNameException extends HttpException {
   constructor(message = '저장 파일의 확장자와 설정 언어가 일치하지 않습니다.') {
     super(message, HttpStatus.BAD_REQUEST);
