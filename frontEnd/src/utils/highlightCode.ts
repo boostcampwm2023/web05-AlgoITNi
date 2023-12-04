@@ -1,7 +1,7 @@
-import hljs from 'highlight.js';
+import codeHighlighter from '@/configs/highlightCodeConfig';
 
 const highlightCode = (language: string, code: string) => {
-  return hljs.highlight(code, { language }).value.replace(/" "/g, '&nbsp; ');
+  return codeHighlighter.highlight(code, { language }).value.replace(/" "/g, '&nbsp; ');
 };
 
 export default highlightCode;
