@@ -7,12 +7,14 @@ import useSpeaker from '@/stores/useSpeaker';
 import { SettingProps } from '@/types/settingModal';
 
 function AudioSelector({
+  stream,
   imgSrc,
   media,
   testState,
   toggleState,
   playRef,
 }: {
+  stream: MediaStream;
   imgSrc: string;
   media: SettingProps;
   testState: boolean;
@@ -22,18 +24,22 @@ function AudioSelector({
   return (
     <div className="flex items-center w-full basis-1/2">
       <div className="flex items-center w-full">
-        <div className="flex w-[70%]">
-          <img src={imgSrc} alt="mic" width="40px" />
+        <div className="w-[70%]">
+          <div className="flex items-center gap-5 mb-4">
+            <img src={imgSrc} alt="mic" width="25px" />
+            <span className="text-xl font-bold">{imgSrc.match('speaker') ? '스피커' : '마이크'}</span>
+          </div>
           <MediaSelector
+            stream={stream}
             className="w-[80%] text-[1vw] "
             optionsData={media.list as MediaDeviceInfo[]}
             setFunc={media.setFunc as React.Dispatch<React.SetStateAction<string>>}
           />
         </div>
 
-        <Button.Default onClick={toggleState} fontSize="1vw">
+        <Button.White onClick={toggleState} fontSize="1vw">
           {testState ? '중지' : '테스트'}
-        </Button.Default>
+        </Button.White>
         <audio ref={playRef} autoPlay>
           <track kind="captions" />
         </audio>
@@ -80,8 +86,15 @@ export default function AudioSetting({ stream, mic, speaker }: { stream: MediaSt
 
   return (
     <div className="flex flex-col items-center w-full h-full">
-      <AudioSelector imgSrc={micSrc} media={mic} testState={micTest} toggleState={toggleMicTest} playRef={audioRef} />
-      <AudioSelector imgSrc={speakerSrc} media={speaker} testState={speakerTest} toggleState={toggleSpeakerTest} playRef={mp3Ref} />
+      <AudioSelector stream={stream} imgSrc={micSrc} media={mic} testState={micTest} toggleState={toggleMicTest} playRef={audioRef} />
+      <AudioSelector
+        stream={stream}
+        imgSrc={speakerSrc}
+        media={speaker}
+        testState={speakerTest}
+        toggleState={toggleSpeakerTest}
+        playRef={mp3Ref}
+      />
     </div>
   );
 }
