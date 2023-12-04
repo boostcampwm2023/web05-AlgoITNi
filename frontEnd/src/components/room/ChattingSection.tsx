@@ -88,25 +88,27 @@ export default function ChattingSection({ roomId, nickname }: ChattingSectionPro
   }, [allMessages]);
 
   return (
-    <div className="flex relative flex-col items-center justify-center w-full pt-2 h-full rounded-lg bg-primary min-w-[150px]">
-      <div
-        ref={messageAreaRef}
-        className="flex flex-col w-full h-full gap-2 px-2 pt-2 pl-4 mr-4 overflow-auto grow custom-scroll"
-        onScroll={handleScroll}
-      >
-        {allMessages.map((messageData, index) => (
-          <ChattingMessage messageData={messageData} key={index} isMyMessage={messageData.socketId === socket.id} />
-        ))}
+    <Section>
+      <div className="flex relative flex-col items-center justify-center w-full pt-2 h-full rounded-lg bg-primary min-w-[150px]">
+        <div
+          ref={messageAreaRef}
+          className="flex flex-col w-full h-full gap-2 px-2 pt-2 pl-4 mr-4 overflow-auto grow custom-scroll"
+          onScroll={handleScroll}
+        >
+          {allMessages.map((messageData, index) => (
+            <ChattingMessage messageData={messageData} key={index} isMyMessage={messageData.socketId === socket.id} />
+          ))}
+        </div>
+        {isRecievedMessage && <ScrollDownButton handleMoveToBottom={handleMoveToBottom} />}
+        <ChattingInput
+          handleMessageSend={handleMessageSend}
+          message={message}
+          handleInputMessage={handleInputMessage}
+          usingAi={usingAi}
+          setUsingAi={setUsingAi}
+          postingAi={postingAi}
+        />
       </div>
-      {isRecievedMessage && <ScrollDownButton handleMoveToBottom={handleMoveToBottom} />}
-      <ChattingInput
-        handleMessageSend={handleMessageSend}
-        message={message}
-        handleInputMessage={handleInputMessage}
-        usingAi={usingAi}
-        setUsingAi={setUsingAi}
-        postingAi={postingAi}
-      />
-    </div>
+    </Section>
   );
 }
