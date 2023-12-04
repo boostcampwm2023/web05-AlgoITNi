@@ -8,8 +8,8 @@ interface ChattingMessageProps {
 export default function ChattingMessage({ messageData, isMyMessage }: ChattingMessageProps) {
   return (
     <div className={`flex flex-col gap-0.5 ${isMyMessage ? 'items-end' : 'items-start'}`}>
-      <span className="mx-1 text-xs font-light text-white">{messageData.nickname}</span>
-      <div className={`px-4 py-2 rounded-lg w-fit ${isMyMessage ? 'bg-blue-200' : 'bg-white'}`}>
+      <span className="mx-1 text-xs font-light ">{messageData.nickname}</span>
+      <div className={`px-4 py-2 rounded-lg w-fit ${isMyMessage ? 'bg-blue-100' : 'bg-yellow-100'}`}>
         <span>{messageData.message}</span>
       </div>
     </div>

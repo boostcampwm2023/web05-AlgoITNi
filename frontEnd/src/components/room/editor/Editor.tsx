@@ -41,8 +41,8 @@ export default function Editor({ plainCode, languageInfo, setPlainCode, codeData
   };
 
   return (
-    <div className="flex flex-grow">
-      <div className="w-10 py-2 pr-2 overflow-hidden border-r border-white">
+    <div className="flex flex-grow ">
+      <div className="w-10 py-2 pr-2 overflow-hidden border-r ">
         <LineNumber plainCode={plainCode} />
       </div>
       <InputArea

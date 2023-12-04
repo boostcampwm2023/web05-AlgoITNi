@@ -14,7 +14,7 @@ function Default({ children, onClick, fontSize }: ButtonProps) {
   return (
     <button
       type="button"
-      className="px-[1.6vw] py-[14px] bg-primary text-white rounded-[15px] font-Pretendard"
+      className="px-[1.6vw] py-[14px] bg-primary rounded-[15px] font-Pretendard border drop-shadow-lg"
       onClick={onClick}
       style={{ fontSize }}
     >
@@ -27,7 +27,7 @@ function Full({ children, onClick, fontSize }: ButtonProps) {
   return (
     <button
       type="button"
-      className="px-[1.6vw] py-[14px] bg-primary text-white rounded-[15px] w-full"
+      className="px-[1.6vw] py-[14px] bg-primary rounded-[15px] w-full border drop-shadow-lg"
       onClick={onClick}
       style={{ fontSize }}
     >
@@ -40,7 +40,7 @@ function White({ children, onClick, fontSize }: ButtonProps) {
   return (
     <button
       type="button"
-      className="border-2 border-light-gray text-gray rounded-[15px] px-[1.6vw] py-[14px] bg-white"
+      className="border-2 border-light-gray text-gray rounded-[15px] px-[1.6vw] py-[14px] bg-white drop-shadow-lg shadow"
       onClick={onClick}
       style={{ fontSize }}
     >
@@ -53,7 +53,7 @@ function Dark({ children, onClick, fontSize }: ButtonProps) {
   return (
     <button
       type="button"
-      className="text-gray rounded-[15px] px-[1.6vw] py-[14px] bg-secondary text-white"
+      className="text-gray rounded-[15px] px-[1.6vw] py-[14px] border drop-shadow-lg shadow"
       onClick={onClick}
       style={{ fontSize }}
     >

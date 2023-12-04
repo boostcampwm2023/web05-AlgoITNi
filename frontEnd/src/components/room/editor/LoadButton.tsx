@@ -16,7 +16,7 @@ function LoadButtonElement({ children, onClick }: { children: React.ReactNode; o
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center justify-center w-32 px-4 py-2 text-sm text-white duration-300 rounded-lg hover:text-black hover:bg-base whitespace-nowrap"
+      className="flex items-center justify-center w-32 px-4 py-2 text-sm text-black duration-300 rounded-lg hover:text-black hover:bg-base whitespace-nowrap"
     >
       {children}
     </button>
@@ -69,10 +69,10 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName, s
 
   return (
     <div className="relative h-full">
-      <div className="peer flex items-center min-w-[8vh] justify-center px-[max(2vh,25px)] h-full text-[max(1.2vh,10px)] bg-secondary font-light text-white rounded whitespace-nowrap">
+      <div className="peer flex items-center min-w-[8vh] justify-center px-[max(2vh,25px)] h-full text-[max(1.2vh,10px)] border drop-shadow-lg font-light text-black rounded whitespace-nowrap shadow">
         불러오기
       </div>
-      <div className="absolute z-10 items-center justify-between hidden gap-2 p-2 -translate-x-1/2 rounded-lg bg-secondary left-1/2 -top-12 peer-hover:flex hover:flex">
+      <div className="absolute z-10 items-center justify-between hidden gap-2 p-2 -translate-x-1/2 bg-white border rounded-lg drop-shadow-lg left-1/2 -top-12 peer-hover:flex hover:flex">
         <LoadButtonElement onClick={handleLoadLocalCodeFile}>로컬에서 불러오기</LoadButtonElement>
         <LoadButtonElement onClick={handleLoadCloudCodeFile}>클라우드에서 불러오기</LoadButtonElement>
       </div>
