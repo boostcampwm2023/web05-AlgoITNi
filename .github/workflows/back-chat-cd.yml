@@ -49,4 +49,11 @@ jobs:
             echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> /root/.env
             echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> /root/.env
             echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> /root/.env
+            echo "LLM_URL=${{ secrets.LLM_URL }}" >> /root/.env
+            echo "CLOVASTUDIO=${{ secrets.CLOVASTUDIO }}" >> /root/.env
+            echo "APIGW=${{ secrets.APIGW }}" >> /root/.env
+            echo "REQUESTID=${{ secrets.REQUESTID }}" >> /root/.env
+            echo "Accept=${{ secrets.Accept }}" >> /root/.env
+            echo "ContentType=${{ secrets.ContentType }}" >> /root/.env
+            echo "MONGO_PROD=${{ secrets.MONGO_PROD }}" >> /root/.env
             ./deploy.sh
