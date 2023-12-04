@@ -95,6 +95,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (count === SOCKET.EMPTY_ROOM) {
       this.subscriberClient.unsubscribe(room);
       this.rooms.delete(room);
+      this.chatService.deleteByRoom(room);
     }
   }
 
@@ -118,15 +119,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     if (ai) {
       try {
+        await this.publisherClient.publish(
+          room,
+          JSON.stringify({ using: true }),
+        );
+
         const llmMessageDto: LLMMessageDto = await this.processAIResponse(
           room,
           message,
           socket.id,
         );
+
         await this.chatService.insertOrUpdate(room, llmMessageDto);
         response.message = llmMessageDto.content;
       } catch (error) {
-        console.error(error);
+        throw new WsException({
+          statusCode: ERRORS.FAILED_ACCESS_LLM.statusCode,
+          message: ERRORS.FAILED_ACCESS_LLM.message,
+        });
       }
     }
 

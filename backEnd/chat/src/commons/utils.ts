@@ -34,4 +34,8 @@ export const ERRORS = {
     statusCode: HttpStatus.BAD_REQUEST,
     message: '메시지를 PUB하는데 실패했습니다.',
   },
+  FAILED_ACCESS_LLM: {
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: '클로바 스튜디오를 사용할 수 없습니다.',
+  },
 };

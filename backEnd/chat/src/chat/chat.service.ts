@@ -39,6 +39,10 @@ export class ChatService {
     return result;
   }
 
+  async deleteByRoom(room: string): Promise<any> {
+    return await this.llmModel.findOneAndDelete({ room }).exec();
+  }
+
   validateRoom(room: string) {
     if (!room) {
       throw new WsException({
