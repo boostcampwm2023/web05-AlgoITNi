@@ -1,16 +1,32 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Code } from './schemas/code.schemas';
-import { Model } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 import { SaveCodeDto } from './dto/saveCode.dto';
+import { TransactionRollback } from '../common/exception/exception';
 
 @Injectable()
 export class CodesService {
-  constructor(@InjectModel(Code.name) private codeModel: Model<Code>) {}
+  private logger = new Logger(CodesService.name);
+  constructor(
+    @InjectModel(Code.name) private codeModel: Model<Code>,
+    @InjectConnection() private readonly connection: Connection,
+  ) {}
 
   async save(saveCodeDto: SaveCodeDto): Promise<Code> {
-    const savedCode = new this.codeModel(saveCodeDto);
-    return savedCode.save();
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      const code = await this.codeModel.create(saveCodeDto);
+      await session.commitTransaction();
+      return code;
+    } catch (e) {
+      await session.abortTransaction();
+      this.logger.error(e);
+      throw new TransactionRollback();
+    } finally {
+      await session.endSession();
+    }
   }
 
   async getAll(userID: number) {
@@ -23,11 +39,35 @@ export class CodesService {
 
   async update(userID: number, objectID: string, saveCodeDto: SaveCodeDto) {
     const query = { userID: userID, _id: objectID };
-    return this.codeModel.updateOne(query, saveCodeDto);
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      const result = await this.codeModel.updateOne(query, saveCodeDto);
+      await session.commitTransaction();
+      return result;
+    } catch (e) {
+      await session.abortTransaction();
+      this.logger.error(e);
+      throw new TransactionRollback();
+    } finally {
+      await session.endSession();
+    }
+    return;
   }
 
   async delete(userID: number, objectID: string) {
     const query = { userID: userID, _id: objectID };
-    await this.codeModel.deleteOne(query);
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      await this.codeModel.deleteOne(query);
+      await session.commitTransaction();
+    } catch (e) {
+      await session.abortTransaction();
+      this.logger.error(e);
+      throw new TransactionRollback();
+    } finally {
+      await session.endSession();
+    }
   }
 }

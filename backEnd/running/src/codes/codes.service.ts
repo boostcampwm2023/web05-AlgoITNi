@@ -13,6 +13,8 @@ import { supportLang, runCommandResult } from '../common/type';
 import { RequestCodeDto } from './dto/request-code.dto';
 import * as process from 'process';
 import { errorMessage } from './errorMessage';
+import { v4 as uuidv4 } from 'uuid';
+
 @Injectable()
 export class CodesService {
   private logger = new Logger(CodesService.name);
@@ -96,9 +98,9 @@ export class CodesService {
   getFilePath(language: supportLang) {
     switch (language) {
       case 'python':
-        return path.join(this.tempDir, `python-${Date.now()}.py`);
+        return path.join(this.tempDir, `${uuidv4()}.py`);
       case 'javascript':
-        return path.join(this.tempDir, `javascript-${Date.now()}.js`);
+        return path.join(this.tempDir, `${uuidv4()}.js`);
     }
   }
 }
