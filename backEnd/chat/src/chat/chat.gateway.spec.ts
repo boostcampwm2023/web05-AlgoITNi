@@ -93,6 +93,7 @@ describe('ChatGateway', () => {
         room: '',
         message: 'testMessage',
         nickname: 'testNickname',
+        ai: false,
       };
       const testSocket = { id: '12345' } as unknown as Socket;
 
@@ -109,6 +110,7 @@ describe('ChatGateway', () => {
         room: 'testRoom',
         message: '',
         nickname: 'testNickname',
+        ai: false,
       };
       const testSocket = { id: '12345' } as unknown as Socket;
 
@@ -125,6 +127,7 @@ describe('ChatGateway', () => {
         room: 'testRoom',
         message: 'testMessage',
         nickname: '',
+        ai: false,
       };
       const testSocket = { id: '12345' } as unknown as Socket;
 

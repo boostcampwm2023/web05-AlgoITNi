@@ -22,6 +22,10 @@ export const ERRORS = {
     statusCode: HttpStatus.BAD_REQUEST,
     message: '방 이름을 입력해주세요.',
   },
+  SEND_MESSAGE: {
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: '메시지를 보내는 과정에 에러가 발생했습니다.',
+  },
   MESSAGE_EMPTY: {
     statusCode: HttpStatus.BAD_REQUEST,
     message: '메시지를 입력해주세요.',
