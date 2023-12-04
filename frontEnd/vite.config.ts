@@ -8,11 +8,19 @@ export default defineConfig({
   server: {
     proxy: {
       '/codes': {
-        target: 'https://api.algoitni.site',
+        target: 'https://api.algoitni.site/',
         changeOrigin: true,
       },
       '/run': {
-        target: 'https://api.algoitni.site',
+        target: 'https://api.algoitni.site/',
+        changeOrigin: true,
+      },
+      '/auth': {
+        target: 'https://api.algoitni.site/',
+        changeOrigin: true,
+      },
+      '/cache': {
+        target: 'https://api.algoitni.site/',
         changeOrigin: true,
       },
     },

@@ -43,6 +43,7 @@
     "cache-manager-ioredis": "^2.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "cls-hooked": "^4.2.2",
     "connect-redis": "^7.1.0",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.3.1",

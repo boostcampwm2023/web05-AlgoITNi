@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
@@ -47,7 +48,6 @@ export class RunService {
   async requestRunningApi(
     codeBlock: RequestCodeBlockDto,
   ): Promise<ResponseCodeBlockDto> {
-    console.log('requestRunningAPI');
     const url =
       'http://' +
       path.join(
@@ -67,11 +67,7 @@ export class RunService {
       const res = e.response.data;
       if (e.response.data.status === HttpStatus.INTERNAL_SERVER_ERROR)
         throw new InternalServerErrorException();
-      return new ResponseCodeBlockDto(
-        res.statusCode,
-        res.message,
-        'Failed to Run Code',
-      );
+      throw new BadRequestException(res.message);
     }
   }
 

@@ -22,6 +22,10 @@ export const ERRORS = {
     statusCode: HttpStatus.BAD_REQUEST,
     message: '방 이름을 입력해주세요.',
   },
+  SEND_MESSAGE: {
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: '메시지를 보내는 과정에 에러가 발생했습니다.',
+  },
   MESSAGE_EMPTY: {
     statusCode: HttpStatus.BAD_REQUEST,
     message: '메시지를 입력해주세요.',
@@ -29,5 +33,9 @@ export const ERRORS = {
   FAILED_PUBLISHING: {
     statusCode: HttpStatus.BAD_REQUEST,
     message: '메시지를 PUB하는데 실패했습니다.',
+  },
+  FAILED_ACCESS_LLM: {
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: '클로바 스튜디오를 사용할 수 없습니다.',
   },
 };

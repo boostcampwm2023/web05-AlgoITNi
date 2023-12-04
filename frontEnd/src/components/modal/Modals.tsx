@@ -5,7 +5,10 @@ import Modal from './Modal';
 const portalElement = document.getElementById('modal') as HTMLElement;
 
 export default function Modals() {
-  const { modals, hideModal } = useModalState((state) => state);
+  const {
+    modals,
+    actions: { hideModal },
+  } = useModalState((state) => state);
   return createPortal(
     <>
       {modals.map((id) => (

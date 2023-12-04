@@ -21,11 +21,13 @@ export default {
         remove: 'remove 0.2s',
       },
       colors: {
-        primary: '#37485D',
+        primary: 'white',
         secondary: '#132A37',
         base: '#F0F2F5',
         black: '#0C151C',
-        'light-gray': '##D3D8E1',
+        'light-gray': '#D3D8E1',
+        'point-red': '#EA4335',
+        'point-blue': '#347DFF',
       },
       screens: {
         mobile: { min: '360px', max: '767px' },

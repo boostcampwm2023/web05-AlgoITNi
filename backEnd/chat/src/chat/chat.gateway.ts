@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import {
   ConnectedSocket,
   MessageBody,
@@ -18,6 +19,7 @@ import { MessageDto } from './dto/message.dto';
 import * as os from 'os';
 import { ERRORS, SOCKET, SOCKET_EVENT } from '../commons/utils';
 import { ChatService } from './chat.service';
+import axios from 'axios';
 
 @WebSocketGateway({ namespace: SOCKET.NAME_SPACE, cors: true })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -34,6 +36,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     @InjectRedis() private readonly client: Redis,
     private readonly chatService: ChatService,
+    private readonly configService: ConfigService,
   ) {
     this.subscriberClient = client.duplicate();
     this.publisherClient = client.duplicate();
@@ -92,6 +95,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (count === SOCKET.EMPTY_ROOM) {
       this.subscriberClient.unsubscribe(room);
       this.rooms.delete(room);
+      this.chatService.deleteByRoom(room);
     }
   }
 
@@ -102,17 +106,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     this.logger.log(`Instance ${this.instanceId} - sendMessage: ${socket.id}`);
 
-    const { room, message, nickname } = data;
+    this.chatService.validateSendMessage(data);
 
-    this.chatService.validateRoom(room);
-    this.chatService.validateMessage(message);
-    this.chatService.validateNickname(nickname);
+    const { room, message, nickname, ai } = data;
 
     const response = {
       message: message,
       nickname: nickname,
       socketId: socket.id,
+      ai: ai,
     };
+
+    if (ai) {
+      try {
+        await this.publisherClient.publish(
+          room,
+          JSON.stringify({ using: true }),
+        );
+
+        const llmMessageDto: LLMMessageDto = await this.processAIResponse(
+          room,
+          message,
+          socket.id,
+        );
+
+        await this.chatService.insertOrUpdate(room, llmMessageDto);
+        response.message = llmMessageDto.content;
+      } catch (error) {
+        throw new WsException({
+          statusCode: ERRORS.FAILED_ACCESS_LLM.statusCode,
+          message: ERRORS.FAILED_ACCESS_LLM.message,
+        });
+      }
+    }
 
     try {
       await this.publisherClient.publish(room, JSON.stringify(response));
@@ -122,5 +148,94 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         message: ERRORS.FAILED_PUBLISHING.message,
       });
     }
+  }
+
+  public getRoomCount(room: string): number {
+    return this.roomToCount.get(room) || 0;
+  }
+
+  public getRoom(room: string): boolean {
+    return this.rooms.get(room) || false;
+  }
+
+  public async useLLM(room: string, message: string, socketId: string) {
+    const url = this.configService.get<string>('LLM_URL');
+    const headers = {
+      'X-NCP-CLOVASTUDIO-API-KEY':
+        this.configService.get<string>('CLOVASTUDIO'),
+      'X-NCP-APIGW-API-KEY': this.configService.get<string>('APIGW'),
+      'X-NCP-CLOVASTUDIO-REQUEST-ID':
+        this.configService.get<string>('REQUESTID'),
+      ContentType: this.configService.get<string>('ContentType'),
+      Accept: this.configService.get<string>('Accept'),
+    };
+
+    const newMessage: LLMMessageDto = {
+      role: 'user',
+      content: message,
+    };
+
+    const llmHistory: LLMHistoryDto = await this.chatService.insertOrUpdate(
+      room,
+      newMessage,
+    );
+
+    const data: LLMRequestDto = {
+      messages: llmHistory.messages,
+      topP: 0.8,
+      topK: 0,
+      maxTokens: 256,
+      temperature: 0.5,
+      repeatPenalty: 5.0,
+      stopBefore: [],
+      includeAiFilters: true,
+    };
+
+    try {
+      const response = await axios.post(url, data, {
+        headers,
+        responseType: 'stream',
+      });
+      return response.data;
+    } catch (error) {
+      this.logger.error(`sendMessage from ${socketId} is failed`);
+      throw error;
+    }
+  }
+
+  async processAIResponse(
+    room: string,
+    message: string,
+    socketId: string,
+  ): Promise<LLMMessageDto> {
+    const llmHistoryStream = await this.useLLM(room, message, socketId);
+    const response = [];
+
+    llmHistoryStream.on('data', (chunk) => {
+      const lines = chunk.toString().split('\n\n');
+      lines.forEach((line) => {
+        response.push(line);
+      });
+    });
+
+    return new Promise((resolve, reject) => {
+      llmHistoryStream.on('end', () => {
+        const resultIndex = response.findIndex((line) =>
+          line.includes('event:result'),
+        );
+        const resultLine = response[resultIndex];
+        const data = resultLine.split('data:')[1].trim();
+        try {
+          const dataJson = JSON.parse(data);
+          const message = dataJson.message;
+          resolve({
+            role: message.role,
+            content: message.content,
+          });
+        } catch (error) {
+          reject('JSON parsing error');
+        }
+      });
+    });
   }
 }

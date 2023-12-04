@@ -33,7 +33,7 @@ export default function QuizIframe({ htmlData }: { htmlData?: string }) {
 
   return (
     <div className="w-full h-[90%]">
-      <iframe ref={iframeRef} title="quiz" className="flex items-center justify-center w-full h-full overflow-hidden text-white" />
+      <iframe ref={iframeRef} title="quiz" className="flex items-center justify-center w-full h-full overflow-hidden" />
     </div>
   );
 }

@@ -1,5 +1,7 @@
+export type Language = 'python' | 'javascript';
+
 export interface LanguageInfo {
-  name: string;
+  name: Language;
   optionText: string;
   extension: string;
 }

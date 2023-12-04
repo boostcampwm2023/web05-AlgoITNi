@@ -12,9 +12,13 @@ import useModifyState from '@/stores/useModifyState';
 export default function CodeListModal({
   codeData,
   setPlainCode,
+  setLanguage,
+  setFileName,
 }: {
   codeData: LoadCodeData[];
   setPlainCode: (value: React.SetStateAction<string>) => void;
+  setLanguage: (value: React.SetStateAction<string>) => void;
+  setFileName: (value: React.SetStateAction<string>) => void;
 }) {
   const { data } = useQuery({
     queryKey: [QUERY_KEYS.LOAD_CODES],
@@ -39,6 +43,8 @@ export default function CodeListModal({
         callback: () => {
           setPlainCode(result.content);
           setModifyId(result.id);
+          setLanguage(result.language);
+          setFileName(result.title);
         },
       });
     }
