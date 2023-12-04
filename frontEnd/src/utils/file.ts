@@ -33,7 +33,7 @@ export const downloadLocalFile = (contents: string, fileName: string, extension:
   const fileURL = URL.createObjectURL(file);
 
   element.href = fileURL;
-  element.download = `${fileName}.${extension}`;
+  element.download = `${fileName || 'solution'}.${extension}`;
   document.body.appendChild(element);
 
   element.click();
