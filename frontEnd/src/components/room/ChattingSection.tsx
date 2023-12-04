@@ -71,11 +71,14 @@ export default function ChattingSection({ roomId, nickname }: ChattingSectionPro
       transports: ['websocket'],
     });
     socket.on(CHATTING_SOCKET_RECIEVE_EVNET.NEW_MESSAGE, (recievedMessage) => {
-      const newMessage: MessageData = JSON.parse(recievedMessage);
+      const newMessage: MessageData | { using: boolean } = JSON.parse(recievedMessage);
 
-      if (newMessage.ai && newMessage.socketId === socket.id) setPostingAi(false);
+      if ('using' in newMessage) setPostingAi(newMessage.using);
+      else {
+        if (newMessage.ai) setPostingAi(false);
 
-      setAllMessage((prev) => [...prev, newMessage]);
+        setAllMessage((prev) => [...prev, newMessage]);
+      }
     });
     socket.connect();
 
