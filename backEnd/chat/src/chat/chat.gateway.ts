@@ -116,6 +116,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       ai: ai,
     };
 
+    if (ai) {
+      try {
+        const llmMessageDto: LLMMessageDto = await this.processAIResponse(
+          room,
+          message,
+          socket.id,
+        );
+        await this.chatService.insertOrUpdate(room, llmMessageDto);
+        response.message = llmMessageDto.content;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
     try {
       await this.publisherClient.publish(room, JSON.stringify(response));
     } catch (error) {
@@ -161,7 +175,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     );
 
     const data: LLMRequestDto = {
-      messages: llmHistory,
+      messages: llmHistory.messages,
       topP: 0.8,
       topK: 0,
       maxTokens: 256,
@@ -172,11 +186,50 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     };
 
     try {
-      const response = await axios.post(url, data, { headers });
+      const response = await axios.post(url, data, {
+        headers,
+        responseType: 'stream',
+      });
       return response.data;
     } catch (error) {
       this.logger.error(`sendMessage from ${socketId} is failed`);
       throw error;
     }
+  }
+
+  async processAIResponse(
+    room: string,
+    message: string,
+    socketId: string,
+  ): Promise<LLMMessageDto> {
+    const llmHistoryStream = await this.useLLM(room, message, socketId);
+    const response = [];
+
+    llmHistoryStream.on('data', (chunk) => {
+      const lines = chunk.toString().split('\n\n');
+      lines.forEach((line) => {
+        response.push(line);
+      });
+    });
+
+    return new Promise((resolve, reject) => {
+      llmHistoryStream.on('end', () => {
+        const resultIndex = response.findIndex((line) =>
+          line.includes('event:result'),
+        );
+        const resultLine = response[resultIndex];
+        const data = resultLine.split('data:')[1].trim();
+        try {
+          const dataJson = JSON.parse(data);
+          const message = dataJson.message;
+          resolve({
+            role: message.role,
+            content: message.content,
+          });
+        } catch (error) {
+          reject('JSON parsing error');
+        }
+      });
+    });
   }
 }

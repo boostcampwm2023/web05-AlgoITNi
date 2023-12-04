@@ -1,5 +1,5 @@
 class LLMRequestDto {
-  messages: LLMHistoryDto;
+  messages: LLMMessageDto[];
 
   topP: number;
 

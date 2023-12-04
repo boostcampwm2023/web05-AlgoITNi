@@ -30,7 +30,10 @@ export class ChatService {
     await history.save();
 
     const result: LLMHistoryDto = {
-      messages: history.messages,
+      messages: history.messages.map((message) => ({
+        role: message.role,
+        content: message.content,
+      })),
     };
 
     return result;
