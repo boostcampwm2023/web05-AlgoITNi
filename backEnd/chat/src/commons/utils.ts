@@ -31,11 +31,11 @@ export const ERRORS = {
     message: '메시지를 입력해주세요.',
   },
   FAILED_PUBLISHING: {
-    statusCode: HttpStatus.BAD_REQUEST,
+    statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
     message: '메시지를 PUB하는데 실패했습니다.',
   },
   FAILED_ACCESS_LLM: {
-    statusCode: HttpStatus.BAD_REQUEST,
+    statusCode: HttpStatus.TOO_MANY_REQUESTS,
     message: '클로바 스튜디오를 사용할 수 없습니다.',
   },
 };
