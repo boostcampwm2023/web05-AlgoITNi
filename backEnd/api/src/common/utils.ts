@@ -1,7 +1,13 @@
 import * as process from 'process';
+import { supportLang } from './type';
+export const supportLangEnum = {
+  PYTHON: 'python',
+  JAVASCRIPT: 'javascript',
+};
 
-export const requestPath = {
-  RUN_PYTHON: '/codes/python',
+export const requestPath: Record<supportLang, string> = {
+  python: '/codes/python',
+  javascript: '/codes/js',
 };
 
 const timeUnit = {
@@ -53,12 +59,13 @@ export const jwtError = {
 export const ResponseMessage = {
   NEED_LOGIN: '로그인이 필요합니다.',
   INTERNAL_SERVER_ERROR: 'Internal server error',
+  NOT_SUPPORT: '지원하지 않는 언어 타입입니다.',
 };
 
 export const SOCKET_EVENT = {
   NAME_SPACE: 'run',
-  CONNECT: 'connected',
   DISCONNECT: 'disconnect',
+  REQUEST: 'request',
   DONE: 'done',
 };
 

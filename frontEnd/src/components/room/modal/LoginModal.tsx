@@ -1,10 +1,44 @@
-import { useParams } from 'react-router-dom';
+import { ReactNode } from 'react';
+import { MODE } from '@/constants/env';
+import getDevCookie from '@/apis/getDevCookie';
+import reactQueryClient from '@/configs/reactQueryClient';
+import QUERY_KEYS from '@/constants/queryKeys';
+import useModal from '@/hooks/useModal';
+
+type LoginButtonWrapperProps = {
+  handleClick: () => void;
+  className: string;
+  type: 'github' | 'google';
+  children: ReactNode;
+};
+
+function LoginButtonWrapper({ handleClick, className, type, children }: LoginButtonWrapperProps) {
+  const nextPath = window.location.pathname.split('/')[1];
+
+  if (MODE === 'development')
+    return (
+      <button type="button" onClick={handleClick} className={className}>
+        {children}
+      </button>
+    );
+
+  return (
+    <a href={`https://api.algoitni.site/auth/${type}?next=${nextPath};`} onClick={handleClick} className={className}>
+      {children}
+    </a>
+  );
+}
 
 export default function LoginModal({ code }: { code: string }) {
-  const { roomId } = useParams();
-
-  const handleClick = () => {
+  const { hide } = useModal();
+  const handleClick = async () => {
     localStorage.setItem('code', code);
+    if (MODE === 'development') {
+      const token = await getDevCookie();
+      document.cookie = `access_token=${token};`;
+      hide();
+    }
+    reactQueryClient.invalidateQueries({ queryKey: [QUERY_KEYS.LOAD_CODES] });
   };
 
   return (
@@ -16,18 +50,14 @@ export default function LoginModal({ code }: { code: string }) {
         <h1 className="text-2xl font-bold">소셜로그인</h1>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col justify-between h-full gap-4">
-            <a
-              href={`https://api.algoitni.site/auth/github?next=${roomId}`}
-              onClick={handleClick}
-              className="flex items-center p-4 text-white bg-black rounded-full"
-            >
+            <LoginButtonWrapper type="github" handleClick={handleClick} className="flex items-center p-4 text-white bg-black rounded-full">
               <img src="/github.png" className="w-8 h-8" alt="github" />
               <span className="text-xl font-bold px-11 basis-[90%]">Github Login</span>
-            </a>
-            <a href="https://algoitni.site" className="flex items-center p-4 border-2 rounded-full">
+            </LoginButtonWrapper>
+            <LoginButtonWrapper type="google" handleClick={handleClick} className="flex items-center p-4 border-2 rounded-full">
               <img src="/google.png" className="w-8 h-8" alt="google" />
               <span className="text-xl font-bold px-11 basis-[90%]">Google Login</span>
-            </a>
+            </LoginButtonWrapper>
           </div>
         </div>
       </div>

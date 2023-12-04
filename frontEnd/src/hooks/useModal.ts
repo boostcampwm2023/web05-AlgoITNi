@@ -10,7 +10,7 @@ function useModal(): CalledByModalInner;
 function useModal<P extends Record<string, unknown>>(Component?: React.ComponentType<P>): CalledByModalOuter<P>;
 
 function useModal<P extends Record<string, unknown>>(Component?: React.ComponentType<P>): CalledByModalInner | CalledByModalOuter<P> {
-  const { showModal, hideModal } = useModalState((state) => state);
+  const { showModal, hideModal } = useModalState((state) => state.actions);
   const [modalId] = useState(uuidv4());
   // Modals에서 주입시킨 Provider로부터 Modal에 애니메이션을 적용시키는 함수 Context를 가져온다.
   const hideThisModal = useContext(ModalHideContext);

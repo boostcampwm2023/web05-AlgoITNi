@@ -31,4 +31,5 @@ module.exports = {
     'react/no-danger': 'off',
     'react/require-default-props': 'off',
   },
+  ignorePatterns: ['vite.config.ts'],
 };

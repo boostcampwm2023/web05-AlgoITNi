@@ -5,23 +5,27 @@ export const MODAL_COMPONENTS: { [id: string]: { Component: React.ComponentType<
 
 type ModalState = {
   modals: string[];
-  showModal: (id: string) => void;
-  hideModal: (id: string) => void;
+  actions: {
+    showModal: (id: string) => void;
+    hideModal: (id: string) => void;
+  };
 };
 
 const useModalState = create<ModalState>((set) => ({
   modals: [],
-  showModal: (id: string) =>
-    set((state) => ({
-      ...state,
-      modals: [...state.modals, id],
-    })),
+  actions: {
+    showModal: (id: string) =>
+      set((state) => ({
+        ...state,
+        modals: [...state.modals, id],
+      })),
 
-  hideModal: (id: string) =>
-    set((state) => ({
-      ...state,
-      modals: [...state.modals.filter((modalId) => modalId !== id)],
-    })),
+    hideModal: (id: string) =>
+      set((state) => ({
+        ...state,
+        modals: [...state.modals.filter((modalId) => modalId !== id)],
+      })),
+  },
 }));
 
 export default useModalState;

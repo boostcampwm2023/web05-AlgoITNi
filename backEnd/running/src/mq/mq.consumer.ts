@@ -12,7 +12,7 @@ export class MqConsumer {
   private logger = new Logger(MqConsumer.name);
   private errorMessage = {
     400: 'Failed to Run Code',
-    201: 'Running Python Code Success',
+    201: 'Running Code Success',
   };
   constructor(
     private redisService: RedisService,
@@ -20,15 +20,14 @@ export class MqConsumer {
   ) {}
   @Process(REDIS.QUEUE)
   async getMessageQueue(job: Job) {
-    this.logger.debug(`getMessageQueue ${job.id}, ${job.data}`);
+    this.logger.debug(`getMessageQueue ${job.id}, ${job.data.code}`);
     let result: ResponseCodeDto | string;
     const responseCodeBlockDTO = new ResponseCodeBlockDto();
 
     try {
-      result = await this.codesService.testCode(job.data);
-      const output: string | string[] =
+      result = await this.codesService.runCode(job.data);
+      const output: string =
         typeof result === 'string' ? result : result.output;
-      this.logger.debug(JSON.stringify(result));
 
       responseCodeBlockDTO.statusCode = HttpStatus.CREATED;
       responseCodeBlockDTO.result = output;

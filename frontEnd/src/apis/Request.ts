@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { VITE_API_URL } from '@/constants/env';
+import { MODE, VITE_API_URL } from '@/constants/env';
 
 const Request = axios.create({
-  baseURL: VITE_API_URL,
+  baseURL: MODE === 'development' ? '/' : VITE_API_URL,
 });
 
 export default Request;

@@ -1,3 +1,3 @@
 export class ResponseCodeDto {
-  output: string[];
+  output: string;
 }

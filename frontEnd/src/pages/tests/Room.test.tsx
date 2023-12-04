@@ -9,7 +9,8 @@ import reactQueryClient from '@/configs/reactQueryClient';
 const mockRoomData = {
   socket: {} as Socket,
   streamList: [] as { id: string; stream: MediaStream }[],
-  dataChannels: [] as { id: string; dataChannel: RTCDataChannel }[],
+  codeDataChannels: [] as { id: string; dataChannel: RTCDataChannel }[],
+  languageDataChannels: [] as { id: string; dataChannel: RTCDataChannel }[],
 };
 const mockMedia = {
   stream: {} as MediaStream,
@@ -24,6 +25,9 @@ jest.mock('@/constants/env', () => ({
   VITE_TURN_URL: '',
   VITE_TURN_USERNAME: '',
   VITE_TURN_CREDENTIAL: '',
+  VITE_API_URL: '',
+  VITE_CHAT_URL: '',
+  MODE: '',
 }));
 
 describe('Room 조건부 렌더링 테스트', () => {
