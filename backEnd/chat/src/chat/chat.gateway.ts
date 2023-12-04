@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import {
   ConnectedSocket,
   MessageBody,
@@ -18,6 +19,7 @@ import { MessageDto } from './dto/message.dto';
 import * as os from 'os';
 import { ERRORS, SOCKET, SOCKET_EVENT } from '../commons/utils';
 import { ChatService } from './chat.service';
+import axios from 'axios';
 
 @WebSocketGateway({ namespace: SOCKET.NAME_SPACE, cors: true })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -34,6 +36,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     @InjectRedis() private readonly client: Redis,
     private readonly chatService: ChatService,
+    private readonly configService: ConfigService,
   ) {
     this.subscriberClient = client.duplicate();
     this.publisherClient = client.duplicate();
@@ -129,5 +132,51 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   public getRoom(room: string): boolean {
     return this.rooms.get(room) || false;
+  }
+
+  public async useLLM(room: string, message: string, socketId: string) {
+    const url = this.configService.get<string>('LLM_URL');
+    const headers = {
+      'X-NCP-CLOVASTUDIO-API-KEY': this.configService.get<string>(
+        'X-NCP-CLOVASTUDIO-API-KEY',
+      ),
+      'X-NCP-APIGW-API-KEY': this.configService.get<string>(
+        'X-NCP-APIGW-API-KEY',
+      ),
+      'X-NCP-CLOVASTUDIO-REQUEST-ID': this.configService.get<string>(
+        'X-NCP-CLOVASTUDIO-REQUEST-ID',
+      ),
+      'Content-Type': this.configService.get<string>('Content-Type'),
+      Accept: this.configService.get<string>('Accept'),
+    };
+
+    const newMessage: LLMMessageDto = {
+      role: 'user',
+      content: message,
+    };
+
+    const llmHistory: LLMHistoryDto = await this.chatService.insertOrUpdate(
+      room,
+      newMessage,
+    );
+
+    const data: LLMRequestDto = {
+      messages: llmHistory,
+      topP: 0.8,
+      topK: 0,
+      maxTokens: 256,
+      temperature: 0.5,
+      repeatPenalty: 5.0,
+      stopBefore: [],
+      includeAiFilters: true,
+    };
+
+    try {
+      const response = await axios.post(url, data, { headers });
+      return response.data;
+    } catch (error) {
+      this.logger.error(`sendMessage from ${socketId} is failed`);
+      throw error;
+    }
   }
 }
