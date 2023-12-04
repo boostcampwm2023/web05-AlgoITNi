@@ -1,4 +1,12 @@
 import aiIcon from '@/assets/ai.svg';
+import Spinner from '@/components/common/Spinner';
+
+function SendButtonText({ usingAi, postingAi }: { usingAi: boolean; postingAi: boolean }) {
+  if (!usingAi) return '전송';
+
+  if (postingAi) return <Spinner size={7} width={4} />;
+  return '질문';
+}
 
 interface ChattingInputProps {
   handleMessageSend: (event: React.FormEvent<HTMLFormElement>) => void;
@@ -24,7 +32,7 @@ export default function ChattingInput({
   return (
     <form onSubmit={handleMessageSend} className="w-full p-2 rounded-b-lg bg-primary">
       <div className="flex items-center h-10 border rounded-lg border-base">
-        <button onClick={handleChangeMessageType} type="button" className="w-10 h-10 ml-2 bg-transparent">
+        <button onClick={handleChangeMessageType} type="button" className="min-w-[40px] h-full ml-2 p-1 bg-transparent">
           <img src={aiIcon} alt="AI 아이콘" />
         </button>
         <input
@@ -36,10 +44,12 @@ export default function ChattingInput({
         />
         <button
           type="submit"
-          className={`h-full px-4 py-1 font-light text-white rounded-e-lg whitespace-nowrap  ${usingAi ? 'bg-[#347DFF]' : 'bg-secondary'}`}
+          className={`h-full px-4 py-1 font-light text-white rounded-e-lg whitespace-nowrap w-16 flex items-center justify-center ${
+            usingAi ? 'bg-[#347DFF]' : 'bg-secondary'
+          }`}
           disabled={usingAi && postingAi}
         >
-          {usingAi ? '질문' : '전송'}
+          <SendButtonText usingAi={usingAi} postingAi={postingAi} />
         </button>
       </div>
     </form>
