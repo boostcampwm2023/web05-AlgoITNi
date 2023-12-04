@@ -3,5 +3,5 @@ interface EditorFileNameProps {
 }
 
 export default function EditorFileName({ children }: EditorFileNameProps) {
-  return <h1 className="text-white text-[max(2vh,15px)]">{children}</h1>;
+  return <h1 className="text-[max(2vh,15px)]">{children}</h1>;
 }

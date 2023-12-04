@@ -10,7 +10,7 @@ function SaveButtonElement({ children, onClick }: { children: React.ReactNode; o
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center justify-center w-32 px-4 py-2 text-sm text-white duration-300 rounded-lg hover:text-black hover:bg-base whitespace-nowrap"
+      className="flex items-center justify-center w-32 px-4 py-2 text-sm text-black duration-300 rounded-lg hover:text-black hover:bg-base whitespace-nowrap"
     >
       {children}
     </button>
@@ -43,10 +43,10 @@ export default function SaveButton({ plainCode, languageInfo, fileName, setFileN
 
   return (
     <div className="relative h-full">
-      <div className="peer flex items-center min-w-[8vh] justify-center px-[max(2vh,25px)] h-full text-[max(1.2vh,10px)] bg-secondary font-light text-white rounded whitespace-nowrap">
+      <div className="peer flex items-center min-w-[8vh] justify-center px-[max(2vh,25px)] h-full text-[max(1.2vh,10px)] font-light text-black rounded whitespace-nowrap border drop-shadow-lg shadow">
         저장하기
       </div>
-      <div className="absolute z-10 items-center justify-between hidden gap-2 p-2 -translate-x-1/2 rounded-lg bg-secondary left-1/2 -top-12 peer-hover:flex hover:flex">
+      <div className="absolute z-10 items-center justify-between hidden gap-2 p-2 -translate-x-1/2 bg-white border rounded-lg shadow left-1/2 -top-12 peer-hover:flex hover:flex drop-shadow-lg">
         <SaveButtonElement onClick={handleSaveLocal}>로컬에 저장</SaveButtonElement>
         <SaveButtonElement onClick={handleSaveCloud}>클라우드에 저장</SaveButtonElement>
       </div>
