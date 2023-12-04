@@ -21,6 +21,7 @@ export default function ChattingSection({ roomId, nickname }: ChattingSectionPro
   const [message, setMessage] = useState('');
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
   const [usingAi, setUsingAi] = useState<boolean>(false);
+  const [postingAi, setPostingAi] = useState<boolean>(false);
   const { isViewingLastMessage, isRecievedMessage, setScrollRatio, setIsRecievedMessage } = useLastMessageViewingState();
 
   const messageAreaRef = useRef<HTMLDivElement | null>(null);
@@ -57,12 +58,12 @@ export default function ChattingSection({ roomId, nickname }: ChattingSectionPro
     if (!socket) return;
 
     if (usingAi) {
-      // TODO: AI 관련 SOCKET 전송
-    } else {
-      socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname });
-      setMessage('');
-      setScrollRatio(100);
-    }
+      setPostingAi(true);
+      socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname, ai: true });
+    } else socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname, ai: false });
+
+    setMessage('');
+    setScrollRatio(100);
   };
 
   useEffect(() => {
@@ -70,7 +71,11 @@ export default function ChattingSection({ roomId, nickname }: ChattingSectionPro
       transports: ['websocket'],
     });
     socket.on(CHATTING_SOCKET_RECIEVE_EVNET.NEW_MESSAGE, (recievedMessage) => {
-      setAllMessage((prev) => [...prev, JSON.parse(recievedMessage)]);
+      const newMessage: MessageData = JSON.parse(recievedMessage);
+
+      if (newMessage.ai && newMessage.socketId === socket.id) setPostingAi(false);
+
+      setAllMessage((prev) => [...prev, newMessage]);
     });
     socket.connect();
 
@@ -83,20 +88,25 @@ export default function ChattingSection({ roomId, nickname }: ChattingSectionPro
   }, [allMessages]);
 
   return (
-    <Section>
-      <div className="flex relative flex-col items-center justify-center w-full pt-2 h-full rounded-lg bg-primary  min-w-[150px] ">
-        <div
-          ref={messageAreaRef}
-          className="flex flex-col w-full h-full gap-2 px-2 pt-2 pl-4 mr-4 overflow-auto grow custom-scroll"
-          onScroll={handleScroll}
-        >
-          {allMessages.map((messageData, index) => (
-            <ChattingMessage messageData={messageData} key={index} isMyMessage={messageData.socketId === socket.id} />
-          ))}
-        </div>
-        {isRecievedMessage && <ScrollDownButton handleMoveToBottom={handleMoveToBottom} />}
-        <ChattingInput handleMessageSend={handleMessageSend} message={message} handleInputMessage={handleInputMessage} />
+    <div className="flex relative flex-col items-center justify-center w-full pt-2 h-full rounded-lg bg-primary min-w-[150px]">
+      <div
+        ref={messageAreaRef}
+        className="flex flex-col w-full h-full gap-2 px-2 pt-2 pl-4 mr-4 overflow-auto grow custom-scroll"
+        onScroll={handleScroll}
+      >
+        {allMessages.map((messageData, index) => (
+          <ChattingMessage messageData={messageData} key={index} isMyMessage={messageData.socketId === socket.id} />
+        ))}
       </div>
-    </Section>
+      {isRecievedMessage && <ScrollDownButton handleMoveToBottom={handleMoveToBottom} />}
+      <ChattingInput
+        handleMessageSend={handleMessageSend}
+        message={message}
+        handleInputMessage={handleInputMessage}
+        usingAi={usingAi}
+        setUsingAi={setUsingAi}
+        postingAi={postingAi}
+      />
+    </div>
   );
 }
