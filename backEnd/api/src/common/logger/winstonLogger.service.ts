@@ -16,20 +16,31 @@ export class WinstonLogger implements LoggerService {
       return path.join(__dirname, 'logs');
     })();
 
-    const dailyOptions = {
-      filename: '%DATE%.log',
-      datePattern: 'YYYY-MM-DD-HH',
-      dirname: logDir,
-      zippedArchive: true,
-      maxSize: '20m',
-      maxFiles: '7d',
-    };
-    const transport: winston.transport[] = [new winstonDaily(dailyOptions)];
+    const transport: winston.transport[] = [
+      new winstonDaily({
+        filename: '%DATE%.log',
+        datePattern: 'YYYY-MM-DD-HH',
+        dirname: logDir,
+        zippedArchive: true,
+        maxSize: '20m',
+        maxFiles: '7d',
+      }),
+      new winstonDaily({
+        filename: '%DATE%.error.log',
+        datePattern: 'YYYY-MM-DD-HH',
+        dirname: logDir + '/error',
+        zippedArchive: true,
+        maxSize: '20m',
+        maxFiles: '7d',
+        level: 'error',
+      }),
+    ];
+
     if (this.configService.get<string>('NODE_ENV') !== 'production') {
       const devConsole = new winston.transports.Console({
         format: combine(
           colorize(),
-          utilities.format.nestLike('api Server', {
+          utilities.format.nestLike('Running Server', {
             prettyPrint: true,
           }),
         ),
