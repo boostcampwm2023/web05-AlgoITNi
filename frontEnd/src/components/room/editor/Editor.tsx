@@ -57,6 +57,9 @@ export default function Editor({
     if (event.key === 'Tab') {
       event.preventDefault();
 
+      Ydoc.current.getText('sharedText').insert(selectionStart, '    ');
+      sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(Ydoc.current));
+
       setCursorPosition((prev) => prev + EDITOR_TAB_SIZE);
       setPlainCode((prev) => `${prev.slice(0, selectionStart)}    ${prev.slice(selectionStart)}`);
     }
