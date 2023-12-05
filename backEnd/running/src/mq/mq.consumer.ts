@@ -33,7 +33,6 @@ export class MqConsumer {
       responseCodeBlockDTO.result = output;
       responseCodeBlockDTO.message = this.errorMessage[HttpStatus.CREATED];
     } catch (e) {
-      this.logger.error(e);
       responseCodeBlockDTO.statusCode = e.status;
       if (e.status === HttpStatus.INTERNAL_SERVER_ERROR) {
         responseCodeBlockDTO.message = e.message;

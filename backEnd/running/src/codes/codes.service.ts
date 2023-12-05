@@ -34,8 +34,7 @@ export class CodesService {
     fs.writeFileSync(filePath, code);
     const { stdout, stderr } = await this.runCommand(filePath, language);
     if (stderr) {
-      this.logger.error(stderr);
-      throw new RunningException(stderr);
+      throw new RunningException(stderr.trim());
     }
     fs.unlinkSync(filePath);
     return this.getOutput(stdout);
