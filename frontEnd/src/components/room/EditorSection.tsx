@@ -11,11 +11,11 @@ import Editor from './editor/Editor';
 import useDataChannelOnMessage from '@/hooks/useDataChannelOnMessage';
 import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
 import { DataChannel } from '@/types/RTCConnection';
-import postRunCode from '@/apis/postRunCode';
 import { VITE_CODE_RUNNING_SOCKET_URL } from '@/constants/env';
 import { RunCodeResponse } from '@/types/runCode';
 import getOutputString from '@/utils/getOutputString';
 import Section from '../common/SectionWrapper';
+import Spinner from '../common/Spinner';
 
 interface EditorSectionProps {
   defaultCode: string | null;
@@ -27,9 +27,12 @@ let executionSocket: Socket;
 
 export default function EditorSection({ defaultCode, codeDataChannels, languageDataChannels }: EditorSectionProps) {
   const [fileName, setFileName] = useState<string>('');
+
   const [plainCode, setPlainCode] = useState<string>(defaultCode || '');
-  const [execResult, setExecResult] = useState<string>('');
   const [languageName, setLanguageName] = useState<string>(EDITOR_DEFAULT_LANGUAGE);
+
+  const [execResult, setExecResult] = useState<string>('');
+  const [isExec, setIsExec] = useState<boolean>(false);
 
   const languageInfo = EDITOR_LANGUAGE_TYPES[languageName];
 
@@ -53,14 +56,21 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
   };
 
   const handleExecCode = () => {
-    executionSocket = io(VITE_CODE_RUNNING_SOCKET_URL);
+    executionSocket = io(VITE_CODE_RUNNING_SOCKET_URL, { transports: ['websocket'] });
 
     executionSocket.on('done', (response: RunCodeResponse) => {
       setExecResult(getOutputString(response));
+      setIsExec(false);
+
       executionSocket.disconnect();
     });
 
-    executionSocket.on('connect', () => postRunCode(executionSocket.id, plainCode, languageName));
+    executionSocket.on('connect', () => {
+      setIsExec(true);
+      setExecResult('');
+
+      executionSocket.emit('request', { code: plainCode, language: languageName });
+    });
   };
 
   useDataChannelOnMessage(codeDataChannels, handleRecieveCodeMessage);
@@ -99,7 +109,9 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
           <div className="flex h-full gap-2">
             <SaveButton plainCode={plainCode} languageInfo={languageInfo} fileName={fileName} setFileName={setFileName} />
             <EditorButton onClick={handleClear}>초기화</EditorButton>
-            <EditorButton onClick={handleExecCode}>실행하기</EditorButton>
+            <EditorButton onClick={handleExecCode} disabled={isExec}>
+              {isExec ? <Spinner /> : '실행하기'}
+            </EditorButton>
           </div>
         </div>
       </div>
