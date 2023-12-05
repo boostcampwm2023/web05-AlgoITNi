@@ -64,8 +64,8 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
   const handleClear = () => {
     setPlainCode('');
 
-    // FIXME: 현재 state로 임시 CRDT 구현
-    sendMessageDataChannels(codeDataChannels, '');
+    Ydoc.current.getText('sharedText').delete(0, Ydoc.current.getText('sharedText').toString().length);
+    sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(Ydoc.current));
   };
 
   const handleExecCode = () => {
