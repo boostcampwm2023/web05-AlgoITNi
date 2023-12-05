@@ -15,8 +15,6 @@ import { ResponseCodeBlockDto } from './dto/response-codeblock.dto';
 import { RequestRunPipe } from './pipes/saveCode.pipe';
 import { RequestCodeBlockDto } from './dto/request-codeblock.dto';
 import { RunService } from './run.service';
-import { returnCode } from '../common/returnCode';
-import { VulnerableException } from '../common/exception/exception';
 
 @WebSocketGateway({ namespace: SOCKET_EVENT.NAME_SPACE, cors: true })
 export class RunGateway implements OnGatewayConnection {
@@ -48,13 +46,6 @@ export class RunGateway implements OnGatewayConnection {
     @ConnectedSocket() socket: Socket,
     @Body(RequestRunPipe) codeBlock: RequestCodeBlockDto,
   ) {
-    const { code, language } = codeBlock;
-    const securityCheck = this.runService.securityCheck(code, language);
-
-    if (securityCheck === returnCode['vulnerable']) {
-      socket.emit(SOCKET_EVENT.DONE, new VulnerableException());
-      return;
-    }
     await this.runService.requestRunningMQPubSub(codeBlock, socket.id);
   }
 

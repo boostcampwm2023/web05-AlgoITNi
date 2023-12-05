@@ -9,7 +9,6 @@ import { returnCode } from '../common/returnCode';
 import { RequestCodeBlockDto } from './dto/request-codeblock.dto';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { requestPath } from '../common/utils';
 import * as path from 'path';
 import { MqService } from '../mq/mq.service';
 import { RedisService } from '../redis/redis.service';
@@ -50,10 +49,7 @@ export class RunService {
   ): Promise<ResponseCodeBlockDto> {
     const url =
       'http://' +
-      path.join(
-        this.configService.get<string>('RUNNING_SERVER'),
-        requestPath[codeBlock.language],
-      );
+      path.join(this.configService.get<string>('RUNNING_SERVER'), 'codes');
 
     try {
       const result = await axios.post(url, codeBlock);

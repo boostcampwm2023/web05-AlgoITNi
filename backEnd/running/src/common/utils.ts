@@ -26,4 +26,5 @@ export const Messages = {
 export const LanguageCommand: Record<supportLang, string> = {
   python: 'python3',
   javascript: 'node',
+  java: 'java',
 };

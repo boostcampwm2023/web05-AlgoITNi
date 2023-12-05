@@ -95,6 +95,8 @@ export class CodesService {
         return path.join(this.tempDir, `${uuidv4()}.py`);
       case 'javascript':
         return path.join(this.tempDir, `${uuidv4()}.js`);
+      case 'java':
+        return path.join(this.tempDir, `${uuidv4()}.java`);
     }
   }
 }
