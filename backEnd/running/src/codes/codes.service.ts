@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ResponseCodeDto } from './dto/response-code.dto ';
@@ -19,7 +15,9 @@ import { v4 as uuidv4 } from 'uuid';
 export class CodesService {
   private logger = new Logger(CodesService.name);
   private tempDir =
-    process.env.NODE_ENV === 'dev' ? path.join(__dirname, '..', 'tmp') : '/';
+    process.env.NODE_ENV === 'dev'
+      ? path.join(__dirname, '..', 'tmp')
+      : '/algoitni';
   private killSignal: NodeJS.Signals = 'SIGINT';
   private readonly timeOut = 5000;
   constructor() {
@@ -36,11 +34,8 @@ export class CodesService {
     fs.writeFileSync(filePath, code);
     const { stdout, stderr } = await this.runCommand(filePath, language);
     if (stderr) {
-      if (stderr === Messages.UNKNOWN) {
-        throw new InternalServerErrorException();
-      }
-      const errorMessage = this.getErrorMessage(stderr, language);
-      throw new RunningException(errorMessage);
+      this.logger.error(stderr);
+      throw new RunningException(stderr);
     }
     fs.unlinkSync(filePath);
     return this.getOutput(stdout);
