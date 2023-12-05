@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Socket, io } from 'socket.io-client/debug';
+import * as Y from 'yjs';
 import { EDITOR_DEFAULT_LANGUAGE, EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
 import OutputArea from './editor/OutputArea';
 import LoadButton from './editor/LoadButton';
@@ -29,6 +30,7 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
   const [fileName, setFileName] = useState<string>('');
 
   const [plainCode, setPlainCode] = useState<string>(defaultCode || '');
+  const [cursorPosition, setCursorPosition] = useState<number>(0);
   const [languageName, setLanguageName] = useState<string>(EDITOR_DEFAULT_LANGUAGE);
 
   const [execResult, setExecResult] = useState<string>('');
@@ -36,12 +38,23 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
 
   const languageInfo = EDITOR_LANGUAGE_TYPES[languageName];
 
+  const Ydoc = useRef(new Y.Doc());
+
   useEffect(() => {
     localStorage.removeItem('code');
   }, []);
 
-  const handleRecieveCodeMessage = (event: MessageEvent<string>) => {
-    setPlainCode(event.data);
+  const handleRecieveCodeMessage = (event: MessageEvent) => {
+    const relPos = Y.createRelativePositionFromTypeIndex(Ydoc.current.getText('sharedText'), cursorPosition);
+
+    const update = new Uint8Array(event.data);
+    Y.applyUpdate(Ydoc.current, update);
+
+    const updatedText = Ydoc.current.getText('sharedText').toString();
+    setPlainCode(updatedText);
+
+    const pos = Y.createAbsolutePositionFromRelativePosition(relPos, Ydoc.current);
+    if (pos) setCursorPosition(pos.index);
   };
 
   const handleRecieveLanguageMessage = (event: MessageEvent) => {
@@ -76,9 +89,6 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
   useDataChannelOnMessage(codeDataChannels, handleRecieveCodeMessage);
   useDataChannelOnMessage(languageDataChannels, handleRecieveLanguageMessage);
 
-  // TODO: CRDT 로직 추가
-  // 현재는 state를 이용해 문자열이 중첩되는 문제만 해결한 상태
-
   useEffect(() => {
     sendMessageDataChannels(languageDataChannels, languageName);
   }, [languageName]);
@@ -91,7 +101,15 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
           <LanguageTypeDropDown languageName={languageName} setLanguageName={setLanguageName} />
         </div>
         <div className="flex flex-col overflow-y-auto row-[span_7_/_span_7] custom-scroll">
-          <Editor plainCode={plainCode} languageInfo={languageInfo} setPlainCode={setPlainCode} codeDataChannels={codeDataChannels} />
+          <Editor
+            Ydoc={Ydoc}
+            plainCode={plainCode}
+            languageInfo={languageInfo}
+            setPlainCode={setPlainCode}
+            codeDataChannels={codeDataChannels}
+            cursorPosition={cursorPosition}
+            setCursorPosition={setCursorPosition}
+          />
         </div>
         <div className="row-span-3">
           <OutputArea execResult={execResult} />
