@@ -15,6 +15,10 @@ export default {
           '0%': { transform: 'scale(1)' },
           '100%': { transform: 'scale(0.2) ' },
         },
+        toast: {
+          '0%': { width: '100%' },
+          '100%': { width: '0%' },
+        },
       },
       animation: {
         render: 'render 0.2s',

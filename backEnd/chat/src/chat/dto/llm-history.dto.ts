@@ -1,0 +1,3 @@
+class LLMHistoryDto {
+  messages: LLMMessageDto[];
+}

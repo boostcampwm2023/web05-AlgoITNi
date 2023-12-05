@@ -60,14 +60,16 @@ export class RunGateway implements OnGatewayConnection {
 
   @OnEvent(EVENT.COMPLETE)
   answer(data) {
-    this.logger.log('received running result');
+    this.logger.log(`received running result ${JSON.stringify(data)}`);
     const socket = this.connectedSockets.get(data.socketID);
-    const response = new ResponseCodeBlockDto(
-      data.statusCode,
-      data.result,
-      data.message,
-    );
-    socket.emit(SOCKET_EVENT.DONE, response);
+    if (socket) {
+      const response = new ResponseCodeBlockDto(
+        data.statusCode,
+        data.result,
+        data.message,
+      );
+      socket.emit(SOCKET_EVENT.DONE, response);
+    }
   }
 
   @SubscribeMessage(SOCKET_EVENT.DISCONNECT)

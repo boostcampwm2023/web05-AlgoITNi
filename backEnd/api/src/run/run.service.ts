@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
@@ -66,11 +67,7 @@ export class RunService {
       const res = e.response.data;
       if (e.response.data.status === HttpStatus.INTERNAL_SERVER_ERROR)
         throw new InternalServerErrorException();
-      return new ResponseCodeBlockDto(
-        res.statusCode,
-        res.message,
-        'Failed to Run Code',
-      );
+      throw new BadRequestException(res.message);
     }
   }
 

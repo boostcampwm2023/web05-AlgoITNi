@@ -28,7 +28,6 @@ export class MqConsumer {
       result = await this.codesService.runCode(job.data);
       const output: string =
         typeof result === 'string' ? result : result.output;
-      this.logger.debug(result);
 
       responseCodeBlockDTO.statusCode = HttpStatus.CREATED;
       responseCodeBlockDTO.result = output;

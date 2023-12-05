@@ -12,8 +12,8 @@ RUN npm run build
 
 FROM node:18-alpine
 
-RUN apk add --no-cache python3
-RUN npm install pm2 -g
+RUN apk add --no-cache python3 \
+    && npm install pm2 -g
 
 WORKDIR /usr/src/app
 
