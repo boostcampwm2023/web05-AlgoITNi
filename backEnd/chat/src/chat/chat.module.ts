@@ -3,6 +3,7 @@ import { ChatGateway } from './chat.gateway';
 import { ChatService } from './chat.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { LLMHistory, LLMHistorySchema } from './schemas/llmHistory.schemas';
+import { ChatSingleGateway } from './chat-single.gateway';
 
 @Module({
   imports: [
@@ -10,6 +11,6 @@ import { LLMHistory, LLMHistorySchema } from './schemas/llmHistory.schemas';
       { name: LLMHistory.name, schema: LLMHistorySchema },
     ]),
   ],
-  providers: [ChatGateway, ChatService],
+  providers: [ChatGateway, ChatService, ChatSingleGateway],
 })
 export class ChatModule {}

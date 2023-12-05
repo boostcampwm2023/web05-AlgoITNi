@@ -2,6 +2,8 @@ import { HttpStatus } from '@nestjs/common';
 
 export const SOCKET = {
   NAME_SPACE: 'chat',
+  V1: 'single',
+  V2: 'kafka',
   EMPTY_ROOM: 0,
 };
 
