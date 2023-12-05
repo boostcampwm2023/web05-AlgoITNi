@@ -2,7 +2,7 @@ import { PipeTransform, Injectable } from '@nestjs/common';
 import { ExtNameException } from '../../common/exception/exception';
 import { RequestCodeBlockDto } from '../dto/request-codeblock.dto';
 import { ResponseMessage } from '../../common/utils';
-import { NotSupportLang } from '../../common/type';
+import { NotSupportLang } from '../../common/supportLang';
 
 @Injectable()
 export class RequestRunPipe implements PipeTransform {

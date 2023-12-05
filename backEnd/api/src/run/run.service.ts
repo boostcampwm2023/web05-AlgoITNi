@@ -14,7 +14,7 @@ import { MqService } from '../mq/mq.service';
 import { RedisService } from '../redis/redis.service';
 import { TimeoutCodeRunning } from '../common/exception/exception';
 import { ResponseCodeBlockDto } from './dto/response-codeblock.dto';
-import { supportLang } from '../common/type';
+import { supportLang } from '../common/supportLang';
 
 @Injectable()
 export class RunService {
