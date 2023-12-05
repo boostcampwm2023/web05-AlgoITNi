@@ -27,25 +27,23 @@ export default function Room() {
   if (!isSetting) return <Setting mediaObject={mediaObject} setSetting={setSetting} setNickName={setNickName} />;
 
   return (
-    <div className="flex flex-col h-screen p-4 bg-base">
-      <div className="flex h-full gap-4">
-        <div className="flex flex-col h-full gap-4 basis-9/12">
-          <div className="flex basis-3/12">
-            <VideoSection mediaObject={mediaObject} streamList={streamList} />
+    <div className="flex w-screen h-screen gap-4 p-2 bg-base">
+      <div className="flex flex-col w-3/4 h-full gap-4">
+        <div className=" flex min-h-[25%] w-full">
+          <VideoSection mediaObject={mediaObject} streamList={streamList} />
+        </div>
+        <div className="flex w-full gap-4 overflow-auto h-3/4">
+          <div className="flex flex-col w-2/5 h-full gap-4">
+            <QuizViewSection />
+            <ControllSection mediaObject={mediaObject} />
           </div>
-          <div className="flex h-full gap-4 basis-9/12">
-            <div className="flex flex-col w-full h-full gap-4 basis-2/5">
-              <QuizViewSection />
-              <ControllSection mediaObject={mediaObject} />
-            </div>
-            <div className="basis-3/5 max-h-[650px]">
-              <EditorSection defaultCode={defaultCode} codeDataChannels={codeDataChannels} languageDataChannels={languageDataChannels} />
-            </div>
+          <div className="w-3/5 max-h-full">
+            <EditorSection defaultCode={defaultCode} codeDataChannels={codeDataChannels} languageDataChannels={languageDataChannels} />
           </div>
         </div>
-        <div className="flex basis-3/12">
-          <ChattingSection roomId={roomId as string} nickname={nickName} />
-        </div>
+      </div>
+      <div className="flex w-1/4 ">
+        <ChattingSection roomId={roomId as string} nickname={nickName} />
       </div>
     </div>
   );
