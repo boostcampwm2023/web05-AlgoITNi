@@ -22,7 +22,7 @@ export default function ControllSection({ mediaObject }: { mediaObject: MediaObj
           className="w-[3vw] p-[1vw] hover:opacity-50 rounded-[15px]  shadow drop-shadow-2xl"
         />
       </div>
-      <button type="button" className="w-[3vw] p-[1vw] hover:opacity-50 rounded-[15px] border-white" onClick={() => show({ mediaObject })}>
+      <button type="button" className="w-[3vw] p-[1vw] hover:opacity-50 rounded-[15px] border-white " onClick={() => show({ mediaObject })}>
         <img src={settingIcon} alt="setting" />
       </button>
     </div>

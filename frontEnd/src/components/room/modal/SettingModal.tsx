@@ -33,7 +33,9 @@ export default function SettingModal({ mediaObject }: { mediaObject: MediaObject
     setCamera(settingVideoTrack.getSettings().deviceId as string);
     hide();
   };
-
+  if (!stream || !mic.list || !camera.list || !speaker.list) {
+    return <div className="w-[50vw] h-[60vh] " />;
+  }
   return (
     <div className="flex flex-col items-center justiy-center">
       <div className="flex w-[50vw] h-[60vh] font-Pretendard">

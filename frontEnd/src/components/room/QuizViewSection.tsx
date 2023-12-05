@@ -1,41 +1,44 @@
-import { useState, memo, useCallback } from 'react';
+import { useState, memo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import useModal from '@/hooks/useModal';
-import LinkInputModal from './modal/LinkInputModal';
 import QUERY_KEYS from '@/constants/queryKeys';
 import getQuizData from '@/apis/getQuizData';
-import Button from '../common/Button';
 import ClickToQuizInput from './quizView/ClickToQuizInput';
 import QuizIframe from './quizView/QuizIframe';
 import Loading from './quizView/Loading';
 import Section from '../common/SectionWrapper';
+import useInput from '@/hooks/useInput';
 
 function QuizViewSection() {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [url, setURL] = useState('');
-  const { show: showLinkInputModal } = useModal(LinkInputModal);
   const { data, isLoading } = useQuery({ queryKey: [QUERY_KEYS, url], queryFn: () => getQuizData(url), enabled: !!url });
-  const handleClick = useCallback(() => showLinkInputModal({ setURL }), []);
+  const { inputValue, onChange } = useInput(url);
 
-  if (url === '' && !data)
-    return (
-      <Section>
-        <button type="button" className="flex items-center justify-center w-full h-full rounded-lg bg-primary " onClick={handleClick}>
-          <ClickToQuizInput />
-        </button>
-      </Section>
-    );
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setURL(inputValue);
+  };
+
+  const handleClick = () => {
+    if (inputRef.current) inputRef.current.focus();
+  };
 
   if (isLoading) return <Loading />;
 
   return (
     <Section>
-      <div className="flex flex-col w-full h-full gap-2 p-4 rounded-lg ovelrflow-hidden bg-primary">
-        <div className="flex justify-end w-full">
-          <Button.Dark fontSize="0.8rem" onClick={handleClick}>
-            변경하기
-          </Button.Dark>
-        </div>
-        <QuizIframe htmlData={data} />
+      <div className="flex flex-col w-full h-full gap-4 p-4">
+        <form onSubmit={handleSubmit} className="w-full ">
+          <input
+            ref={inputRef}
+            type="text"
+            className="w-full p-2 border rounded-lg"
+            value={inputValue}
+            onChange={onChange}
+            placeholder="링크를 입력하세요"
+          />
+        </form>
+        {data && url ? <QuizIframe htmlData={data} /> : <ClickToQuizInput handleClick={handleClick} />}
       </div>
     </Section>
   );
