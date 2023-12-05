@@ -48,6 +48,7 @@ export class CodesService {
       const childProcess = exec(
         `${command} ${filePath}`,
         (error, stdout, stderr) => {
+          clearTimeout(timer);
           if (error) {
             this.logger.error(`failed to run requested code ${error.message}`);
 
@@ -56,7 +57,6 @@ export class CodesService {
             }
             resolve({ stdout, stderr });
           } else {
-            clearTimeout(timer);
             resolve({ stdout, stderr });
           }
         },
