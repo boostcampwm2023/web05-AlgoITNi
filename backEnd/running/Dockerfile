@@ -25,11 +25,11 @@ RUN npm ci --omit=dev
 
 EXPOSE 3000
 
-RUN chmod -R 741 || true\
-    mkdir /usr/src/app/logs\
-    chmod -R 662 /usr/src/app/logs || true\
-    mkdir /algoitni\
-    chmod -R 777 /algoitni || true
+RUN chmod -R 741 || true
+RUN mkdir -p /usr/src/app/logs/error
+RUN chmod -R 557 /usr/src/app/logs || true
+RUN mkdir /algoitni
+RUN chmod -R 777 /algoitni || true
 
 RUN adduser deploy || true
 
