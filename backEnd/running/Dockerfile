@@ -12,8 +12,7 @@ RUN npm run build
 
 FROM node:18-alpine
 
-RUN apk add --no-cache python3
-RUN apk add --no-cache openjdk11
+RUN apk add --no-cache python3 openjdk17 build-base
 RUN npm install pm2 -g
 
 WORKDIR /usr/src/app

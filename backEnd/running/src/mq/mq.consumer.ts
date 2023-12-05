@@ -22,32 +22,34 @@ export class MqConsumer {
   async getMessageQueue(job: Job) {
     this.logger.debug(`getMessageQueue ${job.id}, ${job.data.code}`);
     let result: ResponseCodeDto | string;
-    const responseCodeBlockDTO = new ResponseCodeBlockDto();
+    const res = new ResponseCodeBlockDto();
 
     try {
       result = await this.codesService.runCode(job.data);
       const output: string =
         typeof result === 'string' ? result : result.output;
 
-      responseCodeBlockDTO.statusCode = HttpStatus.CREATED;
-      responseCodeBlockDTO.result = output;
-      responseCodeBlockDTO.message = this.errorMessage[HttpStatus.CREATED];
+      res.statusCode = HttpStatus.CREATED;
+      res.result = output;
+      res.message = this.errorMessage[HttpStatus.CREATED];
     } catch (e) {
-      responseCodeBlockDTO.statusCode = e.status;
-      if (e.status === HttpStatus.INTERNAL_SERVER_ERROR) {
-        responseCodeBlockDTO.message = e.message;
+      if (e.status !== HttpStatus.BAD_REQUEST) {
+        this.logger.error(e);
+        res.statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+        res.message = 'Internal Server Error';
       } else {
-        responseCodeBlockDTO.result = e.message;
-        responseCodeBlockDTO.message = this.errorMessage[e.status];
+        res.statusCode = e.status;
+        res.result = e.message;
+        res.message = this.errorMessage[e.status];
       }
     } finally {
       this.logger.log(`${job.id} complete`);
 
       const mode = process.env.MODE || 'V3';
       if (mode !== 'V3') {
-        return this.redisService.addCompletedJob(job.id, responseCodeBlockDTO);
+        return this.redisService.addCompletedJob(job.id, res);
       }
-      return this.redisService.publish(job.id, responseCodeBlockDTO);
+      return this.redisService.publish(job.id, res);
     }
   }
 }

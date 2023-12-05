@@ -1,8 +1,4 @@
 import * as process from 'process';
-export const supportLangEnum = {
-  PYTHON: 'python',
-  JAVASCRIPT: 'javascript',
-};
 
 const timeUnit = {
   SECOND: 's',

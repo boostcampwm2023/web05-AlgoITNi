@@ -4,7 +4,7 @@ import * as path from 'path';
 import { ResponseCodeDto } from './dto/response-code.dto ';
 import { RunningException } from 'src/common/exception/exception';
 import { exec } from 'child_process';
-import { LanguageCommand, Messages } from '../common/utils';
+import { languageCommand, Messages, needCompile } from '../common/utils';
 import { supportLang, runCommandResult } from '../common/type';
 import { RequestCodeDto } from './dto/request-code.dto';
 import * as process from 'process';
@@ -27,40 +27,45 @@ export class CodesService {
   }
 
   async runCode(codeBlock: RequestCodeDto): Promise<ResponseCodeDto | string> {
-    this.logger.debug('function[testCode] Called');
     const { code, language } = codeBlock;
-    const filePath = this.getFilePath(language);
-
-    fs.writeFileSync(filePath, code);
-    const { stdout, stderr } = await this.runCommand(filePath, language);
-    if (stderr) {
-      throw new RunningException(stderr.trim());
+    const filePaths = this.getFilePath(language);
+    const [filePath, compile_dist] = filePaths;
+    try {
+      fs.writeFileSync(filePath, code);
+      const { stdout, stderr } = await this.runCommand(filePaths, language);
+      if (stderr) {
+        throw new RunningException(stderr.trim());
+      }
+      return this.getOutput(stdout);
+    } finally {
+      fs.unlinkSync(filePath);
+      if (needCompile.includes(language)) {
+        fs.unlinkSync(compile_dist);
+      }
     }
-    fs.unlinkSync(filePath);
-    return this.getOutput(stdout);
   }
 
-  runCommand(filePath, language: supportLang): Promise<runCommandResult> {
-    const command = LanguageCommand[language];
+  runCommand(
+    filePaths: string[],
+    language: supportLang,
+  ): Promise<runCommandResult> {
+    const command = languageCommand(language, filePaths);
     return new Promise((resolve) => {
       // eslint-disable-next-line
       let timer;
-      const childProcess = exec(
-        `${command} ${filePath}`,
-        (error, stdout, stderr) => {
-          clearTimeout(timer);
-          if (error) {
-            this.logger.error(`failed to run requested code ${error.message}`);
+      const childProcess = exec(command, (error, stdout, stderr) => {
+        clearTimeout(timer);
+        if (error) {
+          this.logger.error(`failed to run requested code ${error.message}`);
 
-            if (error.signal === this.killSignal) {
-              stderr = Messages.TIMEOUT;
-            }
-            resolve({ stdout, stderr });
-          } else {
-            resolve({ stdout, stderr });
+          if (error.signal === this.killSignal) {
+            stderr = Messages.TIMEOUT;
           }
-        },
-      );
+          resolve({ stdout, stderr });
+        } else {
+          resolve({ stdout, stderr });
+        }
+      });
 
       timer = setTimeout(() => {
         this.logger.log('timeout!');
@@ -90,13 +95,19 @@ export class CodesService {
   }
 
   getFilePath(language: supportLang) {
-    switch (language) {
-      case 'python':
-        return path.join(this.tempDir, `${uuidv4()}.py`);
-      case 'javascript':
-        return path.join(this.tempDir, `${uuidv4()}.js`);
-      case 'java':
-        return path.join(this.tempDir, `${uuidv4()}.java`);
-    }
+    const uuid = uuidv4();
+    const extensions = {
+      python: '.py',
+      javascript: '.js',
+      java: '.java',
+      c: '.c',
+    };
+
+    const fileExtension = extensions[language] || '';
+
+    return [
+      path.join(this.tempDir, `${uuid}${fileExtension}`),
+      path.join(this.tempDir, `${uuid}`),
+    ];
   }
 }
