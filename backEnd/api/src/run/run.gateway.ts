@@ -94,6 +94,7 @@ export class RunGateway implements OnGatewayConnection {
 
   @Cron(CronExpression.EVERY_MINUTE)
   handleNotCompleteSocket() {
+    console.log('cron');
     const Before10S = Date.now() - 10000;
     this.connectedSockets.forEach((value, key) => {
       const { socket, createTime } = value;
