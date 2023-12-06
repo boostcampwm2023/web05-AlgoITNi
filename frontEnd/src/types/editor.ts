@@ -1,4 +1,4 @@
-export type Language = 'python' | 'javascript';
+export type Language = 'python' | 'javascript' | 'java' | 'c';
 
 export interface LanguageInfo {
   name: Language;
