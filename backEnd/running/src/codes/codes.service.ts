@@ -4,8 +4,15 @@ import * as path from 'path';
 import { ResponseCodeDto } from './dto/response-code.dto ';
 import { RunningException } from 'src/common/exception/exception';
 import { exec } from 'child_process';
-import { languageCommand, Messages, needCompile } from '../common/utils';
-import { supportLang, runCommandResult } from '../common/type';
+import { Messages } from '../common/utils';
+import {
+  supportLang,
+  languageExtName,
+  distExtName,
+  needCompile,
+  languageCommand,
+} from '../common/supportLang';
+import { runCommandResult } from '../common/type';
 import { RequestCodeDto } from './dto/request-code.dto';
 import * as process from 'process';
 import { errorMessage } from './errorMessage';
@@ -96,18 +103,12 @@ export class CodesService {
 
   getFilePath(language: supportLang) {
     const uuid = uuidv4();
-    const extensions = {
-      python: '.py',
-      javascript: '.js',
-      java: '.java',
-      c: '.c',
-    };
 
-    const fileExtension = extensions[language] || '';
-
+    const fileExtension = languageExtName[language] || '';
+    const distExtension = distExtName[language] || '';
     return [
       path.join(this.tempDir, `${uuid}${fileExtension}`),
-      path.join(this.tempDir, `${uuid}`),
+      path.join(this.tempDir, `${uuid}${distExtension}`),
     ];
   }
 }
