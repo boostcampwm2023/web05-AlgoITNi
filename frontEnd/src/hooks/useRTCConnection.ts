@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { Socket, io } from 'socket.io-client/debug';
 import { RTC_SOCKET_EMIT_EVENT, RTC_SOCKET_RECEIVE_EVENT } from '@/constants/rtcSocketEvents';
 import { VITE_STUN_URL, VITE_TURN_CREDENTIAL, VITE_TURN_URL, VITE_TURN_USERNAME } from '@/constants/env';
-import { DataChannel } from '@/types/RTCConnection';
 import getSocketURL from '@/apis/getSocketURL';
+import useDataChannels from '@/stores/useDataChannels';
 
 const RTCConnections: Record<string, RTCPeerConnection> = {};
 let socket: Socket;
@@ -12,8 +12,8 @@ let socket: Socket;
 const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: boolean) => {
   const [isConnect, setIsConnect] = useState(false);
   const [streamList, setStreamList] = useState<{ id: string; stream: MediaStream }[]>([]);
-  const [codeDataChannels, setCodeDataChannels] = useState<DataChannel[]>([]);
-  const [languageDataChannels, setLanguageDataChannels] = useState<DataChannel[]>([]);
+
+  const { addCodeDataChannel, removeCodeDataChannel, addLanguageChannel, removeLanguageChannel } = useDataChannels();
 
   const socketConnect = async () => {
     const socketURL = await getSocketURL(roomId);
@@ -89,8 +89,8 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
       });
     });
 
-    setCodeDataChannels((prev) => [...prev, { id: socketId, dataChannel: newCodeDataChannel }]);
-    setLanguageDataChannels((prev) => [...prev, { id: socketId, dataChannel: newLanguageDataChannel }]);
+    addCodeDataChannel(socketId, newCodeDataChannel);
+    addLanguageChannel(socketId, newLanguageDataChannel);
 
     return RTCConnection;
   };
@@ -146,13 +146,13 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
     RTCConnections[data.id].close();
     delete RTCConnections[data.id];
 
-    setCodeDataChannels((prev) => prev.filter(({ id }) => id !== data.id));
-    setLanguageDataChannels((prev) => prev.filter(({ id }) => id !== data.id));
+    removeCodeDataChannel(data);
+    removeLanguageChannel(data);
 
     setStreamList((prev) => prev.filter((stream) => stream.id !== data.id));
   };
 
-  return { socket, streamList, codeDataChannels, languageDataChannels };
+  return { socket, streamList };
 };
 
 export default useRTCConnection;

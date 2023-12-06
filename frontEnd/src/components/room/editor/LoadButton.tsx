@@ -8,10 +8,10 @@ import CodeListModal from '../modal/CodeListModal';
 import LoginModal from '../modal/LoginModal';
 import createAuthFailCallback from '@/utils/authFailCallback';
 import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
-import { DataChannel } from '@/types/RTCConnection';
 import { EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
 import QUERY_KEYS from '@/constants/queryKeys';
 import { CRDTContext } from '@/contexts/crdt';
+import useDataChannels from '@/stores/useDataChannels';
 
 function LoadButtonElement({ children, onClick }: { children: React.ReactNode; onClick: React.MouseEventHandler<HTMLButtonElement> }) {
   return (
@@ -30,22 +30,24 @@ interface LoadButtonProps {
   setPlainCode: (value: React.SetStateAction<string>) => void;
   setLanguageName: (value: React.SetStateAction<string>) => void;
   setFileName: (value: React.SetStateAction<string>) => void;
-  codeDataChannels: DataChannel[];
 }
 
-export default function LoadButton({ plainCode, setPlainCode, setLanguageName, setFileName, codeDataChannels }: LoadButtonProps) {
+export default function LoadButton({ plainCode, setPlainCode, setLanguageName, setFileName }: LoadButtonProps) {
   const [click, setClick] = useState(false);
+
   const { show } = useModal(CodeListModal);
   const { show: showLoginModal } = useModal(LoginModal);
+  const errorCallback = createAuthFailCallback(() => showLoginModal({ code: plainCode }));
+
   const { data, isError, error } = useQuery({
     queryKey: [QUERY_KEYS.LOAD_CODES],
     queryFn: getUserCodes,
     enabled: click,
   });
 
-  const crdt = useContext(CRDTContext);
+  const { codeDataChannel } = useDataChannels();
 
-  const errorCallback = createAuthFailCallback(() => showLoginModal({ code: plainCode }));
+  const crdt = useContext(CRDTContext);
 
   useEffect(() => {
     if (data && click) {
@@ -65,10 +67,10 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName, s
       setLanguageName(languageName);
 
       crdt.getText('sharedText').delete(0, crdt.getText('sharedText').toString().length);
-      sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(crdt));
+      sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
 
       crdt.getText('sharedText').insert(0, code);
-      sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(crdt));
+      sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
     });
   };
 
