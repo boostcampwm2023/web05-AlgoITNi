@@ -3,7 +3,7 @@ import { HttpStatus } from '@nestjs/common';
 export const SOCKET = {
   NAME_SPACE: 'chat',
   V1: 'single',
-  V2: 'kafka',
+  KAFKA: 'kafka',
   EMPTY_ROOM: 0,
 };
 
@@ -39,5 +39,9 @@ export const ERRORS = {
   FAILED_ACCESS_LLM: {
     statusCode: HttpStatus.TOO_MANY_REQUESTS,
     message: '클로바 스튜디오를 사용할 수 없습니다.',
+  },
+  FAILED_PARSING: {
+    statusCode: HttpStatus.BAD_REQUEST,
+    message: '메시지 파싱에 실패하였습니다.',
   },
 };
