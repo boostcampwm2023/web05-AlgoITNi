@@ -2,11 +2,7 @@ import { PipeTransform, Injectable } from '@nestjs/common';
 import * as path from 'path';
 import { SaveCodeDto } from '../dto/saveCode.dto';
 import { ExtNameException } from '../../common/exception/exception';
-
-const languageExtName = {
-  '.js': 'javascript',
-  '.py': 'python',
-};
+import { languageExtName } from '../../common/supportLang';
 
 @Injectable()
 export class SaveCodePipe implements PipeTransform {

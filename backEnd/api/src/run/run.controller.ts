@@ -18,7 +18,6 @@ export class RunController {
   @HttpCode(200)
   @Post('v1')
   async requestRunCode(@Body(RequestRunPipe) codeBlock: RequestCodeBlockDto) {
-    this.securityCheck(codeBlock);
     const responseCodeBlockDto =
       await this.runService.requestRunningApi(codeBlock);
     return responseCodeBlockDto;
@@ -27,8 +26,6 @@ export class RunController {
   @HttpCode(200)
   @Post('v2')
   async requestRunCodeV2(@Body(RequestRunPipe) codeBlock: RequestCodeBlockDto) {
-    this.securityCheck(codeBlock);
-
     const responseCodeBlockDto =
       await this.runService.requestRunningMQ(codeBlock);
 
