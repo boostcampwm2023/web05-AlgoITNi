@@ -45,9 +45,13 @@ export class CodesService {
       }
       return this.getOutput(stdout);
     } finally {
-      fs.unlinkSync(filePath);
-      if (needCompile.includes(language)) {
-        fs.unlinkSync(compile_dist);
+      try {
+        fs.unlinkSync(filePath);
+        if (needCompile.includes(language)) {
+          fs.unlinkSync(compile_dist);
+        }
+      } catch (e) {
+        this.logger.error('fail to delete file', e);
       }
     }
   }
