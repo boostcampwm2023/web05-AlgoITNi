@@ -22,6 +22,16 @@ export const EDITOR_LANGUAGE_TYPES: Record<string, LanguageInfo> = {
     optionText: 'C',
     extension: 'c',
   },
+  kotlin: {
+    name: 'kotlin',
+    optionText: 'Kotlin',
+    extension: 'kt',
+  },
+  swift: {
+    name: 'swift',
+    optionText: 'Swift',
+    extension: 'swift',
+  },
 };
 
 export const EDITOR_DEFAULT_LANGUAGE = 'python';
