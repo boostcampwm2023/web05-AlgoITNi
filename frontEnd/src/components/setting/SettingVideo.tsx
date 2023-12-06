@@ -1,9 +1,10 @@
 import { MediaObject } from '@/hooks/useMedia';
 import Video from '../common/Video';
 import MediaSelector from './MediaSelector';
-
-import MediaControlButton from '../common/MediaControlButton';
 import useSpeaker from '@/stores/useSpeaker';
+import EmptyVideo from './EmptyVideo';
+import VideoControlButton from './VideoControlButton';
+import MicControlButton from './MicControlButton';
 
 export default function SettingVideo({ mediaObject }: { mediaObject: MediaObject }) {
   const { stream, camera, mic, speaker } = mediaObject;
@@ -14,39 +15,32 @@ export default function SettingVideo({ mediaObject }: { mediaObject: MediaObject
     { list: mic.list, setFunc: mic.setMic },
     { list: speaker.list, setFunc: setSpeaker },
   ];
+
+  if (!stream) return <EmptyVideo />;
+
   return (
-    stream && (
-      <div className="flex flex-col gap-[20px] w-full h-full">
-        <div className="relative w-full h-[60vh]">
-          <Video stream={stream} muted />
-          <div className="absolute flex items-center justify-center w-full gap-[1vw] bottom-[10px]">
-            <MediaControlButton
-              stream={stream}
-              kind="mic"
-              className="w-[5vw] p-[1vw] hover:opacity-50 border-solid border-[1px] rounded-[50%] border-white"
-            />
-            <MediaControlButton
-              stream={stream}
-              kind="video"
-              className="w-[5vw] p-[1vw] hover:opacity-50 border-solid border-[1px] rounded-[50%] border-white"
-            />
-          </div>
-        </div>
-        <div className="flex gap-[10px]">
-          {selector.map(
-            ({ list, setFunc }, i) =>
-              list && (
-                <MediaSelector
-                  stream={stream}
-                  className="w-[33%] font-Pretendard text-xl"
-                  key={i}
-                  optionsData={list as MediaDeviceInfo[]}
-                  setFunc={setFunc as React.Dispatch<React.SetStateAction<string>>}
-                />
-              ),
-          )}
+    <div className="flex flex-col gap-[20px] w-full h-full">
+      <div className="relative w-full h-[60vh]">
+        <Video stream={stream} muted />
+        <div className="absolute flex items-center justify-center w-full gap-[1vw] bottom-[10px]">
+          <MicControlButton stream={stream} />
+          <VideoControlButton stream={stream} />
         </div>
       </div>
-    )
+      <div className="flex gap-[10px]">
+        {selector.map(
+          ({ list, setFunc }, i) =>
+            list && (
+              <MediaSelector
+                stream={stream}
+                className="w-1/3 text-xl "
+                key={i}
+                optionsData={list as MediaDeviceInfo[]}
+                setFunc={setFunc as React.Dispatch<React.SetStateAction<string>>}
+              />
+            ),
+        )}
+      </div>
+    </div>
   );
 }
