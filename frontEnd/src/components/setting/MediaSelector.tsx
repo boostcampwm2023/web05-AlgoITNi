@@ -12,7 +12,7 @@ export default function MediaSelector({
   const onChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFunc(e.target.value);
   };
-  if (Object.keys(stream).length === 0) return <div />;
+  if (!stream.id) return <div />;
 
   const [videoTrack] = stream.getVideoTracks();
   const [audioTrack] = stream.getAudioTracks();

@@ -1,3 +1,4 @@
+import { useParams } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { Socket, io } from 'socket.io-client/debug';
 import { VITE_CHAT_URL } from '@/constants/env';
@@ -10,21 +11,20 @@ import { CHATTING_SOCKET_EMIT_EVNET, CHATTING_SOCKET_RECIEVE_EVNET } from '@/con
 import Section from '../common/SectionWrapper';
 import { CHATTING_ERROR_STATUS_CODE, CHATTING_ERROR_TEXT } from '@/constants/chattingErrorResponse';
 import ChattingErrorToast from '../common/ChattingErrorToast';
-
-interface ChattingSectionProps {
-  roomId: string;
-  nickname: string;
-}
+import useRoomConfigData from '@/stores/useRoomConfigData';
 
 let socket: Socket;
 let timer: NodeJS.Timeout | null;
 
-export default function ChattingSection({ roomId, nickname }: ChattingSectionProps) {
+export default function ChattingSection() {
   const [message, setMessage] = useState('');
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
   const [usingAi, setUsingAi] = useState<boolean>(false);
   const [postingAi, setPostingAi] = useState<boolean>(false);
   const [errorData, setErrorData] = useState<ErrorData | null>(null);
+  const { roomId } = useParams();
+
+  const nickname = useRoomConfigData((state) => state.nickname);
 
   const { isViewingLastMessage, isRecievedMessage, setScrollRatio, setIsRecievedMessage } = useLastMessageViewingState();
 
