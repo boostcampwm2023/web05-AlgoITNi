@@ -14,7 +14,7 @@ export default function Room() {
   const { roomId } = useParams();
   const mediaObject = useMedia();
 
-  const isSetting = useRoomConfigData((state) => state.isSetting);
+  const isSetting = useRoomConfigData((state) => state.isSettingDone);
 
   const { streamList } = useRTCConnection(roomId as string, mediaObject.stream as MediaStream, isSetting);
 

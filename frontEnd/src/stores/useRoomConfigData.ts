@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 interface RoomConfigData {
-  isSetting: boolean;
+  isSettingDone: boolean;
   nickname: string;
   actions: {
     settingOn: () => void;
@@ -14,11 +14,11 @@ const defaultCode = localStorage.getItem('code');
 const defaultNickName = localStorage.getItem('nickName');
 
 const useRoomConfigData = create<RoomConfigData>((set) => ({
-  isSetting: (!!defaultCode || defaultCode === '') && !!defaultNickName,
+  isSettingDone: (!!defaultCode || defaultCode === '') && !!defaultNickName,
   nickname: defaultNickName || '',
   actions: {
-    settingOn: () => set((state) => ({ ...state, isSetting: true })),
-    settingOff: () => set((state) => ({ ...state, isSetting: false })),
+    settingOn: () => set((state) => ({ ...state, isSettingDone: true })),
+    settingOff: () => set((state) => ({ ...state, isSettingDone: false })),
     setNickname: (value) => set((state) => ({ ...state, nickname: value })),
   },
 }));

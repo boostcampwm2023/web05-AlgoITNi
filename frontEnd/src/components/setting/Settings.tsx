@@ -11,11 +11,13 @@ export default function Setting({ mediaObject }: { mediaObject: MediaObject }) {
   const { setNickname, settingOn } = useRoomConfigData((state) => state.actions);
   const ref = useFocus<HTMLInputElement>();
   const { inputValue, onChange } = useInput(randomNameGenerator());
+
   const onClick = () => {
     setNickname(inputValue);
     localStorage.setItem('nickName', inputValue);
     settingOn();
   };
+
   return (
     <div>
       <div className="mb-[5%]  mx-[7vw] mt-4">
