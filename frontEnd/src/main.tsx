@@ -8,6 +8,7 @@ import Room from '@pages/Room.tsx';
 
 import Modals from './components/modal/Modals';
 import reactQueryClient from './configs/reactQueryClient';
+import { CRDTProvider } from './contexts/crdt';
 
 const router = createBrowserRouter([
   {
@@ -23,8 +24,10 @@ const router = createBrowserRouter([
 function Main() {
   return (
     <QueryClientProvider client={reactQueryClient}>
-      <RouterProvider router={router} />
-      <Modals />
+      <CRDTProvider>
+        <RouterProvider router={router} />
+        <Modals />
+      </CRDTProvider>
     </QueryClientProvider>
   );
 }

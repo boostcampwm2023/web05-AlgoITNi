@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import * as Y from 'yjs';
 import { useQuery } from '@tanstack/react-query';
 import { LoadCodeData } from '@/types/loadCodeData';
 import CodeFileButton from './codeList/CodeFileButton';
@@ -8,6 +9,9 @@ import WarningModal from './WarningModal';
 import getUserCodes from '@/apis/getUserCodes';
 import QUERY_KEYS from '@/constants/queryKeys';
 import useModifyState from '@/stores/useModifyState';
+import { CRDTContext } from '@/contexts/crdt';
+import useDataChannels from '@/stores/useDataChannels';
+import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
 
 export default function CodeListModal({
   codeData,
@@ -28,6 +32,8 @@ export default function CodeListModal({
   const [selectOne, setSelectOne] = useState<string>('');
   const { show } = useModal(WarningModal);
   const { hide } = useModal();
+  const crdt = useContext(CRDTContext);
+  const { codeDataChannel } = useDataChannels();
 
   const findById = (id: string) => {
     const result = codeData.find((code) => code.id === id);
@@ -41,6 +47,12 @@ export default function CodeListModal({
       show({
         warningString: '작업중이던 내용이 모두 지워집니다.',
         callback: () => {
+          crdt.getText('sharedText').delete(0, crdt.getText('sharedText').toString().length);
+          sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
+
+          crdt.getText('sharedText').insert(0, result.content);
+          sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
+
           setPlainCode(result.content);
           setModifyId(result.id);
           setLanguage(result.language);
