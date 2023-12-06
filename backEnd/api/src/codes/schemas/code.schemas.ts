@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
-import { supportLang } from '../../common/type';
+import { supportLang } from '../../common/supportLang';
 
 export type CodeDocument = HydratedDocument<Code>;
 

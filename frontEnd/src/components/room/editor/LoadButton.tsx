@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import * as Y from 'yjs';
 import getUserCodes from '@/apis/getUserCodes';
 import useModal from '@/hooks/useModal';
 import { uploadLocalFile } from '@/utils/file';
@@ -7,9 +8,10 @@ import CodeListModal from '../modal/CodeListModal';
 import LoginModal from '../modal/LoginModal';
 import createAuthFailCallback from '@/utils/authFailCallback';
 import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
-import { DataChannel } from '@/types/RTCConnection';
 import { EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
 import QUERY_KEYS from '@/constants/queryKeys';
+import { CRDTContext } from '@/contexts/crdt';
+import useDataChannels from '@/stores/useDataChannels';
 
 function LoadButtonElement({ children, onClick }: { children: React.ReactNode; onClick: React.MouseEventHandler<HTMLButtonElement> }) {
   return (
@@ -28,20 +30,24 @@ interface LoadButtonProps {
   setPlainCode: (value: React.SetStateAction<string>) => void;
   setLanguageName: (value: React.SetStateAction<string>) => void;
   setFileName: (value: React.SetStateAction<string>) => void;
-  codeDataChannels: DataChannel[];
 }
 
-export default function LoadButton({ plainCode, setPlainCode, setLanguageName, setFileName, codeDataChannels }: LoadButtonProps) {
+export default function LoadButton({ plainCode, setPlainCode, setLanguageName, setFileName }: LoadButtonProps) {
   const [click, setClick] = useState(false);
+
   const { show } = useModal(CodeListModal);
   const { show: showLoginModal } = useModal(LoginModal);
+  const errorCallback = createAuthFailCallback(() => showLoginModal({ code: plainCode }));
+
   const { data, isError, error } = useQuery({
     queryKey: [QUERY_KEYS.LOAD_CODES],
     queryFn: getUserCodes,
     enabled: click,
   });
 
-  const errorCallback = createAuthFailCallback(() => showLoginModal({ code: plainCode }));
+  const { codeDataChannel } = useDataChannels();
+
+  const crdt = useContext(CRDTContext);
 
   useEffect(() => {
     if (data && click) {
@@ -60,8 +66,11 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName, s
       setPlainCode(code);
       setLanguageName(languageName);
 
-      // FIXME: 현재 state로 임시 CRDT 구현
-      sendMessageDataChannels(codeDataChannels, code);
+      crdt.getText('sharedText').delete(0, crdt.getText('sharedText').toString().length);
+      sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
+
+      crdt.getText('sharedText').insert(0, code);
+      sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
     });
   };
 

@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { supportLang } from '../../common/type';
+import { supportLang } from '../../common/supportLang';
 
 export class GetCodeDto {
   @Expose()
