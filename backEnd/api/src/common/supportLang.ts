@@ -1,6 +1,14 @@
-export type supportLang = 'python' | 'javascript' | 'java' | 'c';
+export type supportLang =
+  | 'python'
+  | 'javascript'
+  | 'java'
+  | 'c'
+  | 'swift'
+  | 'kotlin';
 export function NotSupportLang(lang: string) {
-  return !['python', 'javascript', 'java', 'c'].includes(lang);
+  return !['python', 'javascript', 'java', 'c', 'swift', 'kotlin'].includes(
+    lang,
+  );
 }
 
 export const languageExtName = {
@@ -8,4 +16,6 @@ export const languageExtName = {
   '.py': 'python',
   '.java': 'java',
   '.c': 'c',
+  '.swift': 'swift',
+  '.kt': 'kotlin',
 };
