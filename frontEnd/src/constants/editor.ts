@@ -12,6 +12,16 @@ export const EDITOR_LANGUAGE_TYPES: Record<string, LanguageInfo> = {
     optionText: 'JavaScript',
     extension: 'js',
   },
+  java: {
+    name: 'java',
+    optionText: 'Java',
+    extension: 'java',
+  },
+  c: {
+    name: 'c',
+    optionText: 'C',
+    extension: 'c',
+  },
 };
 
 export const EDITOR_DEFAULT_LANGUAGE = 'python';
