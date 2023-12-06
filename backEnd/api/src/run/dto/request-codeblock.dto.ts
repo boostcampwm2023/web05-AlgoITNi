@@ -1,5 +1,5 @@
 import { IsString } from 'class-validator';
-import { supportLang } from '../../common/type';
+import { supportLang } from '../../common/supportLang';
 
 export class RequestCodeBlockDto {
   @IsString()

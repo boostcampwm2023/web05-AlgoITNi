@@ -1,5 +1,4 @@
 import { useMutation } from '@tanstack/react-query';
-import Button from '@/components/common/Button';
 import useFocus from '@/hooks/useFocus';
 import useInput from '@/hooks/useInput';
 import useModal from '@/hooks/useModal';
@@ -38,36 +37,28 @@ export default function SaveModal({
     onError: createAuthFailCallback(() => showLoginModal({ code })),
   });
 
-  const handleClick = async () => {
-    if (!inputValue) {
-      if (ref.current) ref.current.focus();
-      return;
-    }
-    setFileName(`${inputValue}.${EDITOR_LANGUAGE_TYPES[language].extension}`);
-    hide();
-    mutate();
-  };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputValue && ref.current) return ref.current.focus();
 
-  const handleKeyDown = (e: React.KeyboardEvent) => e.key === 'Enter' && handleClick();
+    setFileName(`${inputValue}.${EDITOR_LANGUAGE_TYPES[language].extension}`);
+    mutate();
+    return hide();
+  };
 
   return (
     <div className="flex flex-col gap-4">
       <div className="text-xl">저장될 코드의 파일 이름을 입력해주세요</div>
-      <div className="flex items-center justify-center gap-4">
-        <input
-          ref={ref}
-          value={inputValue}
-          onChange={onChange}
-          onKeyDown={handleKeyDown}
-          className="px-4 py-2 text-xl"
-          placeholder="solution"
-        />
-        <div className={inputValue ? '' : 'opacity-50'}>
-          <Button.Default onClick={handleClick} fontSize="1vw">
-            저장하기
-          </Button.Default>
+      <form onSubmit={handleSubmit}>
+        <div className="flex items-center justify-center gap-4">
+          <input ref={ref} value={inputValue} onChange={onChange} className="px-4 py-2 text-xl" placeholder="solution" />
+          <div className={inputValue ? '' : 'opacity-50'}>
+            <button type="submit" className="px-6 py-2 text-lg text-white rounded-lg font-Pretendard drop-shadow-lg bg-point-blue">
+              저장하기
+            </button>
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

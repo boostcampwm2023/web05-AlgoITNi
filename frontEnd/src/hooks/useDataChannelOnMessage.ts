@@ -6,5 +6,5 @@ export default function useDataChannelOnMessage(dataChannelArr: DataChannel[], o
     dataChannelArr.forEach(({ dataChannel }) => {
       dataChannel.onmessage = onMessageHandler;
     });
-  }, [dataChannelArr]);
+  }, [dataChannelArr, onMessageHandler]);
 }

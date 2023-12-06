@@ -16,7 +16,7 @@ ENV DISPLAY=:99
 WORKDIR /var/app
 
 COPY package.json package-lock.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 RUN npm install -g pm2
 RUN npm install puppeteer
 

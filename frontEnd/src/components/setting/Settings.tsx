@@ -5,23 +5,19 @@ import SettingVideo from './SettingVideo';
 import Header from '../common/Header';
 import useFocus from '@/hooks/useFocus';
 import useInput from '@/hooks/useInput';
+import useRoomConfigData from '@/stores/useRoomConfigData';
 
-export default function Setting({
-  mediaObject,
-  setSetting,
-  setNickName,
-}: {
-  mediaObject: MediaObject;
-  setSetting: React.Dispatch<React.SetStateAction<boolean>>;
-  setNickName: React.Dispatch<React.SetStateAction<string>>;
-}) {
+export default function Setting({ mediaObject }: { mediaObject: MediaObject }) {
+  const { setNickname, settingOn } = useRoomConfigData((state) => state.actions);
   const ref = useFocus<HTMLInputElement>();
   const { inputValue, onChange } = useInput(randomNameGenerator());
+
   const onClick = () => {
-    setNickName(inputValue);
+    setNickname(inputValue);
     localStorage.setItem('nickName', inputValue);
-    setSetting(true);
+    settingOn();
   };
+
   return (
     <div>
       <div className="mb-[5%]  mx-[7vw] mt-4">

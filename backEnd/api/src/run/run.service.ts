@@ -9,13 +9,12 @@ import { returnCode } from '../common/returnCode';
 import { RequestCodeBlockDto } from './dto/request-codeblock.dto';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { requestPath } from '../common/utils';
 import * as path from 'path';
 import { MqService } from '../mq/mq.service';
 import { RedisService } from '../redis/redis.service';
 import { TimeoutCodeRunning } from '../common/exception/exception';
 import { ResponseCodeBlockDto } from './dto/response-codeblock.dto';
-import { supportLang } from '../common/type';
+import { supportLang } from '../common/supportLang';
 
 @Injectable()
 export class RunService {
@@ -50,10 +49,7 @@ export class RunService {
   ): Promise<ResponseCodeBlockDto> {
     const url =
       'http://' +
-      path.join(
-        this.configService.get<string>('RUNNING_SERVER'),
-        requestPath[codeBlock.language],
-      );
+      path.join(this.configService.get<string>('RUNNING_SERVER'), 'codes');
 
     try {
       const result = await axios.post(url, codeBlock);
@@ -86,15 +82,11 @@ export class RunService {
     this.logger.log(`get completed result ${JSON.stringify(result)}`);
     return result;
   }
-  async requestRunningMQPubSub(
-    codeBlock: RequestCodeBlockDto,
-    socketID: string,
-  ): Promise<void> {
+  async requestRunningMQPubSub(codeBlock: RequestCodeBlockDto) {
     const job = await this.mqService.addMessage(codeBlock);
     this.logger.log(`added message queue job#${job.id}`);
 
-    // start subscribe
-    this.mqService.setInfo(job.id, socketID);
+    return job.id;
   }
 
   pythonCheck() {
