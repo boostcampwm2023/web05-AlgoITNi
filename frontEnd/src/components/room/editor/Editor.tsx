@@ -4,27 +4,21 @@ import InputArea from './InputArea';
 import LineNumber from './LineNumber';
 import { EDITOR_TAB_SIZE } from '@/constants/editor';
 import { LanguageInfo } from '@/types/editor';
-import { DataChannel } from '@/types/RTCConnection';
 import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
 import { CRDTContext } from '@/contexts/crdt';
+import useDataChannels from '@/stores/useDataChannels';
 
 interface EditorProps {
   plainCode: string;
   languageInfo: LanguageInfo;
   setPlainCode: React.Dispatch<React.SetStateAction<string>>;
-  codeDataChannels: DataChannel[];
   cursorPosition: number;
   setCursorPosition: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function Editor({
-  plainCode,
-  languageInfo,
-  setPlainCode,
-  codeDataChannels,
-  cursorPosition,
-  setCursorPosition,
-}: EditorProps) {
+export default function Editor({ plainCode, languageInfo, setPlainCode, cursorPosition, setCursorPosition }: EditorProps) {
+  const { codeDataChannel } = useDataChannels();
+
   const crdt = useContext(CRDTContext);
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -44,7 +38,7 @@ export default function Editor({
       crdt.getText('sharedText').delete(newCursor, removedLength);
     }
 
-    sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(crdt));
+    sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
   };
 
   const handleClick = (event: React.MouseEvent<HTMLTextAreaElement>) => {
@@ -59,7 +53,7 @@ export default function Editor({
       event.preventDefault();
 
       crdt.getText('sharedText').insert(selectionStart, '    ');
-      sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(crdt));
+      sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
 
       setCursorPosition((prev) => prev + EDITOR_TAB_SIZE);
       setPlainCode((prev) => `${prev.slice(0, selectionStart)}    ${prev.slice(selectionStart)}`);

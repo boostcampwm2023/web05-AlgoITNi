@@ -18,11 +18,7 @@ export default function Room() {
   const [isSetting, setSetting] = useState((!!defaultCode || defaultCode === '') && !!defaultNickName);
   const [nickName, setNickName] = useState(defaultNickName || '');
 
-  const { streamList, codeDataChannels, languageDataChannels } = useRTCConnection(
-    roomId as string,
-    mediaObject.stream as MediaStream,
-    isSetting,
-  );
+  const { streamList } = useRTCConnection(roomId as string, mediaObject.stream as MediaStream, isSetting);
 
   if (!isSetting) return <Setting mediaObject={mediaObject} setSetting={setSetting} setNickName={setNickName} />;
 
@@ -38,7 +34,7 @@ export default function Room() {
             <ControllSection mediaObject={mediaObject} />
           </div>
           <div className="w-3/5 max-h-full">
-            <EditorSection defaultCode={defaultCode} codeDataChannels={codeDataChannels} languageDataChannels={languageDataChannels} />
+            <EditorSection defaultCode={defaultCode} />
           </div>
         </div>
       </div>
