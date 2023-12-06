@@ -85,9 +85,8 @@ export default function ChattingSection() {
     setAllMessage((prev) => [...prev, newMessage]);
   };
 
-  const handleChattingSocketError = (errorMessage: string) => {
-    const errorResponse: ErrorResponse = JSON.parse(errorMessage);
-    const { statusCode } = errorResponse;
+  const handleChattingSocketError = (errorMessage: ErrorResponse) => {
+    const { statusCode } = errorMessage;
 
     const { MESSAGE_ERROR_CODE, SERVER_ERROR_CODE, AI_ERROR_CODE } = CHATTING_ERROR_STATUS_CODE;
     const { MESSAGE_ERROR_TEXT, SERVER_ERROR_TEXT, AI_ERROR_TEXT } = CHATTING_ERROR_TEXT;
@@ -103,7 +102,7 @@ export default function ChattingSection() {
     });
 
     socket.on(CHATTING_SOCKET_RECIEVE_EVNET.NEW_MESSAGE, handleRecieveMessage);
-    socket.on('error', handleChattingSocketError);
+    socket.on('exception', handleChattingSocketError);
     socket.connect();
 
     socket.emit(CHATTING_SOCKET_EMIT_EVNET.JOIN_ROOM, { room: roomId });
