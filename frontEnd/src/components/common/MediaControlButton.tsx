@@ -1,22 +1,19 @@
-import micOnSVG from '@/assets/micOn.svg';
-import micOffSVG from '@/assets/micOff.svg';
-import videoOffSVG from '@/assets/videoOff.svg';
-import videoOnSVG from '@/assets/videoOn.svg';
+import MicOffSvg from '@/assets/MicOffSvg';
+import MicOnSvg from '@/assets/MicOnSvg';
+import VideoOffSvg from '@/assets/VideoOffSvg';
+import VideoOnSvg from '@/assets/VideoOnSvg';
 import useMediaControl from '@/stores/useMediaControl';
 
-function selectImage(kind: 'mic' | 'video', isOn: boolean) {
-  if (kind === 'mic' && isOn) return micOnSVG;
-  if (kind === 'mic' && !isOn) return micOffSVG;
-  if (kind === 'video' && isOn) return videoOnSVG;
-  if (kind === 'video' && !isOn) return videoOffSVG;
-  throw new Error('잘못된 입력입니다!');
+interface MediaControlButtonProps {
+  stream: MediaStream;
+  kind: 'mic' | 'video';
+  className: string;
+  color: string;
 }
 
-export default function MediaControlButton({ stream, kind, className }: { stream: MediaStream; kind: 'mic' | 'video'; className: string }) {
+export default function MediaControlButton({ stream, kind, className, color }: MediaControlButtonProps) {
   const { micOn, micToggle } = useMediaControl((state) => state);
   const { videoOn, videoToggle } = useMediaControl((state) => state);
-  const state = kind === 'mic' ? micOn : videoOn;
-  const img = selectImage(kind, state);
 
   const offVideo = () => {
     stream?.getVideoTracks().forEach((track) => {
@@ -48,7 +45,7 @@ export default function MediaControlButton({ stream, kind, className }: { stream
         className={className}
         style={{ backgroundColor: micOn ? 'transparent' : '#ea4335', transition: 'all 0.5s' }}
       >
-        <img src={img} alt="micButton" />
+        {micOn ? <MicOnSvg color={color} /> : <MicOffSvg color={color} />}
       </button>
     );
 
@@ -59,7 +56,7 @@ export default function MediaControlButton({ stream, kind, className }: { stream
       className={className}
       style={{ backgroundColor: videoOn ? 'transparent' : '#ea4335', transition: 'all 0.5s' }}
     >
-      <img src={img} alt="videoButton" />
+      {videoOn ? <VideoOnSvg color={color} /> : <VideoOffSvg color={color} />}
     </button>
   );
 }

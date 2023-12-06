@@ -35,7 +35,8 @@ export default {
       },
       screens: {
         mobile: { min: '360px', max: '767px' },
-        pc: { min: '768px' },
+        tablet: { max: '1024px' },
+        pc: { min: '1024px' },
       },
     },
   },

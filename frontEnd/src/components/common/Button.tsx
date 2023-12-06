@@ -27,7 +27,7 @@ function Full({ children, onClick, fontSize }: ButtonProps) {
   return (
     <button
       type="button"
-      className="px-[1.6vw] py-[14px]  rounded-lg w-full border drop-shadow-lg bg-point-blue text-white"
+      className="w-full py-2 text-white border rounded-lg drop-shadow-lg bg-point-blue"
       onClick={onClick}
       style={{ fontSize }}
     >
