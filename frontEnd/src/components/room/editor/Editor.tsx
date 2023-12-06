@@ -23,15 +23,21 @@ export default function Editor({ plainCode, languageInfo, setPlainCode, cursorPo
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = event.target.value;
-    setPlainCode(newText);
-
     const newCursor = event.target.selectionStart; // 연산 이후의 최종 위치
+
+    setPlainCode(newText);
     setCursorPosition(newCursor);
 
     const changedLength = plainCode.length - newText.length;
-    // 글자가 추가된 경우
-    if (changedLength < 0) {
+    const isAdded = changedLength < 0;
+
+    if (isAdded) {
       const addedText = newText.slice(newCursor - Math.abs(changedLength), newCursor);
+      const isOneLetter = addedText.length === 1;
+      const isKorean = addedText.match(/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/);
+
+      if (isOneLetter && isKorean) return;
+
       crdt.getText('sharedText').insert(newCursor - Math.abs(changedLength), addedText);
     } else {
       const removedLength = Math.abs(changedLength);
