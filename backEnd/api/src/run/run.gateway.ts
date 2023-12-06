@@ -96,8 +96,9 @@ export class RunGateway implements OnGatewayConnection {
   handleNotCompleteSocket() {
     const Before10S = Date.now() - 10000;
     this.connectedSockets.forEach((value, key) => {
-      const { createTime } = value;
+      const { socket, createTime } = value;
       if (createTime < Before10S) this.connectedSockets.delete(key);
+      socket.disconnect();
     });
   }
 }
