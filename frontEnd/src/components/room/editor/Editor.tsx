@@ -1,3 +1,4 @@
+import { useContext } from 'react';
 import * as Y from 'yjs';
 import InputArea from './InputArea';
 import LineNumber from './LineNumber';
@@ -5,13 +6,13 @@ import { EDITOR_TAB_SIZE } from '@/constants/editor';
 import { LanguageInfo } from '@/types/editor';
 import { DataChannel } from '@/types/RTCConnection';
 import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
+import { CRDTContext } from '@/contexts/crdt';
 
 interface EditorProps {
   plainCode: string;
   languageInfo: LanguageInfo;
   setPlainCode: React.Dispatch<React.SetStateAction<string>>;
   codeDataChannels: DataChannel[];
-  Ydoc: React.MutableRefObject<Y.Doc>;
   cursorPosition: number;
   setCursorPosition: React.Dispatch<React.SetStateAction<number>>;
 }
@@ -21,10 +22,11 @@ export default function Editor({
   languageInfo,
   setPlainCode,
   codeDataChannels,
-  Ydoc,
   cursorPosition,
   setCursorPosition,
 }: EditorProps) {
+  const crdt = useContext(CRDTContext);
+
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = event.target.value;
     setPlainCode(newText);
@@ -33,17 +35,16 @@ export default function Editor({
     setCursorPosition(newCursor);
 
     const changedLength = plainCode.length - newText.length;
-
-    // 추가된 경우
+    // 글자가 추가된 경우
     if (changedLength < 0) {
       const addedText = newText.slice(newCursor - Math.abs(changedLength), newCursor);
-      Ydoc.current.getText('sharedText').insert(newCursor - Math.abs(changedLength), addedText);
+      crdt.getText('sharedText').insert(newCursor - Math.abs(changedLength), addedText);
     } else {
       const removedLength = Math.abs(changedLength);
-      Ydoc.current.getText('sharedText').delete(newCursor, removedLength);
+      crdt.getText('sharedText').delete(newCursor, removedLength);
     }
 
-    sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(Ydoc.current));
+    sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(crdt));
   };
 
   const handleClick = (event: React.MouseEvent<HTMLTextAreaElement>) => {
@@ -57,8 +58,8 @@ export default function Editor({
     if (event.key === 'Tab') {
       event.preventDefault();
 
-      Ydoc.current.getText('sharedText').insert(selectionStart, '    ');
-      sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(Ydoc.current));
+      crdt.getText('sharedText').insert(selectionStart, '    ');
+      sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(crdt));
 
       setCursorPosition((prev) => prev + EDITOR_TAB_SIZE);
       setPlainCode((prev) => `${prev.slice(0, selectionStart)}    ${prev.slice(selectionStart)}`);

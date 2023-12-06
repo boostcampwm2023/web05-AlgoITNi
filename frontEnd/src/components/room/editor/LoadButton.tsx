@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import * as Y from 'yjs';
 import getUserCodes from '@/apis/getUserCodes';
 import useModal from '@/hooks/useModal';
 import { uploadLocalFile } from '@/utils/file';
@@ -10,6 +11,7 @@ import sendMessageDataChannels from '@/utils/sendMessageDataChannels';
 import { DataChannel } from '@/types/RTCConnection';
 import { EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
 import QUERY_KEYS from '@/constants/queryKeys';
+import { CRDTContext } from '@/contexts/crdt';
 
 function LoadButtonElement({ children, onClick }: { children: React.ReactNode; onClick: React.MouseEventHandler<HTMLButtonElement> }) {
   return (
@@ -41,6 +43,8 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName, s
     enabled: click,
   });
 
+  const crdt = useContext(CRDTContext);
+
   const errorCallback = createAuthFailCallback(() => showLoginModal({ code: plainCode }));
 
   useEffect(() => {
@@ -60,8 +64,11 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName, s
       setPlainCode(code);
       setLanguageName(languageName);
 
-      // FIXME: 현재 state로 임시 CRDT 구현
-      sendMessageDataChannels(codeDataChannels, code);
+      crdt.getText('sharedText').delete(0, crdt.getText('sharedText').toString().length);
+      sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(crdt));
+
+      crdt.getText('sharedText').insert(0, code);
+      sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(crdt));
     });
   };
 

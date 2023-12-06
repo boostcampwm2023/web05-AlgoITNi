@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Socket, io } from 'socket.io-client/debug';
 import * as Y from 'yjs';
 import { EDITOR_DEFAULT_LANGUAGE, EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
@@ -17,6 +17,7 @@ import { RunCodeResponse } from '@/types/runCode';
 import getOutputString from '@/utils/getOutputString';
 import Section from '../common/SectionWrapper';
 import Spinner from '../common/Spinner';
+import { CRDTContext, CRDTProvider } from '@/contexts/crdt';
 
 interface EditorSectionProps {
   defaultCode: string | null;
@@ -38,22 +39,22 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
 
   const languageInfo = EDITOR_LANGUAGE_TYPES[languageName];
 
-  const Ydoc = useRef(new Y.Doc());
+  const crdt = useContext(CRDTContext);
 
   useEffect(() => {
     localStorage.removeItem('code');
   }, []);
 
   const handleRecieveCodeMessage = (event: MessageEvent) => {
-    const relPos = Y.createRelativePositionFromTypeIndex(Ydoc.current.getText('sharedText'), cursorPosition);
+    const relPos = Y.createRelativePositionFromTypeIndex(crdt.getText('sharedText'), cursorPosition);
 
     const update = new Uint8Array(event.data);
-    Y.applyUpdate(Ydoc.current, update);
+    Y.applyUpdate(crdt, update);
 
-    const updatedText = Ydoc.current.getText('sharedText').toString();
+    const updatedText = crdt.getText('sharedText').toString();
     setPlainCode(updatedText);
 
-    const pos = Y.createAbsolutePositionFromRelativePosition(relPos, Ydoc.current);
+    const pos = Y.createAbsolutePositionFromRelativePosition(relPos, crdt);
     if (pos) setCursorPosition(pos.index);
   };
 
@@ -61,11 +62,14 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
     setLanguageName(event.data);
   };
 
+  const clearEditor = () => {
+    crdt.getText('sharedText').delete(0, crdt.getText('sharedText').toString().length);
+    sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(crdt));
+  };
+
   const handleClear = () => {
     setPlainCode('');
-
-    Ydoc.current.getText('sharedText').delete(0, Ydoc.current.getText('sharedText').toString().length);
-    sendMessageDataChannels(codeDataChannels, Y.encodeStateAsUpdate(Ydoc.current));
+    clearEditor();
   };
 
   const handleExecCode = () => {
@@ -94,45 +98,46 @@ export default function EditorSection({ defaultCode, codeDataChannels, languageD
   }, [languageName]);
 
   return (
-    <Section>
-      <div className="w-full h-full grid grid-rows-[repeat(12,minmax(0,1fr))] rounded-lg bg-primary">
-        <div className="flex items-center justify-between h-full row-span-1 p-2 px-4 border-b">
-          <EditorFileName>{fileName}</EditorFileName>
-          <LanguageTypeDropDown languageName={languageName} setLanguageName={setLanguageName} />
-        </div>
-        <div className="flex flex-col overflow-y-auto row-[span_7_/_span_7] custom-scroll">
-          <Editor
-            Ydoc={Ydoc}
-            plainCode={plainCode}
-            languageInfo={languageInfo}
-            setPlainCode={setPlainCode}
-            codeDataChannels={codeDataChannels}
-            cursorPosition={cursorPosition}
-            setCursorPosition={setCursorPosition}
-          />
-        </div>
-        <div className="row-span-3">
-          <OutputArea execResult={execResult} />
-        </div>
-        <div className="flex items-center justify-between row-span-1 gap-2 p-[1vh]">
-          <div className="h-full">
-            <LoadButton
+    <CRDTProvider>
+      <Section>
+        <div className="w-full h-full grid grid-rows-[repeat(12,minmax(0,1fr))] rounded-lg bg-primary">
+          <div className="flex items-center justify-between h-full row-span-1 p-2 px-4 border-b">
+            <EditorFileName>{fileName}</EditorFileName>
+            <LanguageTypeDropDown languageName={languageName} setLanguageName={setLanguageName} />
+          </div>
+          <div className="flex flex-col overflow-y-auto row-[span_7_/_span_7] custom-scroll">
+            <Editor
               plainCode={plainCode}
+              languageInfo={languageInfo}
               setPlainCode={setPlainCode}
-              setLanguageName={setLanguageName}
-              setFileName={setFileName}
               codeDataChannels={codeDataChannels}
+              cursorPosition={cursorPosition}
+              setCursorPosition={setCursorPosition}
             />
           </div>
-          <div className="flex h-full gap-2">
-            <SaveButton plainCode={plainCode} languageInfo={languageInfo} fileName={fileName} setFileName={setFileName} />
-            <EditorButton onClick={handleClear}>초기화</EditorButton>
-            <EditorButton onClick={handleExecCode} disabled={isExec}>
-              {isExec ? <Spinner /> : '실행하기'}
-            </EditorButton>
+          <div className="row-span-3">
+            <OutputArea execResult={execResult} />
+          </div>
+          <div className="flex items-center justify-between row-span-1 gap-2 p-[1vh]">
+            <div className="h-full">
+              <LoadButton
+                plainCode={plainCode}
+                setPlainCode={setPlainCode}
+                setLanguageName={setLanguageName}
+                setFileName={setFileName}
+                codeDataChannels={codeDataChannels}
+              />
+            </div>
+            <div className="flex h-full gap-2">
+              <SaveButton plainCode={plainCode} languageInfo={languageInfo} fileName={fileName} setFileName={setFileName} />
+              <EditorButton onClick={handleClear}>초기화</EditorButton>
+              <EditorButton onClick={handleExecCode} disabled={isExec}>
+                {isExec ? <Spinner /> : '실행하기'}
+              </EditorButton>
+            </div>
           </div>
         </div>
-      </div>
-    </Section>
+      </Section>
+    </CRDTProvider>
   );
 }
