@@ -4,16 +4,13 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
 RUN npm run build
 
-FROM node:18-alpine
-
-RUN apk add --no-cache python3 openjdk17 build-base
-RUN npm install pm2 -g
+FROM hkleeeee/ubuntu:22.04
 
 WORKDIR /usr/src/app
 
@@ -33,4 +30,4 @@ RUN adduser deploy || true
 
 USER deploy
 
-CMD ["pm2-runtime", "dist/main.js", "-i", "max"]
+CMD ["pm2-runtime", "dist/main.js", "-i", "1"]
