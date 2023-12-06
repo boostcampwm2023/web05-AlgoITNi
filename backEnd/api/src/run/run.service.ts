@@ -82,15 +82,11 @@ export class RunService {
     this.logger.log(`get completed result ${JSON.stringify(result)}`);
     return result;
   }
-  async requestRunningMQPubSub(
-    codeBlock: RequestCodeBlockDto,
-    socketID: string,
-  ): Promise<void> {
+  async requestRunningMQPubSub(codeBlock: RequestCodeBlockDto) {
     const job = await this.mqService.addMessage(codeBlock);
     this.logger.log(`added message queue job#${job.id}`);
 
-    // start subscribe
-    this.mqService.setInfo(job.id, socketID);
+    return job.id;
   }
 
   pythonCheck() {
