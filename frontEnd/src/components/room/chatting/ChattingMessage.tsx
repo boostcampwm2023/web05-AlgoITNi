@@ -20,7 +20,7 @@ export default function ChattingMessage({ messageData, isMyMessage }: ChattingMe
     <div className={`flex flex-col gap-0.5 ${myMessage ? 'items-end' : 'items-start'}`}>
       <span className="mx-1 text-xs font-light">{aiMessage ? '클로바 X' : messageData.nickname}</span>
       <div className={`px-4 py-2 rounded-lg w-fit ${getMessageColor()}`}>
-        <span>{messageData.message}</span>
+        <span className="whitespace-pre-wrap">{messageData.message}</span>
       </div>
     </div>
   );

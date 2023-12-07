@@ -11,7 +11,7 @@ function SendButtonText({ usingAi, postingAi }: { usingAi: boolean; postingAi: b
 interface ChattingInputProps {
   handleMessageSend: (event: React.FormEvent<HTMLFormElement>) => void;
   message: string;
-  handleInputMessage: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleInputMessage: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   usingAi: boolean;
   setUsingAi: React.Dispatch<React.SetStateAction<boolean>>;
   postingAi: boolean;
@@ -25,21 +25,30 @@ export default function ChattingInput({
   setUsingAi,
   postingAi,
 }: ChattingInputProps) {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      handleMessageSend(event as unknown as React.FormEvent<HTMLFormElement>);
+    }
+  };
+
   return (
     <form onSubmit={handleMessageSend} className="w-full p-2 rounded-b-lg bg-base">
       <ToggleAi usingAi={usingAi} setUsingAi={setUsingAi} />
-      <div className="flex items-center w-full h-12 rounded-lg drop-shadow-lg">
-        <input
+      <div className="flex items-center w-full h-[72px] rounded-lg drop-shadow-lg">
+        <textarea
+          onKeyDown={handleKeyDown}
           disabled={usingAi && postingAi}
-          type="text"
           value={message}
           onChange={handleInputMessage}
-          className={`w-full h-12 p-2 px-4 focus:outline-none rounded-s-lg ${usingAi ? 'border-point-blue border-2' : ''}`}
+          className={`w-full h-full p-2 px-4 focus:outline-none rounded-s-lg resize-none border-2 custom-scroll ${
+            usingAi ? 'border-point-blue' : 'border-white'
+          }`}
           placeholder={usingAi ? 'AI에게 질문해보세요' : 'Message'}
         />
         <button
           type="submit"
-          className={`h-full px-4 py-1 font-normal rounded-e-lg whitespace-nowrap w-16 flex items-center justify-center ${
+          className={`font-normal rounded-e-lg whitespace-nowrap w-16 flex items-center justify-center h-full ${
             usingAi ? 'bg-point-blue text-white' : 'bg-primary text-black'
           }`}
           disabled={usingAi && postingAi}

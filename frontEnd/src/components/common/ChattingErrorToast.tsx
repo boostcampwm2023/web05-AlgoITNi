@@ -7,7 +7,7 @@ interface ChattingErrorToastProps {
 
 export default function ChattingErrorToast({ errorData, setErrorData }: ChattingErrorToastProps) {
   return (
-    <div className="absolute z-10 flex flex-col items-start w-full bottom-24 ">
+    <div className="absolute z-10 flex flex-col items-start w-full bottom-28 ">
       <div className="flex flex-col p-5 mb-5 ml-5 drop-shadow-lg bg-base">
         <span className="text-sm">{errorData.text1}</span>
         <span className="text-sm">{errorData.text2}</span>

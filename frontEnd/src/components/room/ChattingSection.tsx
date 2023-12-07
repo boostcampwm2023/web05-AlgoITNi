@@ -18,7 +18,7 @@ import useScroll from '@/hooks/useScroll';
 let socket: Socket;
 
 export default function ChattingSection() {
-  const { inputValue: message, onChange, resetInput } = useInput('');
+  const { inputValue: message, onChange, resetInput } = useInput<HTMLTextAreaElement>('');
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
   const [usingAi, setUsingAi] = useState<boolean>(false);
   const [postingAi, setPostingAi] = useState<boolean>(false);
