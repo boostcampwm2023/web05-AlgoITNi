@@ -10,5 +10,9 @@ export default function useInput(initialValue: string) {
     setInputValue(value);
   };
 
-  return { inputValue, onChange };
+  const resetInput = () => {
+    setInputValue('');
+  };
+
+  return { inputValue, onChange, resetInput };
 }
