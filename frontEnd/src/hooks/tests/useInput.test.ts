@@ -18,4 +18,14 @@ describe('useInput 기능테스트', () => {
 
     expect(result.current.inputValue).toBe('changeValue');
   });
+
+  it('resetInput을 실행시키면 입력값이 초기화된다.', () => {
+    const { result } = renderHook(() => useInput('initial'));
+
+    act(() => {
+      result.current.resetInput();
+    });
+
+    expect(result.current.inputValue).toBe('');
+  });
 });
