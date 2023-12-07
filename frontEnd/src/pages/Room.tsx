@@ -9,17 +9,17 @@ import ChattingSection from '@/components/room/ChattingSection';
 import ControllSection from '@/components/room/ControllSection';
 import useRoomConfigData from '@/stores/useRoomConfigData';
 
-export default function Room() {
-  const defaultCode = localStorage.getItem('code');
+const defaultCode = localStorage.getItem('code');
+const defaultNickName = localStorage.getItem('nickName');
+const hasLogin = (!!defaultCode || defaultCode === '') && !!defaultNickName;
 
+export default function Room() {
   const { roomId } = useParams();
   const mediaObject = useMedia();
-
   const isConnectionDone = useRoomConfigData((state) => state.isConnectionDone);
 
   const { streamList } = useRTCConnection(roomId as string, mediaObject.stream as MediaStream);
-
-  if (!isConnectionDone) return <Setting mediaObject={mediaObject} />;
+  if (!isConnectionDone && !hasLogin) return <Setting mediaObject={mediaObject} />;
 
   return (
     <div className="flex w-screen h-screen gap-4 p-2 bg-base">

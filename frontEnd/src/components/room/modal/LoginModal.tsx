@@ -37,6 +37,7 @@ export default function LoginModal({ code }: { code: string }) {
       const token = await getDevCookie();
       document.cookie = `access_token=${token};`;
       hide();
+      window.location.reload();
     }
     reactQueryClient.invalidateQueries({ queryKey: [QUERY_KEYS.LOAD_CODES] });
   };
