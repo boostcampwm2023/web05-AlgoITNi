@@ -34,7 +34,7 @@ export default {
         'point-blue': '#347DFF',
       },
       screens: {
-        mobile: { min: '360px', max: '767px' },
+        mobile: { max: '767px' },
         tablet: { max: '1024px' },
         pc: { min: '1024px' },
       },

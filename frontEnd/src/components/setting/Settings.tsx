@@ -27,10 +27,10 @@ export default function Setting({ mediaObject }: { mediaObject: MediaObject }) {
         <div className="basis-7/12">
           <SettingVideo mediaObject={mediaObject} />
         </div>
-        <div className="flex flex-col items-center justify-center basis-5/12">
-          <div className="flex flex-col items-center justify-center w-full gap-12">
-            <div className="text-5xl font-bold whitespace-nowrap">참여할 준비가 되셨나요?</div>
-            <div className="flex flex-col gap-2 text-xl">
+        <div className="flex flex-col items-center justify-center px-10 my-10 basis-5/12 tablet:px-0 mobile:px-0">
+          <div className="flex flex-col items-start justify-center w-full gap-12">
+            <div className="text-5xl font-bold whitespace-nowrap mobile:text-4xl">참여할 준비가 되셨나요?</div>
+            <div className="flex flex-col w-full gap-2 text-xl">
               <h2 className="font-bold">닉네임을 설정해보세요!</h2>
               <input className="p-4 rounded-lg drop-shadow-lg" type="text" ref={ref} value={inputValue} onChange={onChange} />
             </div>
