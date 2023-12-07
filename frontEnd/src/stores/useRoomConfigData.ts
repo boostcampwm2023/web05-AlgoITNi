@@ -14,6 +14,8 @@ interface RoomConfigData {
     setNickname: (value: string) => void;
     throwSignalError: () => void;
     throwConnectionError: () => void;
+    resolveSignalError: () => void;
+    resolveConnectionError: () => void;
   };
 }
 
@@ -34,6 +36,8 @@ const useRoomConfigData = create<RoomConfigData>((set) => ({
     setNickname: (value) => set((state) => ({ ...state, nickname: value })),
     throwSignalError: () => set((state) => ({ ...state, isSignalingError: true })),
     throwConnectionError: () => set((state) => ({ ...state, isConnectionError: true })),
+    resolveSignalError: () => set((state) => ({ ...state, isSignalingError: false })),
+    resolveConnectionError: () => set((state) => ({ ...state, isConnectionError: false })),
   },
 }));
 

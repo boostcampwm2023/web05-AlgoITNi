@@ -105,6 +105,8 @@ const useRTCConnection = (roomId: string, localStream: MediaStream) => {
   };
 
   const onAllUser = async (data: { users: Array<{ id: string }> }) => {
+    if (data.users.length === 0) finishConnection();
+
     data.users.forEach((user) => {
       RTCConnections[user.id] = createPeerConnection(user.id);
     });

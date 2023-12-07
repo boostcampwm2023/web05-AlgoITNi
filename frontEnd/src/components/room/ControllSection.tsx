@@ -15,11 +15,13 @@ export default function ControllSection({ mediaObject }: { mediaObject: MediaObj
           stream={stream as MediaStream}
           kind="mic"
           className="w-[3vw] p-[1vw] hover:opacity-50 rounded-[15px]  shadow drop-shadow-2xl"
+          color="black"
         />
         <MediaControlButton
           stream={stream as MediaStream}
           kind="video"
           className="w-[3vw] p-[1vw] hover:opacity-50 rounded-[15px]  shadow drop-shadow-2xl"
+          color="black"
         />
       </div>
       <button type="button" className="w-[3vw] p-[1vw] hover:opacity-50 rounded-[15px] border-white " onClick={() => show({ mediaObject })}>

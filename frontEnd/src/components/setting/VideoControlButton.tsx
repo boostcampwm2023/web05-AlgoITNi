@@ -5,7 +5,8 @@ export default function VideoControlButton({ stream }: { stream: MediaStream }) 
     <MediaControlButton
       stream={stream}
       kind="video"
-      className="w-[5vw] p-[1vw] hover:opacity-50 border-solid border-[1px] rounded-[50%] border-white"
+      className="p-3 border-2 border-white border-solid rounded-full w-[72px] tablet:w-14 hover:opacity-50"
+      color="white"
     />
   );
 }
