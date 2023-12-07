@@ -3,8 +3,8 @@ import Video from '../common/Video';
 import MediaSelector from './MediaSelector';
 import useSpeaker from '@/stores/useSpeaker';
 import EmptyVideo from './EmptyVideo';
-import VideoControlButton from './VideoControlButton';
-import MicControlButton from './MicControlButton';
+import MicControlButton from '../common/MicControlButton';
+import VideoControlButton from '../common/VideoControlButton';
 
 export default function SettingVideo({ mediaObject }: { mediaObject: MediaObject }) {
   const { stream, camera, mic, speaker } = mediaObject;
@@ -23,8 +23,18 @@ export default function SettingVideo({ mediaObject }: { mediaObject: MediaObject
       <div className="relative w-full h-[60vh]">
         <Video stream={stream} muted />
         <div className="absolute flex items-center justify-center w-full gap-6 bottom-4">
-          <MicControlButton stream={stream} />
-          <VideoControlButton stream={stream} />
+          <MicControlButton
+            className="p-3 border-2 border-white border-solid rounded-full w-[72px] tablet:w-14 hover:opacity-50"
+            stream={stream}
+            onColor="white"
+            offColor="white"
+          />
+          <VideoControlButton
+            className="p-3 border-2 border-white border-solid rounded-full w-[72px] tablet:w-14 hover:opacity-50"
+            stream={stream}
+            onColor="white"
+            offColor="white"
+          />
         </div>
       </div>
       <div className="flex gap-2.5">
