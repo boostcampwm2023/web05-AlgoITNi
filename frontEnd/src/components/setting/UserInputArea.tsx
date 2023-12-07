@@ -7,6 +7,7 @@ import randomNameGenerator from '@/utils/randomNameGenerator';
 import useFocus from '@/hooks/useFocus';
 
 export default function UserInputArea() {
+  const mediaPermission = useRoomConfigData((state) => state.mediaPermisson);
   const { isConnectionError, isSignalingError, isSettingDone } = useRoomConfigData();
   const { setNickname, settingOn, settingOff, resolveConnectionError, resolveSignalError } = useRoomConfigData((state) => state.actions);
 
@@ -31,13 +32,19 @@ export default function UserInputArea() {
         <input className="p-4 rounded-lg drop-shadow-lg" type="text" ref={ref} value={inputValue} onChange={onChange} />
       </div>
       <div className="flex flex-col w-full gap-2">
-        <Button.Full
-          onClick={handleClickJoinRoomButton}
-          fontSize="20px"
-          className={isConnectionError || isSignalingError ? 'animate-[vibration_.5s_linear]' : ''}
-        >
-          {isSettingDone ? <Spinner /> : '참여'}
-        </Button.Full>
+        {mediaPermission ? (
+          <Button.Full
+            onClick={handleClickJoinRoomButton}
+            fontSize="20px"
+            className={isConnectionError || isSignalingError ? 'animate-[vibration_.5s_linear]' : ''}
+          >
+            {isSettingDone ? <Spinner /> : '참여'}
+          </Button.Full>
+        ) : (
+          <div className="flex items-center justify-center w-full py-4 text-lg text-white border rounded-lg drop-shadow-lg bg-point-red">
+            카메라 권한을 확인해주세요!
+          </div>
+        )}
         <div className="h-7">
           {isConnectionError && <span className="text-lg font-semibold text-point-red">방이 가득 찼습니다!</span>}
           {isSignalingError && (
