@@ -71,7 +71,7 @@ export class ChatKafkaGateway
   }
 
   @SubscribeMessage(SOCKET_EVENT.JOIN_ROOM)
-  handleJoin(
+  async handleJoin(
     @MessageBody() data: JoinRoomDto,
     @ConnectedSocket() socket: Socket,
   ) {
@@ -87,7 +87,7 @@ export class ChatKafkaGateway
     this.roomToCount.set(room, count + 1);
 
     if (!isRoom) {
-      this.consumer.subscribe({ topic: room, fromBeginning: false });
+      await this.consumer.subscribe({ topic: room, fromBeginning: false });
       this.rooms.set(room, true);
     }
   }
