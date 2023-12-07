@@ -8,10 +8,11 @@ import useRoomConfigData from '@/stores/useRoomConfigData';
 export default function Home() {
   const navigate = useNavigate();
   const { inputValue, onChange } = useInput('');
-  const { settingOff } = useRoomConfigData((state) => state.actions);
+  const { settingOff, stopConnection } = useRoomConfigData((state) => state.actions);
 
   useEffect(() => {
     settingOff();
+    stopConnection();
   }, []);
 
   const handleMakeRoomClick = () => {

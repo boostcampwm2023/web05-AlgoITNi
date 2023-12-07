@@ -11,6 +11,7 @@ export default function Setting({ mediaObject }: { mediaObject: MediaObject }) {
   const { setNickname, settingOn } = useRoomConfigData((state) => state.actions);
   const ref = useFocus<HTMLInputElement>();
   const { inputValue, onChange } = useInput(randomNameGenerator());
+  // const { isConnectionError, isSignalingError } = useRoomConfigData();
 
   const onClick = () => {
     setNickname(inputValue);

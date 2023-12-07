@@ -11,14 +11,15 @@ import useRoomConfigData from '@/stores/useRoomConfigData';
 
 export default function Room() {
   const defaultCode = localStorage.getItem('code');
+
   const { roomId } = useParams();
   const mediaObject = useMedia();
 
-  const isSetting = useRoomConfigData((state) => state.isSettingDone);
+  const isConnectionDone = useRoomConfigData((state) => state.isConnectionDone);
 
-  const { streamList } = useRTCConnection(roomId as string, mediaObject.stream as MediaStream, isSetting);
+  const { streamList } = useRTCConnection(roomId as string, mediaObject.stream as MediaStream);
 
-  if (!isSetting) return <Setting mediaObject={mediaObject} />;
+  if (!isConnectionDone) return <Setting mediaObject={mediaObject} />;
 
   return (
     <div className="flex w-screen h-screen gap-4 p-2 bg-base">

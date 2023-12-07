@@ -5,12 +5,18 @@ import { RTC_SOCKET_EMIT_EVENT, RTC_SOCKET_RECEIVE_EVENT } from '@/constants/rtc
 import { VITE_STUN_URL, VITE_TURN_CREDENTIAL, VITE_TURN_URL, VITE_TURN_USERNAME } from '@/constants/env';
 import getSocketURL from '@/apis/getSocketURL';
 import useDataChannels from '@/stores/useDataChannels';
+import useRoomConfigData from '@/stores/useRoomConfigData';
 
 const RTCConnections: Record<string, RTCPeerConnection> = {};
 let socket: Socket;
 
-const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: boolean) => {
-  const [isConnect, setIsConnect] = useState(false);
+const useRTCConnection = (roomId: string, localStream: MediaStream) => {
+  const {
+    isSettingDone,
+    isConnectionDone,
+    actions: { finishConnection, throwConnectionError, throwSignalError },
+  } = useRoomConfigData();
+
   const [streamList, setStreamList] = useState<{ id: string; stream: MediaStream }[]>([]);
 
   const { addCodeDataChannel, removeCodeDataChannel, addLanguageChannel, removeLanguageChannel } = useDataChannels();
@@ -24,18 +30,20 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
     socket.on(RTC_SOCKET_RECEIVE_EVENT.ANSWER, onAnswer);
     socket.on(RTC_SOCKET_RECEIVE_EVENT.CANDIDATE, onCandidate);
     socket.on(RTC_SOCKET_RECEIVE_EVENT.USER_EXIT, onUserExit);
+
+    socket.on('exception', throwConnectionError);
+    socket.on('error', throwSignalError);
+
     socket.connect();
 
     socket.emit(RTC_SOCKET_EMIT_EVENT.JOIN_ROOM, {
       room: roomId,
     });
-
-    setIsConnect(true);
   };
 
   useEffect(() => {
-    if (localStream && isSetting) {
-      if (!isConnect) socketConnect();
+    if (localStream && isSettingDone) {
+      if (!isConnectionDone) socketConnect();
       else {
         Object.values(RTCConnections).forEach(async (peerConnection) => {
           const videoSender = peerConnection.getSenders().find((sender) => sender.track?.kind === 'video');
@@ -50,7 +58,7 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
         });
       }
     }
-  }, [localStream, isSetting]);
+  }, [localStream, isSettingDone]);
 
   const createPeerConnection = (socketId: string): RTCPeerConnection => {
     const RTCConnection = new RTCPeerConnection({
@@ -87,6 +95,7 @@ const useRTCConnection = (roomId: string, localStream: MediaStream, isSetting: b
         const newArray = [...prev].filter(({ id }) => id !== socketId);
         return [...newArray, { id: socketId, stream: e.streams[0] }];
       });
+      finishConnection();
     });
 
     addCodeDataChannel(socketId, newCodeDataChannel);
