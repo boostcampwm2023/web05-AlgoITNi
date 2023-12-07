@@ -109,6 +109,7 @@ export class ChatKafkaGateway
 
     if (count === SOCKET.EMPTY_ROOM) {
       this.rooms.delete(room);
+      this.roomToCount.delete(room);
     }
   }
 
@@ -123,11 +124,7 @@ export class ChatKafkaGateway
 
     const { room, message, nickname, ai } = data;
 
-    const response = {
-      message: message,
-      nickname: nickname,
-      ai: ai,
-    };
+    const response = { message, nickname, ai };
 
     try {
       await this.producer.send({
