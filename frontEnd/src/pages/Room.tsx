@@ -22,7 +22,7 @@ export default function Room() {
   if (!isConnectionDone && !hasLogin) return <Setting mediaObject={mediaObject} />;
 
   return (
-    <div className="flex h-screen min-w-full min-h-screen gap-4 p-2 overflow-hidden bg-base over">
+    <div className="flex h-screen min-w-full min-h-screen gap-4 p-2 overflow-hidden bg-base">
       <div className="flex flex-col w-3/4 h-full gap-4 tablet:flex-row tablet:w-full">
         <div className="flex w-full tablet:max-w-[250px] mobile:hidden">
           <VideoSection mediaObject={mediaObject} streamList={streamList} />
