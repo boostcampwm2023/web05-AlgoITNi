@@ -66,7 +66,7 @@ export class RunGateway implements OnGatewayConnection {
         result.result,
         result.message,
       );
-      socket.emit(SOCKET_EVENT.DONE, response);
+      socket.emit(SOCKET_EVENT.DONE, response.statusCode);
     });
   }
 
@@ -92,9 +92,9 @@ export class RunGateway implements OnGatewayConnection {
     this.connectedSockets.delete(socket.id);
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   handleNotCompleteSocket() {
-    const Before10S = Date.now() - 10000;
+    const Before10S = Date.now() - 20000;
     this.connectedSockets.forEach((value, key) => {
       const { socket, createTime } = value;
       if (createTime < Before10S) this.connectedSockets.delete(key);
