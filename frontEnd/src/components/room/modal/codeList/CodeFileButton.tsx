@@ -45,7 +45,7 @@ export default function CodeFileButton({
       className="flex flex-col items-center justify-center col-span-1"
     >
       <div className="relative w-1/3 group">
-        <img src="/fileIcon.png" alt="fileIcon" />
+        <img src={`/${code.language}File.png`} alt="fileIcon" />
 
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div className="absolute -top-3 -right-2 w-[50px] group-hover:block hidden" onClick={handleDeleteButton}>
