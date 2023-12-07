@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Socket, io } from 'socket.io-client/debug';
 import { VITE_CHAT_URL } from '@/constants/env';
 import { ErrorData, ErrorResponse, MessageData } from '@/types/chatting';
@@ -12,12 +12,13 @@ import Section from '../common/SectionWrapper';
 import { CHATTING_ERROR_STATUS_CODE, CHATTING_ERROR_TEXT } from '@/constants/chattingErrorResponse';
 import ChattingErrorToast from '../common/ChattingErrorToast';
 import useRoomConfigData from '@/stores/useRoomConfigData';
+import useInput from '@/hooks/useInput';
+import useScroll from '@/hooks/useScroll';
 
 let socket: Socket;
-let timer: NodeJS.Timeout | null;
 
 export default function ChattingSection() {
-  const [message, setMessage] = useState('');
+  const { inputValue: message, onChange, resetInput } = useInput('');
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
   const [usingAi, setUsingAi] = useState<boolean>(false);
   const [postingAi, setPostingAi] = useState<boolean>(false);
@@ -26,35 +27,8 @@ export default function ChattingSection() {
 
   const nickname = useRoomConfigData((state) => state.nickname);
 
-  const { isViewingLastMessage, isRecievedMessage, setScrollRatio, setIsRecievedMessage } = useLastMessageViewingState();
-
-  const messageAreaRef = useRef<HTMLDivElement | null>(null);
-
-  const handleScroll = () => {
-    if (!timer) {
-      timer = setTimeout(() => {
-        timer = null;
-
-        if (!messageAreaRef.current) return;
-
-        const { scrollTop, clientHeight, scrollHeight } = messageAreaRef.current;
-        setScrollRatio(((scrollTop + clientHeight) / scrollHeight) * 100);
-      }, 200);
-    }
-  };
-
-  const moveToBottom = (ref: React.RefObject<HTMLElement>) => {
-    if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
-  };
-
-  const handleMoveToBottom = () => {
-    moveToBottom(messageAreaRef);
-    setScrollRatio(100);
-  };
-
-  const handleInputMessage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(event.target.value);
-  };
+  const { ref: messageAreaRef, scrollRatio, handleScroll, moveToBottom } = useScroll<HTMLDivElement>();
+  const { isViewingLastMessage, isRecievedMessage, setIsRecievedMessage } = useLastMessageViewingState(scrollRatio);
 
   const handleMessageSend = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -66,15 +40,15 @@ export default function ChattingSection() {
       socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname, ai: true });
     } else socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname, ai: false });
 
-    setMessage('');
-    setScrollRatio(100);
+    resetInput();
+    moveToBottom();
   };
 
   const handleRecieveMessage = (recievedMessage: string) => {
     const newMessage: MessageData | { using: boolean } = JSON.parse(recievedMessage);
+    const remoteUsingAi = 'using' in newMessage;
 
-    // 새로운 메시지가 AI 사용 여부에 관한 메시지인 경우
-    if ('using' in newMessage) {
+    if (remoteUsingAi) {
       setPostingAi(newMessage.using);
       return;
     }
@@ -109,7 +83,7 @@ export default function ChattingSection() {
   }, []);
 
   useEffect(() => {
-    if (isViewingLastMessage) moveToBottom(messageAreaRef);
+    if (isViewingLastMessage) moveToBottom();
     else setIsRecievedMessage(true);
   }, [allMessages]);
 
@@ -125,12 +99,12 @@ export default function ChattingSection() {
             <ChattingMessage messageData={messageData} key={index} isMyMessage={messageData.socketId === socket.id} />
           ))}
         </div>
-        {isRecievedMessage && <ScrollDownButton handleMoveToBottom={handleMoveToBottom} />}
+        {isRecievedMessage && <ScrollDownButton handleMoveToBottom={moveToBottom} />}
         {errorData && <ChattingErrorToast errorData={errorData} setErrorData={setErrorData} />}
         <ChattingInput
           handleMessageSend={handleMessageSend}
           message={message}
-          handleInputMessage={handleInputMessage}
+          handleInputMessage={onChange}
           usingAi={usingAi}
           setUsingAi={setUsingAi}
           postingAi={postingAi}
