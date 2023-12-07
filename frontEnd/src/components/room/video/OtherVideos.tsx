@@ -10,7 +10,7 @@ interface OtherVideosProps {
 
 export default function OtherVideos({ streamList }: OtherVideosProps) {
   return streamList.map(({ id, stream }) => (
-    <div className="flex basis-1/4 " key={id}>
+    <div className="col-span-1 tablet:max-w-[250px] tablet:min-h-[150px]" key={id}>
       <Video stream={stream} />
     </div>
   ));
