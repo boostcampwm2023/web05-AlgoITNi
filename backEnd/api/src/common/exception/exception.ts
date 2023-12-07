@@ -50,6 +50,6 @@ export class ExtNameException extends HttpException {
 
 export class CrawlerException extends HttpException {
   constructor(message = '크롤링에 실패하였습니다.') {
-    super(message, HttpStatus.BAD_REQUEST);
+    super(message, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
