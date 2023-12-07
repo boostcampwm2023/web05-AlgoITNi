@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Socket, io } from 'socket.io-client/debug';
 import { VITE_CHAT_URL } from '@/constants/env';
 import { ErrorData, ErrorResponse, MessageData } from '@/types/chatting';
@@ -13,7 +13,7 @@ import { CHATTING_ERROR_STATUS_CODE, CHATTING_ERROR_TEXT } from '@/constants/cha
 import ChattingErrorToast from '../common/ChattingErrorToast';
 import useScroll from '@/hooks/useScroll';
 
-export default function ChattingSection() {
+function ChattingSection() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
 
@@ -99,3 +99,5 @@ export default function ChattingSection() {
     </Section>
   );
 }
+
+export default memo(ChattingSection);
