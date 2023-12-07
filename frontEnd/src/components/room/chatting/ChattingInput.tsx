@@ -3,8 +3,8 @@ import ToggleAi from '@/components/common/ToggleAi';
 
 function SendButtonText({ usingAi, postingAi }: { usingAi: boolean; postingAi: boolean }) {
   if (!usingAi) return '전송';
-
   if (postingAi) return <Spinner />;
+
   return '질문';
 }
 

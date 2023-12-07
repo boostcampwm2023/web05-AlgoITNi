@@ -37,6 +37,8 @@ export default function ChattingSection() {
 
     if (usingAi) {
       setPostingAi(true);
+
+      socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname: `${nickname}의 질문`, ai: false });
       socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname, ai: true });
     } else socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname, ai: false });
 
