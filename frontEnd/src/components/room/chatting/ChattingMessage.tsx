@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { MessageData } from '@/types/chatting';
 
 interface ChattingMessageProps {
@@ -5,7 +6,7 @@ interface ChattingMessageProps {
   isMyMessage: boolean;
 }
 
-export default function ChattingMessage({ messageData, isMyMessage }: ChattingMessageProps) {
+function ChattingMessage({ messageData, isMyMessage }: ChattingMessageProps) {
   const aiMessage = messageData.ai;
   const myMessage = !aiMessage && isMyMessage;
 
@@ -25,3 +26,5 @@ export default function ChattingMessage({ messageData, isMyMessage }: ChattingMe
     </div>
   );
 }
+
+export default memo(ChattingMessage);

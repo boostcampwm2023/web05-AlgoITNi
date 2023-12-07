@@ -1,5 +1,10 @@
+import { useParams } from 'react-router-dom';
+import { Socket } from 'socket.io-client/debug';
 import Spinner from '@/components/common/Spinner';
 import ToggleAi from '@/components/common/ToggleAi';
+import { CHATTING_SOCKET_EMIT_EVNET } from '@/constants/chattingSocketEvents';
+import useInput from '@/hooks/useInput';
+import useRoomConfigData from '@/stores/useRoomConfigData';
 
 function SendButtonText({ usingAi, postingAi }: { usingAi: boolean; postingAi: boolean }) {
   if (!usingAi) return '전송';
@@ -9,22 +14,35 @@ function SendButtonText({ usingAi, postingAi }: { usingAi: boolean; postingAi: b
 }
 
 interface ChattingInputProps {
-  handleMessageSend: (event: React.FormEvent<HTMLFormElement>) => void;
-  message: string;
-  handleInputMessage: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   usingAi: boolean;
   setUsingAi: React.Dispatch<React.SetStateAction<boolean>>;
   postingAi: boolean;
+  setPostingAi: React.Dispatch<React.SetStateAction<boolean>>;
+  socket: Socket | null;
+  moveToBottom: () => void;
 }
 
-export default function ChattingInput({
-  handleMessageSend,
-  message,
-  handleInputMessage,
-  usingAi,
-  setUsingAi,
-  postingAi,
-}: ChattingInputProps) {
+export default function ChattingInput({ usingAi, setUsingAi, postingAi, setPostingAi, socket, moveToBottom }: ChattingInputProps) {
+  const { inputValue: message, onChange, resetInput } = useInput<HTMLTextAreaElement>('');
+  const nickname = useRoomConfigData((state) => state.nickname);
+  const { roomId } = useParams();
+
+  const handleMessageSend = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!socket) return;
+
+    if (usingAi) {
+      setPostingAi(true);
+
+      socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname: `${nickname}의 질문`, ai: false });
+      socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname, ai: true });
+    } else socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname, ai: false });
+
+    resetInput();
+    moveToBottom();
+  };
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
@@ -40,7 +58,7 @@ export default function ChattingInput({
           onKeyDown={handleKeyDown}
           disabled={usingAi && postingAi}
           value={message}
-          onChange={handleInputMessage}
+          onChange={onChange}
           className={`w-full h-full p-2 px-4 focus:outline-none rounded-s-lg resize-none border-2 custom-scroll ${
             usingAi ? 'border-point-blue' : 'border-white'
           }`}
