@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useRTCConnection from '@/hooks/useRTCConnection';
 import Setting from '@/components/setting/Settings';
@@ -11,15 +12,14 @@ import useRoomConfigData from '@/stores/useRoomConfigData';
 
 export default function Room() {
   const defaultCode = localStorage.getItem('code');
-
+  const defaultNickName = localStorage.getItem('nickName');
+  const [hasLogin] = useState((!!defaultCode || defaultCode === '') && !!defaultNickName);
   const { roomId } = useParams();
   const mediaObject = useMedia();
-
   const isConnectionDone = useRoomConfigData((state) => state.isConnectionDone);
 
   const { streamList } = useRTCConnection(roomId as string, mediaObject.stream as MediaStream);
-
-  if (!isConnectionDone) return <Setting mediaObject={mediaObject} />;
+  if (!isConnectionDone && !hasLogin) return <Setting mediaObject={mediaObject} />;
 
   return (
     <div className="flex w-screen h-screen gap-4 p-2 bg-base">
