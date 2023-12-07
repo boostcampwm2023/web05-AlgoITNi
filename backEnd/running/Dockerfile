@@ -30,4 +30,4 @@ RUN adduser deploy || true
 
 USER deploy
 
-CMD ["pm2-runtime", "dist/main.js", "-i", "1"]
+CMD ["pm2-runtime", "dist/main.js", "-i", "max"]

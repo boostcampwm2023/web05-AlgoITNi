@@ -1,11 +1,19 @@
+import { useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import Button from '@/components/common/Button';
 import useInput from '@/hooks/useInput';
+import useRoomConfigData from '@/stores/useRoomConfigData';
 
 export default function Home() {
   const navigate = useNavigate();
   const { inputValue, onChange } = useInput('');
+  const { settingOff, stopConnection } = useRoomConfigData((state) => state.actions);
+
+  useEffect(() => {
+    settingOff();
+    stopConnection();
+  }, []);
 
   const handleMakeRoomClick = () => {
     const roomId = uuidv4();

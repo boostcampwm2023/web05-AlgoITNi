@@ -43,7 +43,7 @@ export default function SaveButton({ plainCode, languageInfo, fileName, setFileN
 
   return (
     <div className="relative h-full">
-      <div className="flex items-center justify-center w-24 h-full px-4 text-sm text-black rounded shadow cursor-pointer peer whitespace-nowrap drop-shadow-lg bg-base">
+      <div className="flex items-center justify-center w-24 h-full px-4 text-sm text-black rounded shadow cursor-pointer peer whitespace-nowrap drop-shadow-lg bg-base mobile:px-2 mobile:py-1 mobile:w-16">
         저장하기
       </div>
       <div className="absolute z-10 items-center justify-between hidden gap-2 p-2 -translate-x-1/2 bg-white border rounded-lg shadow left-1/2 -top-12 peer-hover:flex hover:flex drop-shadow-lg">

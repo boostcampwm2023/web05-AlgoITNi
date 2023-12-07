@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export default function useLastMessageViewingState() {
-  const [scrollRatio, setScrollRatio] = useState(100);
+export default function useLastMessageViewingState(scrollRatio: number) {
   const [isViewingLastMessage, setIsViewingLastMessage] = useState(true);
   const [isRecievedMessage, setIsRecievedMessage] = useState(false);
 
@@ -12,5 +11,5 @@ export default function useLastMessageViewingState() {
     } else setIsViewingLastMessage(false);
   }, [scrollRatio]);
 
-  return { setScrollRatio, setIsRecievedMessage, isRecievedMessage, isViewingLastMessage };
+  return { setIsRecievedMessage, isRecievedMessage, isViewingLastMessage };
 }

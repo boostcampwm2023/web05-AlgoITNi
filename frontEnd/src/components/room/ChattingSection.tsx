@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Socket, io } from 'socket.io-client/debug';
 import { VITE_CHAT_URL } from '@/constants/env';
 import { ErrorData, ErrorResponse, MessageData } from '@/types/chatting';
@@ -11,70 +11,26 @@ import { CHATTING_SOCKET_EMIT_EVNET, CHATTING_SOCKET_RECIEVE_EVNET } from '@/con
 import Section from '../common/SectionWrapper';
 import { CHATTING_ERROR_STATUS_CODE, CHATTING_ERROR_TEXT } from '@/constants/chattingErrorResponse';
 import ChattingErrorToast from '../common/ChattingErrorToast';
-import useRoomConfigData from '@/stores/useRoomConfigData';
+import useScroll from '@/hooks/useScroll';
 
-let socket: Socket;
-let timer: NodeJS.Timeout | null;
-
-export default function ChattingSection() {
-  const [message, setMessage] = useState('');
+function ChattingSection() {
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [allMessages, setAllMessage] = useState<MessageData[]>([]);
+
   const [usingAi, setUsingAi] = useState<boolean>(false);
   const [postingAi, setPostingAi] = useState<boolean>(false);
+
   const [errorData, setErrorData] = useState<ErrorData | null>(null);
   const { roomId } = useParams();
 
-  const nickname = useRoomConfigData((state) => state.nickname);
-
-  const { isViewingLastMessage, isRecievedMessage, setScrollRatio, setIsRecievedMessage } = useLastMessageViewingState();
-
-  const messageAreaRef = useRef<HTMLDivElement | null>(null);
-
-  const handleScroll = () => {
-    if (!timer) {
-      timer = setTimeout(() => {
-        timer = null;
-
-        if (!messageAreaRef.current) return;
-
-        const { scrollTop, clientHeight, scrollHeight } = messageAreaRef.current;
-        setScrollRatio(((scrollTop + clientHeight) / scrollHeight) * 100);
-      }, 200);
-    }
-  };
-
-  const moveToBottom = (ref: React.RefObject<HTMLElement>) => {
-    if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
-  };
-
-  const handleMoveToBottom = () => {
-    moveToBottom(messageAreaRef);
-    setScrollRatio(100);
-  };
-
-  const handleInputMessage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(event.target.value);
-  };
-
-  const handleMessageSend = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!socket) return;
-
-    if (usingAi) {
-      setPostingAi(true);
-      socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname, ai: true });
-    } else socket.emit(CHATTING_SOCKET_EMIT_EVNET.SEND_MESSAGE, { room: roomId, message, nickname, ai: false });
-
-    setMessage('');
-    setScrollRatio(100);
-  };
+  const { ref: messageAreaRef, scrollRatio, handleScroll, moveToBottom } = useScroll<HTMLDivElement>();
+  const { isViewingLastMessage, isRecievedMessage, setIsRecievedMessage } = useLastMessageViewingState(scrollRatio);
 
   const handleRecieveMessage = (recievedMessage: string) => {
     const newMessage: MessageData | { using: boolean } = JSON.parse(recievedMessage);
+    const remoteUsingAi = 'using' in newMessage;
 
-    // 새로운 메시지가 AI 사용 여부에 관한 메시지인 경우
-    if ('using' in newMessage) {
+    if (remoteUsingAi) {
       setPostingAi(newMessage.using);
       return;
     }
@@ -97,19 +53,23 @@ export default function ChattingSection() {
   };
 
   useEffect(() => {
-    socket = io(VITE_CHAT_URL, {
-      transports: ['websocket'],
+    setSocket(() => {
+      const newSocket = io(VITE_CHAT_URL, {
+        transports: ['websocket'],
+      });
+
+      newSocket.on(CHATTING_SOCKET_RECIEVE_EVNET.NEW_MESSAGE, handleRecieveMessage);
+      newSocket.on('exception', handleChattingSocketError);
+      newSocket.connect();
+
+      newSocket.emit(CHATTING_SOCKET_EMIT_EVNET.JOIN_ROOM, { room: roomId });
+
+      return newSocket;
     });
-
-    socket.on(CHATTING_SOCKET_RECIEVE_EVNET.NEW_MESSAGE, handleRecieveMessage);
-    socket.on('exception', handleChattingSocketError);
-    socket.connect();
-
-    socket.emit(CHATTING_SOCKET_EMIT_EVNET.JOIN_ROOM, { room: roomId });
   }, []);
 
   useEffect(() => {
-    if (isViewingLastMessage) moveToBottom(messageAreaRef);
+    if (isViewingLastMessage) moveToBottom();
     else setIsRecievedMessage(true);
   }, [allMessages]);
 
@@ -122,20 +82,22 @@ export default function ChattingSection() {
           onScroll={handleScroll}
         >
           {allMessages.map((messageData, index) => (
-            <ChattingMessage messageData={messageData} key={index} isMyMessage={messageData.socketId === socket.id} />
+            <ChattingMessage messageData={messageData} key={index} isMyMessage={messageData.socketId === socket?.id} />
           ))}
         </div>
-        {isRecievedMessage && <ScrollDownButton handleMoveToBottom={handleMoveToBottom} />}
+        {isRecievedMessage && <ScrollDownButton handleMoveToBottom={moveToBottom} />}
         {errorData && <ChattingErrorToast errorData={errorData} setErrorData={setErrorData} />}
         <ChattingInput
-          handleMessageSend={handleMessageSend}
-          message={message}
-          handleInputMessage={handleInputMessage}
           usingAi={usingAi}
           setUsingAi={setUsingAi}
           postingAi={postingAi}
+          socket={socket}
+          setPostingAi={setPostingAi}
+          moveToBottom={moveToBottom}
         />
       </div>
     </Section>
   );
 }
+
+export default memo(ChattingSection);

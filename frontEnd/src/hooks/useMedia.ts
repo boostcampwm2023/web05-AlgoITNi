@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import useSpeaker from '@/stores/useSpeaker';
 import useMediaControl from '@/stores/useMediaControl';
+import useRoomConfigData from '@/stores/useRoomConfigData';
 
 export interface MediaObject {
   stream: MediaStream | undefined;
@@ -26,6 +27,7 @@ export default function useMedia(): MediaObject {
   const [selectedMic, setSelectedMic] = useState<string>('');
   const { speaker } = useSpeaker((state) => state);
   const { micOn, videoOn } = useMediaControl((state) => state);
+  const { revokeMediaPermission } = useRoomConfigData((state) => state.actions);
 
   useEffect(() => {
     navigator.mediaDevices
@@ -50,7 +52,8 @@ export default function useMedia(): MediaObject {
             track.enabled = false;
           });
         setUserStream(stream);
-      });
+      })
+      .catch(revokeMediaPermission);
   }, [selectedCamera, selectedMic, speaker]);
 
   return {

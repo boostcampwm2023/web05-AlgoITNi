@@ -31,7 +31,7 @@ export function languageCommand(language, filePaths) {
     case 'c':
       return `gcc -o ${compile_dist} ${filepath} && ${compile_dist}`;
     case 'swift':
-      return `swiftc ${filepath} && ${compile_dist}`;
+      return `swiftc -o ${compile_dist} ${filepath} && ${compile_dist}`;
     case 'kotlin':
       return `kotlinc ${filepath} -include-runtime -d ${compile_dist} && java -jar ${compile_dist}`;
   }

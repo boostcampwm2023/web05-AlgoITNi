@@ -1,6 +1,7 @@
 import {
   ConnectedSocket,
   OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
@@ -17,7 +18,7 @@ import { RunService } from './run.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 @WebSocketGateway({ namespace: SOCKET_EVENT.NAME_SPACE, cors: true })
-export class RunGateway implements OnGatewayConnection {
+export class RunGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
@@ -78,6 +79,10 @@ export class RunGateway implements OnGatewayConnection {
     });
   }
 
+  handleDisconnect(@ConnectedSocket() socket: Socket) {
+    this.connectedSockets.delete(socket.id);
+  }
+
   @SubscribeMessage(SOCKET_EVENT.REQUEST)
   async requestRunCode(
     @ConnectedSocket() socket: Socket,
@@ -87,17 +92,12 @@ export class RunGateway implements OnGatewayConnection {
     this.jobSocketInfo.set(jobID, socket.id);
   }
 
-  @SubscribeMessage(SOCKET_EVENT.DISCONNECT)
-  disconnect(@ConnectedSocket() socket: Socket) {
-    this.connectedSockets.delete(socket.id);
-  }
-
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   handleNotCompleteSocket() {
-    const Before10S = Date.now() - 10000;
+    const Before20S = Date.now() - 20000;
     this.connectedSockets.forEach((value, key) => {
       const { socket, createTime } = value;
-      if (createTime < Before10S) this.connectedSockets.delete(key);
+      if (createTime < Before20S) this.connectedSockets.delete(key);
       socket.disconnect();
     });
   }
