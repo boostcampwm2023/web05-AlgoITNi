@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useRTCConnection from '@/hooks/useRTCConnection';
 import Setting from '@/components/setting/Settings';
@@ -10,10 +9,11 @@ import ChattingSection from '@/components/room/ChattingSection';
 import ControllSection from '@/components/room/ControllSection';
 import useRoomConfigData from '@/stores/useRoomConfigData';
 
+const defaultCode = localStorage.getItem('code');
+const defaultNickName = localStorage.getItem('nickName');
+const hasLogin = (!!defaultCode || defaultCode === '') && !!defaultNickName;
+
 export default function Room() {
-  const defaultCode = localStorage.getItem('code');
-  const defaultNickName = localStorage.getItem('nickName');
-  const [hasLogin] = useState((!!defaultCode || defaultCode === '') && !!defaultNickName);
   const { roomId } = useParams();
   const mediaObject = useMedia();
   const isConnectionDone = useRoomConfigData((state) => state.isConnectionDone);
