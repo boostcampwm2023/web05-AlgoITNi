@@ -27,9 +27,7 @@ export default function ChattingInput({ usingAi, setUsingAi, postingAi, setPosti
   const nickname = useRoomConfigData((state) => state.nickname);
   const { roomId } = useParams();
 
-  const handleMessageSend = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleMessageSend = () => {
     if (!socket) return;
 
     if (usingAi) {
@@ -44,14 +42,17 @@ export default function ChattingInput({ usingAi, setUsingAi, postingAi, setPosti
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
+    if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
       event.preventDefault();
-      handleMessageSend(event as unknown as React.FormEvent<HTMLFormElement>);
+
+      if (!message) return;
+
+      handleMessageSend();
     }
   };
 
   return (
-    <form onSubmit={handleMessageSend} className="w-full p-2 rounded-b-lg bg-base">
+    <form className="w-full p-2 rounded-b-lg bg-base">
       <ToggleAi usingAi={usingAi} setUsingAi={setUsingAi} />
       <div className="flex items-center w-full h-[72px] rounded-lg drop-shadow-lg">
         <textarea
