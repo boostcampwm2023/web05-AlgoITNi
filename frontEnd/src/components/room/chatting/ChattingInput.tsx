@@ -28,7 +28,7 @@ export default function ChattingInput({ usingAi, setUsingAi, postingAi, setPosti
   const { roomId } = useParams();
 
   const handleMessageSend = () => {
-    if (!socket) return;
+    if (!socket || !message) return;
 
     if (usingAi) {
       setPostingAi(true);
@@ -43,38 +43,45 @@ export default function ChattingInput({ usingAi, setUsingAi, postingAi, setPosti
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
-      event.preventDefault();
+      if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
+        event.preventDefault();
 
-      if (!message) return;
+        if (!message) return;
 
-      handleMessageSend();
+        handleMessageSend();
+
+        if (!message) return;
+
+        handleMessageSend();
+      }
     }
-  };
 
-  return (
-    <form className="w-full p-2 rounded-b-lg bg-base">
-      <ToggleAi usingAi={usingAi} setUsingAi={setUsingAi} />
-      <div className="flex items-center w-full h-[72px] rounded-lg drop-shadow-lg">
-        <textarea
-          onKeyDown={handleKeyDown}
-          disabled={usingAi && postingAi}
-          value={message}
-          onChange={onChange}
-          className={`w-full h-full p-2 px-4 focus:outline-none rounded-s-lg resize-none border-2 custom-scroll ${
-            usingAi ? 'border-point-blue' : 'border-white'
-          }`}
-          placeholder={usingAi ? 'AI에게 질문해보세요' : 'Message'}
-        />
-        <button
-          type="submit"
-          className={`font-normal rounded-e-lg whitespace-nowrap w-16 flex items-center justify-center h-full ${
-            usingAi ? 'bg-point-blue text-white' : 'bg-primary text-black'
-          }`}
-          disabled={usingAi && postingAi}
-        >
-          <SendButtonText usingAi={usingAi} postingAi={postingAi} />
-        </button>
+    return (
+      <div className="w-full p-2 rounded-b-lg bg-base">
+        <ToggleAi usingAi={usingAi} setUsingAi={setUsingAi} />
+        <div className="flex items-center w-full h-[72px] rounded-lg drop-shadow-lg">
+          <textarea
+            onKeyDown={handleKeyDown}
+            disabled={usingAi && postingAi}
+            value={message}
+            onChange={onChange}
+            className={`w-full h-full p-2 px-4 focus:outline-none rounded-s-lg resize-none border-2 custom-scroll ${
+              usingAi ? 'border-point-blue' : 'border-white'
+            }`}
+            placeholder={usingAi ? 'AI에게 질문해보세요' : 'Message'}
+          />
+          <button
+            type="button"
+            onClick={handleMessageSend}
+            className={`font-normal rounded-e-lg whitespace-nowrap w-16 flex items-center justify-center h-full ${
+              usingAi ? 'bg-point-blue text-white' : 'bg-primary text-black'
+            }`}
+            disabled={usingAi && postingAi}
+          >
+            <SendButtonText usingAi={usingAi} postingAi={postingAi} />
+          </button>
+        </div>
       </div>
-    </form>
-  );
+    );
+  };
 }
