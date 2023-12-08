@@ -67,19 +67,19 @@ export class CodesService {
       const stdout = [];
       const stderr = [];
       try {
-        const childProcess = spawn(commandParts[0], commandParts.slice(1));
+        const childProcess = spawn(commandParts[0], commandParts.slice(1), {
+          env: { STOP: "DON'T TRY TO ATTACK!!! PLZ..." },
+        });
         const timer = setTimeout(() => {
           this.logger.log('timeout!');
           childProcess.kill(this.killSignal);
         }, this.timeOut);
 
         childProcess.stdout.on('data', (data) => {
-          // Handle stdout data
           stdout.push(data);
         });
 
         childProcess.stderr.on('data', (data) => {
-          // Handle stderr data
           stderr.push(data);
         });
 
