@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client/debug';
 import Spinner from '@/components/common/Spinner';
@@ -25,13 +24,10 @@ interface ChattingInputProps {
 
 export default function ChattingInput({ usingAi, setUsingAi, postingAi, setPostingAi, socket, moveToBottom }: ChattingInputProps) {
   const { inputValue: message, onChange, resetInput } = useInput<HTMLTextAreaElement>('');
-  const [prevKey, setPrevKey] = useState<string>('');
   const nickname = useRoomConfigData((state) => state.nickname);
   const { roomId } = useParams();
 
-  const handleMessageSend = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
+  const handleMessageSend = () => {
     if (!socket) return;
 
     if (usingAi) {
@@ -46,18 +42,17 @@ export default function ChattingInput({ usingAi, setUsingAi, postingAi, setPosti
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter') {
-      if (prevKey !== 'Shift' && !event.nativeEvent.isComposing) {
-        event.preventDefault();
-        handleMessageSend(event as unknown as React.FormEvent<HTMLFormElement>);
-      }
-    }
+    if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
+      event.preventDefault();
 
-    setPrevKey(event.key);
+      if (!message) return;
+
+      handleMessageSend();
+    }
   };
 
   return (
-    <form onSubmit={handleMessageSend} className="w-full p-2 rounded-b-lg bg-base">
+    <form className="w-full p-2 rounded-b-lg bg-base">
       <ToggleAi usingAi={usingAi} setUsingAi={setUsingAi} />
       <div className="flex items-center w-full h-[72px] rounded-lg drop-shadow-lg">
         <textarea
