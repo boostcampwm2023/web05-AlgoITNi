@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Socket } from 'socket.io-client/debug';
 import Spinner from '@/components/common/Spinner';
@@ -24,6 +25,7 @@ interface ChattingInputProps {
 
 export default function ChattingInput({ usingAi, setUsingAi, postingAi, setPostingAi, socket, moveToBottom }: ChattingInputProps) {
   const { inputValue: message, onChange, resetInput } = useInput<HTMLTextAreaElement>('');
+  const [prevKey, setPrevKey] = useState<string>('');
   const nickname = useRoomConfigData((state) => state.nickname);
   const { roomId } = useParams();
 
@@ -44,10 +46,14 @@ export default function ChattingInput({ usingAi, setUsingAi, postingAi, setPosti
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault();
-      handleMessageSend(event as unknown as React.FormEvent<HTMLFormElement>);
+    if (event.key === 'Enter') {
+      if (prevKey !== 'Shift' && !event.nativeEvent.isComposing) {
+        event.preventDefault();
+        handleMessageSend(event as unknown as React.FormEvent<HTMLFormElement>);
+      }
     }
+
+    setPrevKey(event.key);
   };
 
   return (
