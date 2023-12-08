@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { ResponseCodeDto } from './dto/response-code.dto ';
 import { RunningException } from 'src/common/exception/exception';
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 import { Messages } from '../common/utils';
 import {
   supportLang,
@@ -41,6 +41,7 @@ export class CodesService {
       fs.writeFileSync(filePath, code);
       const { stdout, stderr } = await this.runCommand(filePaths, language);
       if (stderr) {
+        console.log(stderr);
         throw new RunningException(stderr.trim());
       }
       return this.getOutput(stdout);
@@ -62,26 +63,39 @@ export class CodesService {
   ): Promise<runCommandResult> {
     const command = languageCommand(language, filePaths);
     return new Promise((resolve) => {
-      // eslint-disable-next-line
-      let timer;
-      const childProcess = exec(command, (error, stdout, stderr) => {
-        clearTimeout(timer);
-        if (error) {
-          this.logger.error(`failed to run requested code ${error.message}`);
+      const commandParts = command.split(' ');
+      const stdout = [];
+      const stderr = [];
+      try {
+        const childProcess = spawn(commandParts[0], commandParts.slice(1));
+        const timer = setTimeout(() => {
+          this.logger.log('timeout!');
+          childProcess.kill(this.killSignal);
+        }, this.timeOut);
 
-          if (error.signal === this.killSignal) {
-            stderr = Messages.TIMEOUT;
-          }
-          resolve({ stdout, stderr });
-        } else {
-          resolve({ stdout, stderr });
-        }
-      });
+        childProcess.stdout.on('data', (data) => {
+          // Handle stdout data
+          stdout.push(data);
+        });
 
-      timer = setTimeout(() => {
-        this.logger.log('timeout!');
-        childProcess.kill(this.killSignal);
-      }, this.timeOut);
+        childProcess.stderr.on('data', (data) => {
+          // Handle stderr data
+          stderr.push(data);
+        });
+
+        childProcess.on('close', (code, signal) => {
+          this.logger.log(`child process exited with code ${code}, ${signal}`);
+          clearTimeout(timer);
+          const out = Buffer.concat(stdout).toString();
+          const err =
+            signal === this.killSignal
+              ? Messages.TIMEOUT
+              : Buffer.concat(stderr).toString();
+          resolve({ stdout: out, stderr: err });
+        });
+      } catch (e) {
+        this.logger.error(e);
+      }
     });
   }
 
