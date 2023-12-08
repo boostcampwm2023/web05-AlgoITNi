@@ -35,31 +35,6 @@ describe('ChatGateway', () => {
   });
 
   describe('JOIN_ROOM', () => {
-    it('클라이언트가 방에 참여하면 방마다 클라이언트 수를 기록한다.', async () => {
-      //GIVEN
-      const mockSockets = [
-        new MockSocket('1'),
-        new MockSocket('2'),
-        new MockSocket('3'),
-        new MockSocket('4'),
-      ];
-
-      //WHEN
-      mockSockets
-        .slice(0, 3)
-        .forEach((socket) =>
-          gateway.handleJoin({ room: 'ABC' }, socket as unknown as Socket),
-        );
-      gateway.handleJoin({ room: 'DEF' }, mockSockets[3] as unknown as Socket);
-
-      //THEN
-      //HAPPY PATH
-      expect(gateway.getRoom('ABC')).toBe(true);
-      expect(gateway.getRoom('DEF')).toBe(true);
-      //EDGE CASE
-      expect(gateway.getRoom('GHI')).toBe(false);
-    });
-
     it('클라이언트가 방에 참여하면 방이 생성된다.', async () => {
       //GIVEN
       const mockSockets = [
