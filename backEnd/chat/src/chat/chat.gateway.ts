@@ -27,7 +27,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   private readonly logger = new Logger();
-  private rooms: Map<string, boolean> = new Map();
   private roomToCount: Map<string, number> = new Map();
   private instanceId = process.env.NODE_APP_INSTANCE || os.hostname();
   private subscriberClient: Redis;
@@ -40,6 +39,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     this.subscriberClient = client.duplicate();
     this.publisherClient = client.duplicate();
+
+    this.subscriberClient.subscribe(SOCKET.REDIS_CHAT_CHANEL);
+
+    this.subscriberClient.on('message', this.handleChatMessage.bind(this));
+  }
+
+  private handleChatMessage(channel: string, message: string) {
+    if (channel === SOCKET.REDIS_CHAT_CHANEL) {
+      const { room, ...messageData } = JSON.parse(message);
+      this.server.to(room).emit(SOCKET_EVENT.NEW_MESSAGE, messageData);
+    }
   }
 
   handleConnection(socket: Socket) {
@@ -62,19 +72,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     socket.join(room);
 
-    const isRoom = this.rooms.get(room);
     const count = this.roomToCount.get(room) || 0;
     this.roomToCount.set(room, count + 1);
-
-    if (!isRoom) {
-      this.subscriberClient.subscribe(room);
-      this.subscriberClient.on('message', (channel, message) => {
-        if (channel === room) {
-          this.server.to(room).emit(SOCKET_EVENT.NEW_MESSAGE, message);
-        }
-      });
-      this.rooms.set(room, true);
-    }
   }
 
   @SubscribeMessage(SOCKET_EVENT.LEAVE_ROOM)
@@ -93,8 +92,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.roomToCount.set(room, count);
 
     if (count === SOCKET.EMPTY_ROOM) {
-      this.subscriberClient.unsubscribe(room);
-      this.rooms.delete(room);
+      this.roomToCount.delete(room);
       this.chatService.deleteByRoom(room);
     }
   }
@@ -111,6 +109,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const { room, message, nickname, ai } = data;
 
     const response = {
+      room: room,
       message: message,
       nickname: nickname,
       socketId: socket.id,
@@ -120,7 +119,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (ai) {
       try {
         await this.publisherClient.publish(
-          room,
+          SOCKET.REDIS_CHAT_CHANEL,
           JSON.stringify({ using: true }),
         );
 
@@ -141,7 +140,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     try {
-      await this.publisherClient.publish(room, JSON.stringify(response));
+      await this.publisherClient.publish(
+        SOCKET.REDIS_CHAT_CHANEL,
+        JSON.stringify(response),
+      );
     } catch (error) {
       throw new WsException({
         statusCode: ERRORS.FAILED_PUBLISHING.statusCode,
@@ -152,10 +154,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   public getRoomCount(room: string): number {
     return this.roomToCount.get(room) || 0;
-  }
-
-  public getRoom(room: string): boolean {
-    return this.rooms.get(room) || false;
   }
 
   public async useLLM(room: string, message: string, socketId: string) {
