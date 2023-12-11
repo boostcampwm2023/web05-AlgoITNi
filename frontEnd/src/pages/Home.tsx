@@ -61,8 +61,8 @@ export default function Home() {
       </div>
       <div className="basis-2/4 max-w-[600px] max-h-[600px] mobile:hidden">
         <picture>
-          <source srcSet="/main.webp" type="image/webp" />
-          <img src="/main.png" alt="main" />
+          <source height="600px" width="600px" srcSet="/main.webp" type="image/webp" />
+          <img height="600px" width="600px" src="/main.png" alt="main" />
         </picture>
       </div>
     </div>
