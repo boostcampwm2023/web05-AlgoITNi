@@ -5,6 +5,7 @@ export const SOCKET = {
   V1: 'single',
   KAFKA: 'kafka',
   EMPTY_ROOM: 0,
+  REDIS_CHAT_CHANEL: 'RedisChatting',
 };
 
 export const SOCKET_EVENT = {

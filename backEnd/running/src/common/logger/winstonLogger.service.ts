@@ -58,10 +58,7 @@ export class WinstonLogger implements LoggerService {
         timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
         logFormat,
       ),
-      level:
-        this.configService.get<string>('NODE_ENV') !== 'production'
-          ? 'silly'
-          : 'info',
+      level: 'silly',
       transports: transport,
     });
   }
