@@ -3,9 +3,14 @@ import { DiscoveryService, MetadataScanner, Reflector } from '@nestjs/core';
 import {
   ORM,
   queryRunnerLocalStorage,
+  sessionLocalStorage,
   TRANSACTIONAL_KEY,
 } from './transaction.decorator';
 import { DataSource } from 'typeorm';
+import { Connection } from 'mongoose';
+import { InjectConnection } from '@nestjs/mongoose';
+import { TransactionRollback } from '../exception/exception';
+import { ClientSession } from 'mongoose';
 
 @Injectable()
 export class TransactionService implements OnModuleInit {
@@ -14,6 +19,7 @@ export class TransactionService implements OnModuleInit {
     private readonly metadataScanner: MetadataScanner,
     private readonly reflector: Reflector,
     private readonly dataSource: DataSource,
+    @InjectConnection() private readonly connection: Connection,
   ) {}
 
   onModuleInit(): any {
@@ -58,9 +64,10 @@ export class TransactionService implements OnModuleInit {
           const result = await originalMethod.apply(instance, args);
           await qr.commitTransaction();
           return result;
-        } catch (error) {
+        } catch (e) {
           await qr.rollbackTransaction();
-          throw error;
+          this.logger.error(e);
+          throw new TransactionRollback();
         } finally {
           await qr.release();
         }
@@ -68,5 +75,29 @@ export class TransactionService implements OnModuleInit {
     };
   }
 
-  mongooseTransaction(originalMethod, instance) {}
+  mongooseTransaction(originalMethod, instance) {
+    const connection = this.connection;
+    return async function (...args: any[]) {
+      const session: ClientSession = await connection.startSession();
+
+      const result = await sessionLocalStorage.run(
+        { session },
+        async function () {
+          try {
+            await session.startTransaction();
+            const result = await originalMethod.apply(instance, args);
+            await session.commitTransaction();
+            return result;
+          } catch (e) {
+            await session.abortTransaction();
+            this.logger.error(e);
+            throw new TransactionRollback();
+          } finally {
+            await session.endSession();
+          }
+        },
+      );
+      return result;
+    };
+  }
 }
