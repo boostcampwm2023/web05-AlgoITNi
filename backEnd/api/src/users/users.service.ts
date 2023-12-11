@@ -20,8 +20,7 @@ export class UsersService {
     user.name = userDTO.name;
     user.authServiceID = userDTO.authServiceID;
     user.oauth = oauth;
-    const qr = getLocalStorageRepository(UserEntity);
-    const repository = qr.manager?.getRepository(UserEntity);
+    const repository = getLocalStorageRepository(UserEntity);
     await repository.save<UserEntity>(user);
   }
 
