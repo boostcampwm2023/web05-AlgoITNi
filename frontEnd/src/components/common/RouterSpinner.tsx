@@ -3,7 +3,7 @@ import Spinner from './Spinner';
 export default function RouterSpinner() {
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen">
-      <div className="basis-2/4 max-w-[400px] max-h-[400px] mobile:hidden animate-pulse">
+      <div className="w-[400px] h-[400px] mobile:hidden animate-pulse">
         <picture>
           <source srcSet="/main.webp" type="image/webp" />
           <img src="/main.png" alt="main" />
