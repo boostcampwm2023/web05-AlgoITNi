@@ -90,7 +90,6 @@ export class TransactionService implements OnModuleInit {
             return result;
           } catch (e) {
             await session.abortTransaction();
-            this.logger.error(e);
             throw new TransactionRollback();
           } finally {
             await session.endSession();

@@ -8,6 +8,7 @@ import {
   Transactional,
 } from '../common/transaction/transaction.decorator';
 import { ClientSession } from 'mongoose';
+import { DeleteResult } from 'mongodb';
 
 @Injectable()
 export class CodesService {
@@ -44,9 +45,9 @@ export class CodesService {
   }
 
   @Transactional('mongoose')
-  async delete(userID: number, objectID: string) {
+  async delete(userID: number, objectID: string): Promise<DeleteResult> {
     const query = { userID: userID, _id: objectID };
     const session = getSession();
-    await this.codeModel.deleteOne(query).session(session);
+    return this.codeModel.deleteOne(query).session(session);
   }
 }
