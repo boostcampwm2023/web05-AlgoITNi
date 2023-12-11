@@ -6,9 +6,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import '@styles/index.css';
 import Home from '@pages/Home.tsx';
 
-import Modals from './components/modal/Modals';
 import reactQueryClient from './configs/reactQueryClient';
-import { CRDTProvider } from './contexts/crdt';
+import RouterSpinner from './components/common/RouterSpinner';
 
 const RoomPage = lazy(() => import('./pages/Room'));
 
@@ -20,7 +19,7 @@ const router = createBrowserRouter([
   {
     path: '/:roomId',
     element: (
-      <Suspense fallback={<span>Loading...</span>}>
+      <Suspense fallback={<RouterSpinner />}>
         <RoomPage />
       </Suspense>
     ),
@@ -30,10 +29,7 @@ const router = createBrowserRouter([
 function Main() {
   return (
     <QueryClientProvider client={reactQueryClient}>
-      <CRDTProvider>
-        <RouterProvider router={router} />
-        <Modals />
-      </CRDTProvider>
+      <RouterProvider router={router} />
     </QueryClientProvider>
   );
 }
