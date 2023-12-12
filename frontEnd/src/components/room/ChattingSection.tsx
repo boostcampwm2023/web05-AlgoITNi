@@ -26,19 +26,18 @@ function ChattingSection() {
   const { ref: messageAreaRef, scrollRatio, handleScroll, moveToBottom } = useScroll<HTMLDivElement>();
   const { isViewingLastMessage, isRecievedMessage, setIsRecievedMessage } = useLastMessageViewingState(scrollRatio);
 
-  const handleRecieveMessage = (recievedMessage: string) => {
-    const newMessage: MessageData | { using: boolean } = JSON.parse(recievedMessage);
-    const remoteUsingAi = 'using' in newMessage;
+  const handleRecieveMessage = (recievedMessage: MessageData | { using: boolean }) => {
+    const remoteUsingAi = 'using' in recievedMessage;
 
     if (remoteUsingAi) {
-      setPostingAi(newMessage.using);
+      setPostingAi(recievedMessage.using);
       return;
     }
 
     // 새로운 메시지가 일반적인 채팅 메시지인 경우
-    if (newMessage.ai) setPostingAi(false); // AI의 메시지인 경우
+    if (recievedMessage.ai) setPostingAi(false); // AI의 메시지인 경우
 
-    setAllMessage((prev) => [...prev, newMessage]);
+    setAllMessage((prev) => [...prev, recievedMessage]);
   };
 
   const handleChattingSocketError = (errorMessage: ErrorResponse) => {
