@@ -1,3 +1,4 @@
+import { ConfigService, ConfigModule } from '@nestjs/config';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import { HttpStatus, Injectable, OnModuleInit } from '@nestjs/common';
 import Redis from 'ioredis';
@@ -15,15 +16,18 @@ export class EventsChatService implements OnModuleInit {
   private serverToCpus: Map<string, number> = new Map();
   private roomToUrl: Map<string, string> = new Map();
 
-  constructor(@InjectRedis() private readonly client: Redis) {}
+  constructor(
+    @InjectRedis() private readonly client: Redis,
+    private readonly configService: ConfigService,
+  ) {}
 
   onModuleInit() {
     this.subscribe();
   }
 
   private subscribe() {
-    this.client.subscribe(EVENT.REGISTER);
-    this.client.subscribe(EVENT.SIGNALING);
+    this.client.subscribe(EVENT.CHAT_REGISTER);
+    this.client.subscribe(EVENT.CHAT);
 
     this.client.on('message', async (channel, message) => {
       const data = JSON.parse(message);
@@ -74,7 +78,8 @@ export class EventsChatService implements OnModuleInit {
       return response;
     }
 
-    const server = this.returnUrl;
+    const server =
+      this.returnUrl || this.configService.get<string>('CHAT_SOCKET_URL');
 
     if (!server) {
       throw new URLNotFoundException(ERRORS.URL_NOT_FOUND.message);

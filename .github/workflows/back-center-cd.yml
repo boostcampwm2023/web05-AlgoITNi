@@ -48,4 +48,5 @@ jobs:
             echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> /root/.env
             echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> /root/.env
             echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> /root/.env
+            echo "CHAT_SOCKET_URL=${{ secrets.CHAT_SOCKET_URL }}" >> /root/.env
             ./deploy.sh
