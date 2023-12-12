@@ -23,7 +23,7 @@ export const EVENT = {
   REGISTER: 'register',
   SIGNALING: 'signaling',
 
-  CHAT_REGISTER: 'chaRegister',
+  CHAT_REGISTER: 'chatRegister',
   CHAT: 'chatCpu',
 };
 
