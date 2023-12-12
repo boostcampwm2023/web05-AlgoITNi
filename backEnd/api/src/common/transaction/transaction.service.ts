@@ -68,7 +68,6 @@ export class TransactionService implements OnModuleInit {
             return result;
           } catch (e) {
             await qr.rollbackTransaction();
-            this.logger.error(e);
             throw new TransactionRollback();
           } finally {
             await qr.release();

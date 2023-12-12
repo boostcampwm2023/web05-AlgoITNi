@@ -51,9 +51,12 @@ export class AuthController {
     const id_token: string = await this.googleService.getIDToken(code);
     const user: UserDto = await this.googleService.getUserInfo(id_token);
     let findUser = await this.userService.findUser(user);
+    this.logger.error(JSON.stringify(findUser));
     if (findUser === null) {
       findUser = await this.userService.getUserAfterAddUser(user, 'google');
     }
+    this.logger.error(JSON.stringify(findUser));
+
     const returnTo: string = await this.authService.login(findUser, res, req);
     return res.redirect(returnTo);
   }
@@ -82,9 +85,12 @@ export class AuthController {
     const accessToken = await this.githubService.getGithubAccessToken(code);
     const user: UserDto = await this.githubService.getUserInfo(accessToken);
     let findUser = await this.userService.findUser(user);
+    this.logger.error(JSON.stringify(findUser));
     if (findUser === null) {
       findUser = await this.userService.getUserAfterAddUser(user, 'github');
     }
+    this.logger.error(JSON.stringify(findUser));
+
     const returnTo: string = await this.authService.login(findUser, res, req);
 
     return res.redirect(returnTo);
