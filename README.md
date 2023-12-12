@@ -33,7 +33,9 @@
 
 ---
 
-서버 아키텍처 이미지
+# 🔎서버 아키텍처
+![Untitled](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/019fa58f-c8c0-47f3-87a9-ea7cf36722d0)
+
 
 # 🔎 주요 기능
 
@@ -43,7 +45,8 @@
 
  동료들과 화상회의를 하며 소통할 수 있습니다. <br>
 WebRTC P2P로 통신합시다. <br>
- (이미지)
+ ![4명입장](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/323fc7d1-5b4e-455f-923d-5db5855a0146)
+
 
 ### 😎 코드 공동 편집
  코드 편집기를 통해 코드를 작성할 수 있습니다. <br>
