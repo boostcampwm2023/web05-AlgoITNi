@@ -56,4 +56,5 @@ jobs:
             echo "Accept=${{ secrets.Accept }}" >> /root/.env
             echo "ContentType=${{ secrets.ContentType }}" >> /root/.env
             echo "MONGO_PROD=${{ secrets.MONGO_PROD }}" >> /root/.env
+            echo "SOCKET_URL=${{ secrets.CHAT_SOCKET_URL }}" >> /root/.env
             ./deploy.sh
