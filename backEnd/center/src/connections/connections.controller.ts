@@ -7,14 +7,26 @@ import { ResponseDto } from 'src/common/dto/common-response.dto';
 export class ConnectionsController {
   constructor(private readonly eventService: EventsService) {}
 
-  @Post('join')
-  create(@Body() data: JoinRoomDto): ResponseDto {
+  @Post('join/signalling')
+  findSignalingServer(@Body() data: JoinRoomDto): ResponseDto {
     const response: ResponseDto = this.eventService.findServer(data);
     return response;
   }
 
-  @Post('leave')
-  leave(@Body() data: JoinRoomDto): ResponseDto {
+  @Post('leave/signalling')
+  leaveSignaling(@Body() data: JoinRoomDto): ResponseDto {
+    const response: ResponseDto = this.eventService.leaveRoom(data);
+    return response;
+  }
+
+  @Post('join/chatting')
+  findChattingServer(@Body() data: JoinRoomDto): ResponseDto {
+    const response: ResponseDto = this.eventService.findServer(data);
+    return response;
+  }
+
+  @Post('leave/chatting')
+  leaveChatting(@Body() data: JoinRoomDto): ResponseDto {
     const response: ResponseDto = this.eventService.leaveRoom(data);
     return response;
   }

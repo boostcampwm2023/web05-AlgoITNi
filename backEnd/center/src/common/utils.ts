@@ -22,6 +22,9 @@ export const ERRORS = {
 export const EVENT = {
   REGISTER: 'register',
   SIGNALING: 'signaling',
+
+  CHAT_REGISTER: 'chaRegister',
+  CHAT: 'chatCpu',
 };
 
 export const USE_FULL = 100;
