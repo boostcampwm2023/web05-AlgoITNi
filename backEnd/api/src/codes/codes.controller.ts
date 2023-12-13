@@ -77,12 +77,8 @@ export class CodesController {
   async delete(@Req() req: Request, @Param('id') id: string) {
     const user: UserInfoDto = req.user as UserInfoDto;
     const userID = user.id;
-    try {
-      await this.codesService.delete(userID, id);
-      return { message: 'delete success' };
-    } catch (e) {
-      this.logger.error(e);
-      throw new ResourceNotFound();
-    }
+    const result = await this.codesService.delete(userID, id);
+    if (result.deletedCount <= 0) throw new ResourceNotFound();
+    return { message: 'delete success' };
   }
 }

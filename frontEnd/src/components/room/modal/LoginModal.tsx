@@ -23,7 +23,7 @@ function LoginButtonWrapper({ handleClick, className, type, children }: LoginBut
     );
 
   return (
-    <a href={`https://api.algoitni.site/auth/${type}?next=${nextPath};`} onClick={handleClick} className={className}>
+    <a href={`https://api.algoitni.site/auth/${type}?next=${nextPath}`} onClick={handleClick} className={className}>
       {children}
     </a>
   );
