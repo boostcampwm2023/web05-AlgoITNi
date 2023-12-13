@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
 import { Socket, io } from 'socket.io-client/debug';
-import * as Y from 'yjs';
 import { EDITOR_DEFAULT_LANGUAGE, EDITOR_LANGUAGE_TYPES } from '@/constants/editor';
 import OutputArea from './editor/OutputArea';
 import LoadButton from './editor/LoadButton';
@@ -46,15 +45,15 @@ export default function EditorSection({ defaultCode }: EditorSectionProps) {
   }, []);
 
   const handleRecieveCodeMessage = (event: MessageEvent) => {
-    const relPos = Y.createRelativePositionFromTypeIndex(crdt.getText('sharedText'), cursorPosition);
+    const relPos = crdt.getRelativePosition(cursorPosition);
 
     const update = new Uint8Array(event.data);
-    Y.applyUpdate(crdt, update);
+    crdt.update(update);
 
-    const updatedText = crdt.getText('sharedText').toString();
+    const updatedText = crdt.toString();
     setPlainCode(updatedText);
 
-    const pos = Y.createAbsolutePositionFromRelativePosition(relPos, crdt);
+    const pos = crdt.getAbsolutePosition(relPos);
     if (pos) setCursorPosition(pos.index);
   };
 
@@ -63,8 +62,8 @@ export default function EditorSection({ defaultCode }: EditorSectionProps) {
   };
 
   const clearEditor = () => {
-    crdt.getText('sharedText').delete(0, crdt.getText('sharedText').toString().length);
-    sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
+    crdt.delete(0, crdt.toString().length);
+    sendMessageDataChannels(codeDataChannel, crdt.encodeData());
   };
 
   const handleClear = () => {

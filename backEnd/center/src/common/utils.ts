@@ -20,8 +20,8 @@ export const ERRORS = {
 };
 
 export const EVENT = {
-  REGISTER: 'register',
-  SIGNALING: 'signaling',
+  SIGNALING: 'signalingCpu',
+  CHAT: 'chatCpu',
 };
 
 export const USE_FULL = 100;

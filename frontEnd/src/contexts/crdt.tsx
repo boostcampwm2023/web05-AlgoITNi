@@ -1,9 +1,9 @@
 import React from 'react';
-import * as Y from 'yjs';
+import YjsCRDT, { CRDT } from '@/services/crdt';
 
-const crdt = new Y.Doc();
+const crdt = new YjsCRDT();
 
-export const CRDTContext = React.createContext<Y.Doc>(crdt);
+export const CRDTContext = React.createContext<CRDT>(crdt);
 
 interface CRDTProviderProps {
   children: React.ReactNode;
