@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { useState, useEffect } from 'react';
-import { Socket, io } from 'socket.io-client/debug';
+import { Socket } from 'socket.io-client/debug';
+import createSocket from '@utils/createSocket';
 import { RTC_SOCKET_EMIT_EVENT, RTC_SOCKET_RECEIVE_EVENT } from '@/constants/rtcSocketEvents';
 import { VITE_STUN_URL, VITE_TURN_CREDENTIAL, VITE_TURN_URL, VITE_TURN_USERNAME } from '@/constants/env';
-import getSocketURL from '@/apis/getSocketURL';
+import getSocketURL, { SOCKET_TYPE } from '@/apis/getSocketURL';
 import useDataChannels from '@/stores/useDataChannels';
 import useRoomConfigData from '@/stores/useRoomConfigData';
 
@@ -22,17 +23,19 @@ const useRTCConnection = (roomId: string, localStream: MediaStream) => {
   const { addCodeDataChannel, removeCodeDataChannel, addLanguageChannel, removeLanguageChannel } = useDataChannels();
 
   const socketConnect = async () => {
-    const socketURL = await getSocketURL(roomId);
+    const socketURL = await getSocketURL(SOCKET_TYPE.SIGNAL, roomId);
 
-    socket = io(socketURL);
-    socket.on(RTC_SOCKET_RECEIVE_EVENT.ALL_USERS, onAllUser);
-    socket.on(RTC_SOCKET_RECEIVE_EVENT.OFFER, onOffer);
-    socket.on(RTC_SOCKET_RECEIVE_EVENT.ANSWER, onAnswer);
-    socket.on(RTC_SOCKET_RECEIVE_EVENT.CANDIDATE, onCandidate);
-    socket.on(RTC_SOCKET_RECEIVE_EVENT.USER_EXIT, onUserExit);
+    const socketCallbacks = {
+      [RTC_SOCKET_RECEIVE_EVENT.ALL_USERS]: onAllUser,
+      [RTC_SOCKET_RECEIVE_EVENT.OFFER]: onOffer,
+      [RTC_SOCKET_RECEIVE_EVENT.ANSWER]: onAnswer,
+      [RTC_SOCKET_RECEIVE_EVENT.CANDIDATE]: onCandidate,
+      [RTC_SOCKET_RECEIVE_EVENT.USER_EXIT]: onUserExit,
+      exception: throwConnectionError,
+      error: throwSignalError,
+    };
 
-    socket.on('exception', throwConnectionError);
-    socket.on('error', throwSignalError);
+    socket = createSocket(socketURL, socketCallbacks);
 
     socket.connect();
 
