@@ -11,25 +11,25 @@ export class ConnectionsController {
     private readonly eventChatService: EventsChatService,
   ) {}
 
-  @Get('join/signalling')
+  @Post('join/signalling')
   findSignalingServer(@Body() data: JoinRoomDto): ResponseDto {
     const response: ResponseDto = this.eventService.findServer(data);
     return response;
   }
 
-  @Get('leave/signalling')
+  @Post('leave/signalling')
   leaveSignaling(@Body() data: JoinRoomDto): ResponseDto {
     const response: ResponseDto = this.eventService.leaveRoom(data);
     return response;
   }
 
-  @Get('join/chatting')
+  @Post('join/chatting')
   findChattingServer(@Body() data: JoinRoomDto): ResponseDto {
     const response: ResponseDto = this.eventChatService.findServer(data);
     return response;
   }
 
-  @Get('leave/chatting')
+  @Post('leave/chatting')
   leaveChatting(@Body() data: JoinRoomDto): ResponseDto {
     const response: ResponseDto = this.eventChatService.leaveRoom(data);
     return response;
