@@ -20,10 +20,7 @@ export const ERRORS = {
 };
 
 export const EVENT = {
-  REGISTER: 'register',
-  SIGNALING: 'signaling',
-
-  CHAT_REGISTER: 'chatRegister',
+  SIGNALING: 'signalingCpu',
   CHAT: 'chatCpu',
 };
 

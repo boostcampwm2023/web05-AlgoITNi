@@ -8,6 +8,7 @@ import {
 } from 'src/common/exception/exception';
 import { ERRORS, EVENT, USE_FULL } from 'src/common/utils';
 import { ResponseDto } from 'src/common/dto/common-response.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EventsService implements OnModuleInit {
@@ -15,24 +16,20 @@ export class EventsService implements OnModuleInit {
   private serverToCpus: Map<string, number> = new Map();
   private roomToUrl: Map<string, string> = new Map();
 
-  constructor(@InjectRedis() private readonly client: Redis) {}
+  constructor(
+    @InjectRedis() private readonly client: Redis,
+    private readonly configService: ConfigService,
+  ) {}
 
   onModuleInit() {
     this.subscribe();
   }
 
   private subscribe() {
-    this.client.subscribe(EVENT.REGISTER);
     this.client.subscribe(EVENT.SIGNALING);
 
     this.client.on('message', async (channel, message) => {
       const data = JSON.parse(message);
-
-      if (channel === EVENT.REGISTER) {
-        const { url } = data;
-        this.validateUrl(url);
-        this.handleRegister(url);
-      }
 
       if (channel === EVENT.SIGNALING) {
         const { url, usages } = data;
@@ -41,15 +38,6 @@ export class EventsService implements OnModuleInit {
         this.handleSignaling(url, usages);
       }
     });
-  }
-
-  private handleRegister(url: string) {
-    this.serverToCpus.set(url, 0);
-
-    const nextServer = this.returnUrl;
-    if (!nextServer) {
-      this.returnUrl = url;
-    }
   }
 
   private handleSignaling(url: string, usages: number) {
@@ -74,7 +62,8 @@ export class EventsService implements OnModuleInit {
       return response;
     }
 
-    const server = this.returnUrl;
+    const server =
+      this.returnUrl || this.configService.get<string>('SIGNAL_SOCKET_URL');
 
     if (!server) {
       throw new URLNotFoundException(ERRORS.URL_NOT_FOUND.message);

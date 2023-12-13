@@ -4,7 +4,7 @@ import { EventsService } from 'src/events/events.service';
 import { ResponseDto } from 'src/common/dto/common-response.dto';
 import { EventsChatService } from 'src/events/events-chat.service';
 
-@Controller('connections')
+@Controller()
 export class ConnectionsController {
   constructor(
     private readonly eventService: EventsService,

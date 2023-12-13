@@ -19,7 +19,7 @@ export class EventsService implements OnModuleInit {
 
   onModuleInit() {
     this.initCpuWorker();
-    this.publishSocketInfo();
+    this.scheduling();
   }
 
   private initCpuWorker() {
@@ -34,23 +34,13 @@ export class EventsService implements OnModuleInit {
     });
   }
 
-  private publishSocketInfo() {
-    const socketUrl = this.configService.get<string>('SOCKET_URL');
-
-    const message = {
-      url: socketUrl,
-    };
-    this.client.publish('register', JSON.stringify(message));
-    this.scheduling();
-  }
-
   private scheduling() {
     cron.schedule('*/5 * * * *', () => {
       const message = {
         url: this.configService.get<string>('SOCKET_URL'),
         usages: this.usages,
       };
-      this.client.publish('signaling', JSON.stringify(message));
+      this.client.publish('signalingCpu', JSON.stringify(message));
     });
   }
 }

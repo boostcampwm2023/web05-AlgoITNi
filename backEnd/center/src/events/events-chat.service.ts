@@ -26,17 +26,10 @@ export class EventsChatService implements OnModuleInit {
   }
 
   private subscribe() {
-    this.client.subscribe(EVENT.CHAT_REGISTER);
     this.client.subscribe(EVENT.CHAT);
 
     this.client.on('message', async (channel, message) => {
       const data = JSON.parse(message);
-
-      if (channel === EVENT.CHAT_REGISTER) {
-        const { url } = data;
-        this.validateUrl(url);
-        this.handleRegister(url);
-      }
 
       if (channel === EVENT.CHAT) {
         const { url, usages } = data;
@@ -45,15 +38,6 @@ export class EventsChatService implements OnModuleInit {
         this.handleChatting(url, usages);
       }
     });
-  }
-
-  private handleRegister(url: string) {
-    this.serverToCpus.set(url, 0);
-
-    const nextServer = this.returnUrl;
-    if (!nextServer) {
-      this.returnUrl = url;
-    }
   }
 
   private handleChatting(url: string, usages: number) {

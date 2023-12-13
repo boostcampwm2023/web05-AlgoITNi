@@ -19,7 +19,7 @@ export class EventsService implements OnModuleInit {
 
   onModuleInit() {
     this.initCpuWorker();
-    this.publishSocketInfo();
+    this.scheduling();
   }
 
   private initCpuWorker() {
@@ -32,16 +32,6 @@ export class EventsService implements OnModuleInit {
       const sum = this.cpuUsageQueue.reduce((acc, val) => acc + val, 0);
       this.usages = sum / this.cpuUsageQueue.length;
     });
-  }
-
-  private publishSocketInfo() {
-    const socketUrl = this.configService.get<string>('SOCKET_URL');
-
-    const message = {
-      url: socketUrl,
-    };
-    this.client.publish('chatRegister', JSON.stringify(message));
-    this.scheduling();
   }
 
   private scheduling() {
