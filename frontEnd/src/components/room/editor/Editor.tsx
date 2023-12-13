@@ -1,5 +1,4 @@
 import { useContext } from 'react';
-import * as Y from 'yjs';
 import InputArea from './InputArea';
 import LineNumber from './LineNumber';
 import { EDITOR_TAB_SIZE } from '@/constants/editor';
@@ -38,13 +37,13 @@ export default function Editor({ plainCode, languageInfo, setPlainCode, cursorPo
 
       if (isOneLetter && isKorean) return;
 
-      crdt.getText('sharedText').insert(newCursor - Math.abs(changedLength), addedText);
+      crdt.insert(newCursor - Math.abs(changedLength), addedText);
     } else {
       const removedLength = Math.abs(changedLength);
-      crdt.getText('sharedText').delete(newCursor, removedLength);
+      crdt.delete(newCursor, removedLength);
     }
 
-    sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
+    sendMessageDataChannels(codeDataChannel, crdt.encodeData());
   };
 
   const handleClick = (event: React.MouseEvent<HTMLTextAreaElement>) => {
@@ -58,8 +57,8 @@ export default function Editor({ plainCode, languageInfo, setPlainCode, cursorPo
     if (event.key === 'Tab') {
       event.preventDefault();
 
-      crdt.getText('sharedText').insert(selectionStart, '    ');
-      sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
+      crdt.insert(selectionStart, '    ');
+      sendMessageDataChannels(codeDataChannel, crdt.encodeData());
 
       setCursorPosition((prev) => prev + EDITOR_TAB_SIZE);
       setPlainCode((prev) => `${prev.slice(0, selectionStart)}    ${prev.slice(selectionStart)}`);
