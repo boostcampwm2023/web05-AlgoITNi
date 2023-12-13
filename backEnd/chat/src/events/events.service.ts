@@ -40,7 +40,7 @@ export class EventsService implements OnModuleInit {
         url: this.configService.get<string>('SOCKET_URL'),
         usages: this.usages,
       };
-      this.client.publish('signalingCpu', JSON.stringify(message));
+      this.client.publish('chatCpu', JSON.stringify(message));
     });
   }
 }
