@@ -19,21 +19,24 @@ export const distExtName = {
   kotlin: '.jar',
 };
 
-export function languageCommand(language, filePaths) {
+export function languageCommand(language, filePaths): string[] {
   const [filepath, compile_dist] = filePaths;
   switch (language) {
     case 'python':
-      return `python3 ${filepath}`;
+      return [`python3 ${filepath}`];
     case 'javascript':
-      return `node ${filepath}`;
+      return [`node ${filepath}`];
     case 'java':
-      return `java ${filepath}`;
+      return [`java ${filepath}`];
     case 'c':
-      return `gcc -o ${compile_dist} ${filepath} && ${compile_dist}`;
+      return [`gcc -o ${compile_dist} ${filepath}`, compile_dist];
     case 'swift':
-      return `swiftc -o ${compile_dist} ${filepath} && ${compile_dist}`;
+      return [`swiftc -o ${compile_dist} ${filepath}`, compile_dist];
     case 'kotlin':
-      return `kotlinc ${filepath} -include-runtime -d ${compile_dist} && java -jar ${compile_dist}`;
+      return [
+        `kotlinc ${filepath} -include-runtime -d ${compile_dist}`,
+        `java -jar ${compile_dist}`,
+      ];
   }
 }
 export const needCompile = ['c', 'swift', 'kotlin'];

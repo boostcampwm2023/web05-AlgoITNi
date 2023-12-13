@@ -40,8 +40,8 @@ export class CodesService {
     try {
       fs.writeFileSync(filePath, code);
       const { stdout, stderr } = await this.runCommand(filePaths, language);
+      this.logger.debug(`${stdout}, ${stderr}`);
       if (stderr) {
-        console.log(stderr);
         throw new RunningException(stderr.trim());
       }
       return this.getOutput(stdout);
@@ -57,11 +57,23 @@ export class CodesService {
     }
   }
 
-  runCommand(
+  async runCommand(
     filePaths: string[],
     language: supportLang,
   ): Promise<runCommandResult> {
-    const command = languageCommand(language, filePaths);
+    const commands = languageCommand(language, filePaths);
+    this.logger.debug(JSON.stringify(commands));
+
+    let command;
+    if (commands.length > 1) {
+      const { stdout, stderr } = await this.compile(commands[0]);
+      if (stderr) {
+        return { stdout, stderr };
+      }
+      command = commands[1];
+    } else {
+      command = commands[0];
+    }
     return new Promise((resolve) => {
       const commandParts = command.split(' ');
       const stdout = [];
@@ -96,6 +108,29 @@ export class CodesService {
       } catch (e) {
         this.logger.error(e);
       }
+    });
+  }
+  compile(command: string): Promise<runCommandResult> {
+    const commandParts = command.split(' ');
+    return new Promise((resolve) => {
+      const stdout = [];
+      const stderr = [];
+      const childProcess = spawn(commandParts[0], commandParts.slice(1));
+
+      childProcess.stdout.on('data', (data) => {
+        stdout.push(data);
+      });
+
+      childProcess.stderr.on('data', (data) => {
+        stderr.push(data);
+      });
+
+      childProcess.on('close', (code, signal) => {
+        this.logger.log(`complied done with code ${code}, ${signal}`);
+        const out = Buffer.concat(stdout).toString();
+        const err = Buffer.concat(stderr).toString();
+        resolve({ stdout: out, stderr: err });
+      });
     });
   }
 
