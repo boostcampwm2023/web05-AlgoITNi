@@ -5,6 +5,8 @@
 <h3>동료들과 함께 소통하며 알고리즘 학습을 할 수 있는 플랫폼</h3>
 <h5>🗝️ KeyWords<h5>
 #WebRTC #Socket #CRDT 
+
+
 <br>
 <div align="center">
     <img src="https://img.shields.io/badge/node-339933?&logo=node.js&logoColor=white">
@@ -94,8 +96,6 @@ Pub/Sub을 활용해 다중 서버 환경에서도 채팅을 할 수 있습니�
   - 429 Error 및 InMemory 용량부족 해결 과정 (16만건 처리에 걸리는 시간 64% 감소)
 - [도커 이미지 최적화](https://energetic-palm-634.notion.site/f35c15bc99a842a18ce095fa6bf1c806?v=efbb8ec67beb43b89792200fc1f3c9a1&pvs=4)
   - 도커 이미지 사이즈 85% 감소시킨 이야기
-- [서버에서 OAuth 처리하여 자원 보호하기](https://energetic-palm-634.notion.site/69f2e78273884a65b52c370debb83073?v=2b272ead31924af59732edbda24cef84&pvs=4)
-    - OAuth2.0을 도입하고 안전하게 자원을 관리하는 이야기
 
 # 🔎 개발기
 개발하면서 공부한 내용들과 고민 과정, 이유, 해결 방법을 기록했습니다.
@@ -112,8 +112,8 @@ Pub/Sub을 활용해 다중 서버 환경에서도 채팅을 할 수 있습니�
 - [Transaction 관심사 분리하기](https://energetic-palm-634.notion.site/AsyncLocalStorage-Transaction-34f42523c0ec43f4b633eb7944c0b29d?pvs=4)
 - [SSL Termination을 통해 안전하게 HTTP 통신하기](https://energetic-palm-634.notion.site/SSL-Termination-HTTP-70c76949740f4452a2899fa1e617628a?pvs=4)
 - [Blue-Green으로 무중단 배포하기](https://energetic-palm-634.notion.site/57396ff1e3174251ba2c7487ab070a53?pvs=4)
-- [Clove X 도입하기](https://www.notion.so/Clova-Studio-d990f41d3e814b708906e64fd4707a24?pvs=4)
-
+- [Clove X 도입하기](https://energetic-palm-634.notion.site/Clova-Studio-d990f41d3e814b708906e64fd4707a24?pvs=4)
+- [서버에서 OAuth 처리하여 자원 보호하기](https://energetic-palm-634.notion.site/OAuth-2-0-2bc01496ac9c4ed6b0118642c887828d?pvs=4)
 
 [👉 더 많은 기술정리 보러가기](https://www.notion.so/f4562ec49e0245d2b6ef203588c031ea?v=fbfeb754b1a4471e8ffc174a45c64346&pvs=4)
 
