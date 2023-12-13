@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, useContext } from 'react';
-import * as Y from 'yjs';
 import dompurify from 'dompurify';
 import highlightCode from '@/utils/highlightCode';
 import { LanguageInfo } from '@/types/editor';
@@ -44,8 +43,8 @@ export default function InputArea({ plainCode, cursorPosition, handleChange, han
   }, [languageInfo]);
 
   const handleCompositionEnd = (event: React.CompositionEvent<HTMLTextAreaElement>) => {
-    crdt.getText('sharedText').insert(cursorPosition - 1, event.data);
-    sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
+    crdt.insert(cursorPosition - 1, event.data);
+    sendMessageDataChannels(codeDataChannel, crdt.encodeData());
   };
 
   return (
