@@ -120,7 +120,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       try {
         await this.publisherClient.publish(
           SOCKET.REDIS_CHAT_CHANEL,
-          JSON.stringify({ using: true }),
+          JSON.stringify({ room: room, using: true }),
         );
 
         const llmMessageDto: LLMMessageDto = await this.processAIResponse(
