@@ -1,0 +1,34 @@
+config:
+  target: "http://27.96.130.151:4002/run"
+  socketio:
+    transports: ["websocket"]
+  phases:
+    - name: ramp-up
+      duration: 120
+      arrivalRate: 10
+      rampTo : 300
+  plugins:
+    ensure: { }
+  ensure:
+    maxErrorRate: 1
+    thresholds:
+      - "vusers.session_length.p99": 6000
+      - "socketio.response_time.p99" : 6000
+    condition:
+      - strict: true
+scenarios:
+  - name: Run Code V3
+    engine: socketio
+    flow:
+      - think: 1
+      - emit:
+          channel: "request"
+          data:
+            code: "cnt=0\nfor i in range(10):\n    cnt+=1"
+            language: "python"
+        response:
+          on: 'done'
+          data : [201]
+      - think: 2
+
+

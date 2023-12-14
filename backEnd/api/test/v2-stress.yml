@@ -1,0 +1,28 @@
+config:
+  target: "http://27.96.130.151:4002"
+  phases:
+    - name: ramp-up
+      duration: 180
+      arrivalRate: 10
+      rampTo : 300
+    - name: sustain
+      duration: 1800
+      arrivalRate: 300
+  timeout: 6
+  plugins:
+    ensure: { }
+  ensure:
+    maxErrorRate: 1
+    thresholds:
+      - "http.response_time.p99" : 6000
+    condition:
+      - strict: true
+scenarios:
+  - name: Run Code V2
+    flow:
+      - post:
+          url : "/run/v2"
+          json:
+            code: "cnt=0\nfor i in range(10):\n    cnt+=1"
+            language: "python"
+

@@ -1,0 +1,53 @@
+name: backEnd center server CD
+
+on:
+  push:
+    branches: [BE/release, main]
+
+permissions:
+  contents: read
+
+jobs:
+  center-server:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ✅ 코드 체크아웃
+        uses: actions/checkout@v3
+
+      - name: 👻 노드 설정
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.16.0
+
+      - name: ⬇️ 의존성 설치
+        working-directory: ./backEnd/center
+        run: npm ci
+
+      - name: 📦 프로젝트 빌드
+        working-directory: ./backEnd/center
+        run: npm run build
+
+      - name: 🐳 도커 로그인
+        working-directory: ./backEnd/center
+        run: |
+          docker login -u ${{ secrets.DOCKER_CENTER_USERNAME }} -p ${{ secrets.DOCKER_CENTER_PASSWORD }}
+          docker build -t ${{ secrets.DOCKER_CENTER_REPO }}/center .
+          docker push ${{ secrets.DOCKER_CENTER_REPO }}/center
+
+      - name: 🏃‍♂️Deploy
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{secrets.CENTER_HOST}}
+          username: ${{secrets.CENTER_USERNAME}}
+          key: ${{ secrets.CENTER_PASSWORD }}
+          script: |
+            echo "PORT=${{ secrets.CENTER_SERVER_PORT }}" > /root/.env
+            echo "ALLOWED_ORIGIN=${{ secrets.CENTER_ALLOWED_ORIGIN }}" >> /root/.env
+            echo "NODE_ENV=production" >> /root/.env
+            echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> /root/.env
+            echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> /root/.env
+            echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> /root/.env
+            echo "CHAT_SOCKET_URL=${{ secrets.CHAT_SOCKET_URL }}" >> /root/.env
+            echo "SIGNAL_SOCKET_URL=${{ secrets.SERVER_A_SOCKET_URL }}" >> /root/.env
+            ./deploy.sh

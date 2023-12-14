@@ -1,0 +1,29 @@
+name: backEnd signaling server CI
+
+on:
+  pull_request:
+    branches: [BE/release, dev, main]
+
+permissions:
+  contents: read
+
+jobs:
+  signaling-server:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ✅ 코드 체크아웃
+        uses: actions/checkout@v3
+
+      - name: 👻 노드 설정
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.16.0
+
+      - name: ⬇️ 의존성 설치
+        working-directory: ./backEnd/signaling
+        run: npm ci
+
+      - name: 📦 프로젝트 빌드
+        working-directory: ./backEnd/signaling
+        run: npm run build

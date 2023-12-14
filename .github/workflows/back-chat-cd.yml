@@ -1,0 +1,60 @@
+name: backEnd chat server CD
+
+on:
+  push:
+    branches: [BE/release, main]
+
+permissions:
+  contents: read
+
+jobs:
+  chat-server:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ✅ 코드 체크아웃
+        uses: actions/checkout@v3
+
+      - name: 👻 노드 설정
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.16.0
+
+      - name: ⬇️ 의존성 설치
+        working-directory: ./backEnd/chat
+        run: npm ci
+
+      - name: 📦 프로젝트 빌드
+        working-directory: ./backEnd/chat
+        run: npm run build
+
+      - name: 🐳 도커 로그인
+        working-directory: ./backEnd/chat
+        run: |
+          docker login -u ${{ secrets.DOCKER_CHAT_USERNAME }} -p ${{ secrets.DOCKER_CHAT_PASSWORD }}
+          docker build -t ${{ secrets.DOCKER_CHAT_REPO }}/chat .
+          docker push ${{ secrets.DOCKER_CHAT_REPO }}/chat
+
+      - name: 🏃‍♂️Deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{secrets.CHAT_HOST}}
+          username: ${{secrets.CHAT_USERNAME}}
+          password: ${{secrets.CHAT_PASSWORD}}
+          port: ${{secrets.CHAT_PORT}}
+          script: |
+            echo "PORT=${{ secrets.CHAT_SERVER_PORT }}" > /root/.env
+            echo "ALLOWED_ORIGIN=${{ secrets.CHAT_ALLOWED_ORIGIN }}" >> /root/.env
+            echo "NODE_ENV=production" >> /root/.env
+            echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> /root/.env
+            echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> /root/.env
+            echo "REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}" >> /root/.env
+            echo "LLM_URL=${{ secrets.LLM_URL }}" >> /root/.env
+            echo "CLOVASTUDIO=${{ secrets.CLOVASTUDIO }}" >> /root/.env
+            echo "APIGW=${{ secrets.APIGW }}" >> /root/.env
+            echo "REQUESTID=${{ secrets.REQUESTID }}" >> /root/.env
+            echo "Accept=${{ secrets.Accept }}" >> /root/.env
+            echo "ContentType=${{ secrets.ContentType }}" >> /root/.env
+            echo "MONGO_PROD=${{ secrets.MONGO_PROD }}" >> /root/.env
+            echo "SOCKET_URL=${{ secrets.CHAT_SOCKET_URL }}" >> /root/.env
+            ./deploy.sh

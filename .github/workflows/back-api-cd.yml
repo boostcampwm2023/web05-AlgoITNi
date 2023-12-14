@@ -1,0 +1,51 @@
+name: backEnd API server CD
+on:
+  push:
+    branches: [BE/release, main]
+
+permissions:
+  contents: read
+
+jobs:
+  api-server-cd:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ✅ 코드 체크아웃
+        uses: actions/checkout@v3
+
+      - name: 👻 노드 설정
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+
+      - name: ⬇️ 의존성 설치
+        working-directory: ./backEnd/api
+        run: npm ci
+
+      - name: 📦 프로젝트 빌드
+        working-directory: ./backEnd/api
+        run: npm run build
+
+      - name: 🐳 도커 로그인
+        uses: docker/login-action@v3
+        with:
+          username: ${{secrets.DOCKER_USERNAME}}
+          password: ${{secrets.DOCKER_TOKEN}}
+
+      - name: ⬆️ Docker Image Build
+        working-directory: ./backEnd/api
+        run: |
+          docker build -t ${{secrets.DOCKER_USERNAME}}/api .
+          docker push ${{secrets.DOCKER_USERNAME}}/api
+
+      - name: 🏃‍♂️ Deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{secrets.API_HOST}}
+          username: ${{secrets.API_USERNAME}}
+          password: ${{secrets.API_PASSWORD}}
+          port: ${{secrets.API_PORT}}
+          script: |
+            cd /root
+            echo "${{secrets.API_ENV}}" > .env
+            bash deploy.sh >> /dev/deploy.log 2>&1

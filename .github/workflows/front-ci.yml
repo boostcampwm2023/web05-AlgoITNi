@@ -1,0 +1,41 @@
+name: frontEnd CI
+on:
+  pull_request:
+    branches: [FE/release, dev, main]
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-22.04
+
+    strategy:
+      matrix:
+        node-version: [18.16.0]
+    steps:
+      - name: ✅ 코드 체크아웃
+        uses: actions/checkout@v3
+
+      - name: ⬇️ 의존성 설치
+        working-directory: ./frontEnd
+        run: npm install
+
+      - name: ✅ 유닛 테스트
+        working-directory: ./frontEnd
+        run: npm test
+
+      - name: ⚙️ env 설정
+        working-directory: ./frontEnd
+        run: |
+          touch .env.production
+          echo "VITE_SOCKET_URL=${{secrets.VITE_SOCKET_URL}}" >> .env
+          echo "VITE_API_URL=${{secrets.VITE_API_URL}}" >> .env
+          echo "VITE_TURN_URL=${{secrets.VITE_TURN_URL}}" >> .env
+          echo "VITE_TURN_USERNAME=${{secrets.VITE_TURN_USERNAME}}" >> .env
+          echo "VITE_TURN_CREDENTIAL=${{secrets.VITE_TURN_CREDENTIAL}}" >> .env
+          echo "VITE_STUN_URL=${{secrets.VITE_STUN_URL}}" >> .env
+          echo "VITE_STUN_USERNAME=${{secrets.VITE_STUN_USERNAME}}" >> .env
+          echo "VITE_STUN_CREDENTIAL=${{secrets.VITE_STUN_CREDENTIAL}}" >> .env
+          echo "VITE_CHAT_URL=${{secrets.VITE_CHAT_URL}}" >> .env
+          echo "VITE_CODE_RUNNING_SOCKET_URL=${{secrets.VITE_CODE_RUNNING_SOCKET_URL}}" >> .env
+
+      - name: 📦 프로젝트 빌드
+        working-directory: ./frontEnd
+        run: npm run build
