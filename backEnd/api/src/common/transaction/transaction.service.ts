@@ -58,20 +58,23 @@ export class TransactionService implements OnModuleInit {
     return async function (...args: any[]) {
       const qr = await dataSource.createQueryRunner();
 
-      await queryRunnerLocalStorage.run({ qr }, async function () {
-        try {
-          await qr.startTransaction();
-          const result = await originalMethod.apply(instance, args);
-          await qr.commitTransaction();
-          return result;
-        } catch (e) {
-          await qr.rollbackTransaction();
-          this.logger.error(e);
-          throw new TransactionRollback();
-        } finally {
-          await qr.release();
-        }
-      });
+      const result = await queryRunnerLocalStorage.run(
+        { qr },
+        async function () {
+          try {
+            await qr.startTransaction();
+            const result = await originalMethod.apply(instance, args);
+            await qr.commitTransaction();
+            return result;
+          } catch (e) {
+            await qr.rollbackTransaction();
+            throw new TransactionRollback();
+          } finally {
+            await qr.release();
+          }
+        },
+      );
+      return result;
     };
   }
 
