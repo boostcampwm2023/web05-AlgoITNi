@@ -1,6 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import * as Y from 'yjs';
 import getUserCodes from '@/apis/getUserCodes';
 import useModal from '@/hooks/useModal';
 import { uploadLocalFile } from '@/utils/file';
@@ -66,11 +65,11 @@ export default function LoadButton({ plainCode, setPlainCode, setLanguageName, s
       setPlainCode(code);
       setLanguageName(languageName);
 
-      crdt.getText('sharedText').delete(0, crdt.getText('sharedText').toString().length);
-      sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
+      crdt.delete(0, crdt.toString().length);
+      sendMessageDataChannels(codeDataChannel, crdt.encodeData());
 
-      crdt.getText('sharedText').insert(0, code);
-      sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
+      crdt.insert(0, code);
+      sendMessageDataChannels(codeDataChannel, crdt.encodeData());
     });
   };
 

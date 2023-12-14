@@ -3,7 +3,10 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entity/user.entity';
 import { UserDto } from './dto/user.dto';
-import { TransactionRollback } from '../common/exception/exception';
+import {
+  getLocalStorageRepository,
+  Transactional,
+} from '../common/transaction/transaction.decorator';
 type OAUTH = 'github' | 'google';
 @Injectable()
 export class UsersService {
@@ -11,26 +14,24 @@ export class UsersService {
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
   ) {}
-
-  async addUser(userDTO: UserDto, oauth: OAUTH) {
+  @Transactional('typeorm')
+  async getUserAfterAddUser(
+    userDTO: UserDto,
+    oauth: OAUTH,
+  ): Promise<UserEntity> {
     const user = new UserEntity();
     user.name = userDTO.name;
     user.authServiceID = userDTO.authServiceID;
     user.oauth = oauth;
+    const repository = getLocalStorageRepository(UserEntity);
+    await repository.save<UserEntity>(user);
 
-    const qr = this.getQueryRunner();
-    try {
-      await qr.connect();
-      await qr.startTransaction();
-      await qr.manager.save<UserEntity>(user);
-      await qr.commitTransaction();
-    } catch (e) {
-      console.log(e);
-      await qr.rollbackTransaction();
-      throw new TransactionRollback();
-    } finally {
-      await qr.release();
-    }
+    const find = await repository.findOne({
+      where: {
+        authServiceID: userDTO.authServiceID,
+      },
+    });
+    return find as UserEntity;
   }
 
   async findUser(userDTO: UserDto): Promise<UserEntity> {
@@ -40,10 +41,5 @@ export class UsersService {
       },
     });
     return find;
-  }
-
-  getQueryRunner() {
-    const dataSource = this.usersRepository.manager.connection;
-    return dataSource.createQueryRunner();
   }
 }

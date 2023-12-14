@@ -25,7 +25,8 @@ export class CodesService {
     process.env.NODE_ENV === 'dev'
       ? path.join(__dirname, '..', 'tmp')
       : '/algoitni';
-  private killSignal: NodeJS.Signals = 'SIGINT';
+  private readonly killSignal: NodeJS.Signals = 'SIGINT';
+  private readonly killCode: number = 130;
   private readonly timeOut = 5000;
   constructor() {
     if (!fs.existsSync(this.tempDir)) {
@@ -41,7 +42,6 @@ export class CodesService {
       fs.writeFileSync(filePath, code);
       const { stdout, stderr } = await this.runCommand(filePaths, language);
       if (stderr) {
-        console.log(stderr);
         throw new RunningException(stderr.trim());
       }
       return this.getOutput(stdout);
@@ -57,11 +57,22 @@ export class CodesService {
     }
   }
 
-  runCommand(
+  async runCommand(
     filePaths: string[],
     language: supportLang,
   ): Promise<runCommandResult> {
-    const command = languageCommand(language, filePaths);
+    const commands = languageCommand(language, filePaths);
+
+    let command;
+    if (commands.length > 1) {
+      const { stdout, stderr } = await this.compile(commands[0]);
+      if (stderr) {
+        return { stdout, stderr };
+      }
+      command = commands[1];
+    } else {
+      command = commands[0];
+    }
     return new Promise((resolve) => {
       const commandParts = command.split(' ');
       const stdout = [];
@@ -87,15 +98,38 @@ export class CodesService {
           this.logger.log(`child process exited with code ${code}, ${signal}`);
           clearTimeout(timer);
           const out = Buffer.concat(stdout).toString();
-          const err =
-            signal === this.killSignal
-              ? Messages.TIMEOUT
-              : Buffer.concat(stderr).toString();
+          let err = Buffer.concat(stderr).toString();
+          if (this.isTimeout(code, signal)) {
+            err = Messages.TIMEOUT;
+          }
           resolve({ stdout: out, stderr: err });
         });
       } catch (e) {
         this.logger.error(e);
       }
+    });
+  }
+  compile(command: string): Promise<runCommandResult> {
+    const commandParts = command.split(' ');
+    return new Promise((resolve) => {
+      const stdout = [];
+      const stderr = [];
+      const childProcess = spawn(commandParts[0], commandParts.slice(1));
+
+      childProcess.stdout.on('data', (data) => {
+        stdout.push(data);
+      });
+
+      childProcess.stderr.on('data', (data) => {
+        stderr.push(data);
+      });
+
+      childProcess.on('close', (code, signal) => {
+        this.logger.log(`complied done with code ${code}, ${signal}`);
+        const out = Buffer.concat(stdout).toString();
+        const err = Buffer.concat(stderr).toString();
+        resolve({ stdout: out, stderr: err });
+      });
     });
   }
 
@@ -128,5 +162,9 @@ export class CodesService {
       path.join(this.tempDir, `${uuid}${fileExtension}`),
       path.join(this.tempDir, `${uuid}${distExtension}`),
     ];
+  }
+
+  isTimeout(code: number, signal: NodeJS.Signals) {
+    return code === this.killCode || signal === this.killSignal;
   }
 }

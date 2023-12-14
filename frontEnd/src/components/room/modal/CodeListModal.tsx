@@ -1,5 +1,4 @@
 import { useState, useContext } from 'react';
-import * as Y from 'yjs';
 import { useQuery } from '@tanstack/react-query';
 import { LoadCodeData } from '@/types/loadCodeData';
 import CodeFileButton from './codeList/CodeFileButton';
@@ -47,11 +46,11 @@ export default function CodeListModal({
       show({
         warningString: '작업중이던 내용이 모두 지워집니다.',
         callback: () => {
-          crdt.getText('sharedText').delete(0, crdt.getText('sharedText').toString().length);
-          sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
+          crdt.delete(0, crdt.toString().length);
+          sendMessageDataChannels(codeDataChannel, crdt.encodeData());
 
-          crdt.getText('sharedText').insert(0, result.content);
-          sendMessageDataChannels(codeDataChannel, Y.encodeStateAsUpdate(crdt));
+          crdt.insert(0, result.content);
+          sendMessageDataChannels(codeDataChannel, crdt.encodeData());
 
           setPlainCode(result.content);
           setModifyId(result.id);

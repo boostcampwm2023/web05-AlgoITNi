@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { memo, useEffect, useState } from 'react';
-import { Socket, io } from 'socket.io-client/debug';
-import { VITE_CHAT_URL } from '@/constants/env';
+import { Socket } from 'socket.io-client/debug';
 import { ErrorData, ErrorResponse, MessageData } from '@/types/chatting';
 import ChattingMessage from './chatting/ChattingMessage';
 import useLastMessageViewingState from '@/hooks/useLastMessageViewingState';
@@ -12,6 +11,8 @@ import Section from '../common/SectionWrapper';
 import { CHATTING_ERROR_STATUS_CODE, CHATTING_ERROR_TEXT } from '@/constants/chattingErrorResponse';
 import ChattingErrorToast from '../common/ChattingErrorToast';
 import useScroll from '@/hooks/useScroll';
+import getSocketURL, { SOCKET_TYPE } from '@/apis/getSocketURL';
+import createSocket from '@/utils/createSocket';
 
 function ChattingSection() {
   const [socket, setSocket] = useState<Socket | null>(null);
@@ -26,19 +27,18 @@ function ChattingSection() {
   const { ref: messageAreaRef, scrollRatio, handleScroll, moveToBottom } = useScroll<HTMLDivElement>();
   const { isViewingLastMessage, isRecievedMessage, setIsRecievedMessage } = useLastMessageViewingState(scrollRatio);
 
-  const handleRecieveMessage = (recievedMessage: string) => {
-    const newMessage: MessageData | { using: boolean } = JSON.parse(recievedMessage);
-    const remoteUsingAi = 'using' in newMessage;
+  const handleRecieveMessage = (recievedMessage: MessageData | { using: boolean }) => {
+    const remoteUsingAi = 'using' in recievedMessage;
 
     if (remoteUsingAi) {
-      setPostingAi(newMessage.using);
+      setPostingAi(recievedMessage.using);
       return;
     }
 
     // 새로운 메시지가 일반적인 채팅 메시지인 경우
-    if (newMessage.ai) setPostingAi(false); // AI의 메시지인 경우
+    if (recievedMessage.ai) setPostingAi(false); // AI의 메시지인 경우
 
-    setAllMessage((prev) => [...prev, newMessage]);
+    setAllMessage((prev) => [...prev, recievedMessage]);
   };
 
   const handleChattingSocketError = (errorMessage: ErrorResponse) => {
@@ -52,20 +52,23 @@ function ChattingSection() {
     if (statusCode === AI_ERROR_CODE) setErrorData(AI_ERROR_TEXT);
   };
 
+  const socketConnect = async () => {
+    const socketURL = await getSocketURL(SOCKET_TYPE.CHAT, roomId as string);
+    const socketCallbacks = {
+      [CHATTING_SOCKET_RECIEVE_EVNET.NEW_MESSAGE]: handleRecieveMessage,
+      exception: handleChattingSocketError,
+    };
+
+    const newSocket = createSocket(socketURL, socketCallbacks);
+
+    newSocket.connect();
+    newSocket.emit(CHATTING_SOCKET_EMIT_EVNET.JOIN_ROOM, { room: roomId });
+
+    setSocket(newSocket);
+  };
+
   useEffect(() => {
-    setSocket(() => {
-      const newSocket = io(VITE_CHAT_URL, {
-        transports: ['websocket'],
-      });
-
-      newSocket.on(CHATTING_SOCKET_RECIEVE_EVNET.NEW_MESSAGE, handleRecieveMessage);
-      newSocket.on('exception', handleChattingSocketError);
-      newSocket.connect();
-
-      newSocket.emit(CHATTING_SOCKET_EMIT_EVNET.JOIN_ROOM, { room: roomId });
-
-      return newSocket;
-    });
+    socketConnect();
   }, []);
 
   useEffect(() => {
