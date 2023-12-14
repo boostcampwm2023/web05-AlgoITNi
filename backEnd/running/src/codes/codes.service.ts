@@ -99,7 +99,6 @@ export class CodesService {
           clearTimeout(timer);
           const out = Buffer.concat(stdout).toString();
           let err = Buffer.concat(stderr).toString();
-          this.logger.log(this.isTimeout(code, signal));
           if (this.isTimeout(code, signal)) {
             err = Messages.TIMEOUT;
           }
