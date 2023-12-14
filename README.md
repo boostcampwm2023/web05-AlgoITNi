@@ -4,9 +4,7 @@
 
 <h3>동료들과 함께 소통하며 알고리즘 학습을 할 수 있는 플랫폼</h3>
 <h5>🗝️ KeyWords<h5>
-#WebRTC #Socket #CRDT 
-
-
+<p>#WebRTC #Socket #CRDT</p>
 <br>
 <div align="center">
     <img src="https://img.shields.io/badge/node-339933?&logo=node.js&logoColor=white">
@@ -126,8 +124,11 @@ Pub/Sub을 활용해 다중 서버 환경에서도 채팅을 할 수 있습니�
 |                                 **Front-End**                                  |                                 **Front-End**                                  |                                 **Back-End**                                 |                                 **Back-End**                                 |
 |                       [@HBSPS](https://github.com/HBSPS)                        |                       [@d0422](https://github.com/d0422)                        |                   [@HKLeeeee](https://github.com/HKLeeeee)                    |                  [@Gseungmin](https://github.com/Gseungmin)                   |
 
+![AlgoITNi](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/db73a539-bb3f-4cf0-af23-81e23adc6b17)
+
 
 ## 우리가 일하는 방식
+
 - [그라운드 룰](https://energetic-palm-634.notion.site/1f2cbea527e341c7ad1c8fd84ed5104d?pvs=4)
 - [깃 컨벤션](https://energetic-palm-634.notion.site/Git-Convention-8563596644404eb49148a940773d2be8?pvs=4)
 - [게더타운 규칙](https://energetic-palm-634.notion.site/b3b67313c1f748e7b58abf99466b000b?pvs=4)
