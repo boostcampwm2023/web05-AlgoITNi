@@ -25,7 +25,8 @@ export class CodesService {
     process.env.NODE_ENV === 'dev'
       ? path.join(__dirname, '..', 'tmp')
       : '/algoitni';
-  private killSignal: NodeJS.Signals = 'SIGINT';
+  private readonly killSignal: NodeJS.Signals = 'SIGINT';
+  private readonly killCode: number = 130;
   private readonly timeOut = 5000;
   constructor() {
     if (!fs.existsSync(this.tempDir)) {
@@ -40,7 +41,6 @@ export class CodesService {
     try {
       fs.writeFileSync(filePath, code);
       const { stdout, stderr } = await this.runCommand(filePaths, language);
-      this.logger.debug(`${stdout}, ${stderr}`);
       if (stderr) {
         throw new RunningException(stderr.trim());
       }
@@ -62,7 +62,6 @@ export class CodesService {
     language: supportLang,
   ): Promise<runCommandResult> {
     const commands = languageCommand(language, filePaths);
-    this.logger.debug(JSON.stringify(commands));
 
     let command;
     if (commands.length > 1) {
@@ -99,10 +98,10 @@ export class CodesService {
           this.logger.log(`child process exited with code ${code}, ${signal}`);
           clearTimeout(timer);
           const out = Buffer.concat(stdout).toString();
-          const err =
-            signal === this.killSignal
-              ? Messages.TIMEOUT
-              : Buffer.concat(stderr).toString();
+          let err = Buffer.concat(stderr).toString();
+          if (this.isTimeout(code, signal)) {
+            err = Messages.TIMEOUT;
+          }
           resolve({ stdout: out, stderr: err });
         });
       } catch (e) {
@@ -163,5 +162,9 @@ export class CodesService {
       path.join(this.tempDir, `${uuid}${fileExtension}`),
       path.join(this.tempDir, `${uuid}${distExtension}`),
     ];
+  }
+
+  isTimeout(code: number, signal: NodeJS.Signals) {
+    return code === this.killCode || signal === this.killSignal;
   }
 }

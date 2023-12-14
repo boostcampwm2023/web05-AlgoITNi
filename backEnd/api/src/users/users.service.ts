@@ -15,13 +15,23 @@ export class UsersService {
     private usersRepository: Repository<UserEntity>,
   ) {}
   @Transactional('typeorm')
-  async addUser(userDTO: UserDto, oauth: OAUTH) {
+  async getUserAfterAddUser(
+    userDTO: UserDto,
+    oauth: OAUTH,
+  ): Promise<UserEntity> {
     const user = new UserEntity();
     user.name = userDTO.name;
     user.authServiceID = userDTO.authServiceID;
     user.oauth = oauth;
     const repository = getLocalStorageRepository(UserEntity);
     await repository.save<UserEntity>(user);
+
+    const find = await repository.findOne({
+      where: {
+        authServiceID: userDTO.authServiceID,
+      },
+    });
+    return find as UserEntity;
   }
 
   async findUser(userDTO: UserDto): Promise<UserEntity> {
