@@ -44,9 +44,12 @@
 | ![EnterRoom](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/fea34177-cffe-4700-914c-a304d0302f51) |
 |---|
 | 방에 입장하는 모습 |
+
+
  동료들과 화상회의를 하며 소통할 수 있습니다. <br>
 WebRTC P2P로 통신합시다. <br>
  
+
 |![4명입장](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/323fc7d1-5b4e-455f-923d-5db5855a0146)|
 |---|
 |4명이 모두 입장한 모습|
