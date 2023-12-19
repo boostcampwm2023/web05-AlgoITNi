@@ -27,7 +27,7 @@ export function languageCommand(language, filePaths): string[] {
     case 'javascript':
       return [`node ${filepath}`];
     case 'java':
-      return [`java -Dfile.encoding=UTF-8 ${filepath}`];
+      return [`java ${filepath}`];
     case 'c':
       return [`gcc -o ${compile_dist} ${filepath}`, compile_dist];
     case 'swift':
@@ -35,7 +35,7 @@ export function languageCommand(language, filePaths): string[] {
     case 'kotlin':
       return [
         `kotlinc ${filepath} -include-runtime -d ${compile_dist}`,
-        `java -jar -Dfile.encoding=UTF-8 ${compile_dist}`,
+        `java -jar ${compile_dist}`,
       ];
   }
 }
