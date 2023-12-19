@@ -10,17 +10,21 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class WinstonLogger implements LoggerService {
   private logger: LoggerService;
+  private readonly logDir = (() => {
+    const __dirname = path.resolve();
+    return path.join(__dirname, 'logs');
+  })();
   constructor(private configService: ConfigService) {
-    const logDir = (() => {
-      const __dirname = path.resolve();
-      return path.join(__dirname, 'logs');
-    })();
+    const transport = this.getTransport();
+    this.logger = this.createLogger(transport);
+  }
 
+  getTransport(): winston.transport[] {
     const transport: winston.transport[] = [
       new winstonDaily({
         filename: '%DATE%.log',
         datePattern: 'YYYY-MM-DD-HH',
-        dirname: logDir,
+        dirname: this.logDir,
         zippedArchive: true,
         maxSize: '20m',
         maxFiles: '7d',
@@ -28,7 +32,7 @@ export class WinstonLogger implements LoggerService {
       new winstonDaily({
         filename: '%DATE%.error.log',
         datePattern: 'YYYY-MM-DD-HH',
-        dirname: logDir + '/error',
+        dirname: this.logDir + '/error',
         zippedArchive: true,
         maxSize: '20m',
         maxFiles: '7d',
@@ -48,19 +52,21 @@ export class WinstonLogger implements LoggerService {
 
       transport.push(devConsole);
     }
+    return transport;
+  }
 
+  createLogger(transport: winston.transport[]) {
     const logFormat = printf(
       ({ level, message, timestamp }) => `${timestamp} ${level}: ${message}`,
     );
-
-    this.logger = WinstonModule.createLogger({
+    return WinstonModule.createLogger({
       format: combine(
         timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
         logFormat,
       ),
       level:
         this.configService.get<string>('NODE_ENV') !== 'production'
-          ? 'silly'
+          ? 'debug'
           : 'info',
       transports: transport,
     });
