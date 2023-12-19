@@ -80,9 +80,11 @@ export class CodesService {
       try {
         const childProcess = spawn(commandParts[0], commandParts.slice(1), {
           env: { STOP: "DON'T TRY TO ATTACK!!! PLZ..." },
-          timeout: this.timeOut,
-          killSignal: this.killSignal,
         });
+        const timer = setTimeout(() => {
+          this.logger.log('timeout!');
+          childProcess.kill(this.killSignal);
+        }, this.timeOut);
 
         childProcess.stdout.on('data', (data) => {
           stdout.push(data);
@@ -94,10 +96,10 @@ export class CodesService {
 
         childProcess.on('close', (code, signal) => {
           this.logger.log(`child process exited with code ${code}, ${signal}`);
+          clearTimeout(timer);
           const out = Buffer.concat(stdout).toString();
           let err = Buffer.concat(stderr).toString();
           if (this.isTimeout(code, signal)) {
-            this.logger.log('timeout!');
             err = Messages.TIMEOUT;
           }
           resolve({ stdout: out, stderr: err });

@@ -28,66 +28,52 @@
     <img src="https://img.shields.io/badge/AWS CloudFront-5930B4?logo=amazon-aws&logoColor=white"> 
 </div>
 <br>
-<a href="https://www.youtube.com/watch?v=0P9qkA3zlHk">🎥 데모영상</a>
 </div>
 
 
-
 ---
+
+# 🔎서버 아키텍처
+![Untitled](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/019fa58f-c8c0-47f3-87a9-ea7cf36722d0)
 
 
 # 🔎 주요 기능
 
 ### 🐱 화상회의
 방 생성 버튼으로 새롭게 방을 만들거나 공유받은 방 코드로 이미 있는 방에 참여할 수 있습니다.
-
-|![EnterRoom](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/10569b04-b729-46d4-8414-9c83c4772330)|
-|---|
-| 방에 입장하는 모습 |
-
+![EnterRoom](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/fea34177-cffe-4700-914c-a304d0302f51)
 
  동료들과 화상회의를 하며 소통할 수 있습니다. <br>
 WebRTC P2P로 통신합시다. <br>
- 
-|![4inroom-720](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/f17be568-0de8-4a86-a0fe-6c683095ccd5)|
-|---|
-|4명이 모두 입장한 모습|
+ ![4명입장](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/323fc7d1-5b4e-455f-923d-5db5855a0146)
+
 
 ### 😎 코드 공동 편집
  코드 편집기를 통해 코드를 작성할 수 있습니다. <br>
 CRDT로 공동편집을 구현해 참여한 사람들과 함께 편집할 수 있습니다.<br>
 집단 지성을 발휘해보세요!
 
- |![crdt](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/d41dd3d9-5b3c-4093-9a71-d0a336ff2e47)|
-|---|
-|코드를 공동편집하는 모습|
+ ![crdt](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/42d71ab8-da12-4288-9a5d-47f9524cce96)
 
 ###  📥 문제 보기 
 문제의 링크를 입력해 문제를 보면서 풀이할 수 있습니다. <br>
 크롤링을 통해서 입력한 링크를 가져옵니다.  <br>
 백준 사이트를 가장 잘 보여줍니다.<br>
-
-|![showProm](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/d5ca027e-4a29-4b32-b8f5-7e56a62bfdfa)|
-|---|
-|백준 문제를 불러오는 모습|
+![showProm2](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/c2174696-2465-47dd-b8ab-aa47c7e7abbc)
 
 ### 🐍 코드 실행
 작성한 코드를 실행하고 실행 결과를 확인할 수 있습니다.<br>
 소켓과 메세지 큐를 통해 코드 실행이 요청됩니다. <br>
 지원 언어 : `Python` `Javascript` `Java` `C` `Swift` `Kotlin`
 
-|![running](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/0d64245b-4700-46af-8d51-06c8331548ee)|
-|---|
-|작성한 코드를 실행하는 모습|
+![running](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/282bcc84-4045-49f6-a5f7-2e5995483e73)
 
 ### 💬 채팅
 채팅을 통해서도 소통할 수 있습니다. 음성 채팅이 어려운 상황에서나 참고할 자료를 보낼 때 활용할 수 있습니다.  <br>
 Pub/Sub을 활용해 다중 서버 환경에서도 채팅을 할 수 있습니다. <br>
 채팅 중 **클로바X**에게 질문하고 답변 받을 수 있습니다.
 
-|![chat](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/a1401167-5edc-4395-a87b-b62176aebfc3)|
-|---|
-| 사용자, AI 와 채팅하는 모습|
+![chat](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/a8f14d69-863e-4c6f-8779-ee6422d2dcce)
 
 # 🔎 기술적 도전
 ### 프론트엔드의 기술적 도전
@@ -129,9 +115,6 @@ Pub/Sub을 활용해 다중 서버 환경에서도 채팅을 할 수 있습니�
 
 [👉 더 많은 기술정리 보러가기](https://www.notion.so/f4562ec49e0245d2b6ef203588c031ea?v=fbfeb754b1a4471e8ffc174a45c64346&pvs=4)
 
-
-# 🔎서버 아키텍처
-![Untitled](https://github.com/boostcampwm2023/web05-AlgoITNi/assets/84272873/019fa58f-c8c0-47f3-87a9-ea7cf36722d0)
 
 # 🔎 팀 소개
 
